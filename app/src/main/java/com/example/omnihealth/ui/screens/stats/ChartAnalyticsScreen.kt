@@ -26,18 +26,43 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
+import com.example.omnihealth.R
+import com.example.omnihealth.ui.chart.ChartHeight
+import com.example.omnihealth.ui.chart.CombinedStepsChart
+import com.example.omnihealth.ui.chart.HealthRadarChart
+import com.example.omnihealth.ui.chart.LineTrendChart
+import com.example.omnihealth.ui.chart.MacroPieChart
+import com.example.omnihealth.ui.chart.StepsBarChart
 import com.example.omnihealth.ui.components.SectionHeader
+import com.example.omnihealth.ui.di.LocalHealthRepository
 import com.example.omnihealth.ui.theme.GlassCard
 import com.example.omnihealth.ui.theme.OmniTheme
 import com.example.omnihealth.ui.theme.bounceClick
+import java.util.Locale
 
 @Composable
 fun ChartAnalyticsScreen() {
+    val repository = LocalHealthRepository.current
+    val viewModel: StatsViewModel = viewModel(
+        factory = viewModelFactory { initializer { StatsViewModel(repository) } },
+    )
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
     val palette = OmniTheme.palette
-    val tabs = listOf("趋势", "分布", "对比", "雷达")
+
+    val tabs = listOf(
+        stringResource(R.string.stats_tab_trend),
+        stringResource(R.string.stats_tab_macro),
+        stringResource(R.string.stats_tab_week),
+        stringResource(R.string.stats_tab_radar),
+    )
     var selected by remember { mutableIntStateOf(0) }
 
     LazyColumn(
@@ -49,13 +74,13 @@ fun ChartAnalyticsScreen() {
     ) {
         item {
             Text(
-                text = "数据洞察",
+                text = stringResource(R.string.stats_title),
                 color = palette.textPrimary,
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
             )
             Text(
-                text = "MPAndroidChart · 四种图表 × 四套指标",
+                text = stringResource(R.string.stats_subtitle),
                 color = palette.textTertiary,
                 fontSize = 12.sp,
                 modifier = Modifier.padding(top = 3.dp),
@@ -72,9 +97,7 @@ fun ChartAnalyticsScreen() {
                             .clip(RoundedCornerShape(14.dp))
                             .then(
                                 if (active) {
-                                    Modifier.background(
-                                        Brush.horizontalGradient(listOf(palette.accent, palette.accentAlt)),
-                                    )
+                                    Modifier.background(Brush.horizontalGradient(listOf(palette.accent, palette.accentAlt)))
                                 } else {
                                     Modifier.background(palette.textPrimary.copy(alpha = 0.06f))
                                 },
@@ -93,77 +116,188 @@ fun ChartAnalyticsScreen() {
             }
         }
 
-        item {
-            GlassCard(Modifier.fillMaxWidth(), contentPadding = PaddingValues(16.dp)) {
-                SectionHeader(
-                    title = listOf("体重与体脂趋势", "热量构成", "周对比", "健康五维雷达")[selected],
-                    subtitle = "最近 7 天",
-                )
-                Spacer(Modifier.height(12.dp))
-                ChartPlaceholder(
-                    label = listOf("LineChart", "PieChart", "BarChart", "RadarChart")[selected],
-                )
+        if (!state.hasData) {
+            item {
+                GlassCard(Modifier.fillMaxWidth()) {
+                    Text(
+                        text = stringResource(R.string.stats_no_data),
+                        color = palette.textSecondary,
+                        fontSize = 12.sp,
+                    )
+                }
             }
         }
 
-        item {
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                SummaryCard("周均步数", "6,420", "+8.2%", Modifier.weight(1f))
-                SummaryCard("周均睡眠", "7.1 h", "+0.4 h", Modifier.weight(1f))
+        when (selected) {
+            0 -> {
+                item {
+                    ChartCard(
+                        title = stringResource(R.string.stats_line_title),
+                        subtitle = stringResource(R.string.stats_line_sub),
+                    ) {
+                        LineTrendChart(
+                            labels = state.labels,
+                            values = state.weight,
+                            color = palette.accentAlt,
+                            modifier = Modifier.height(ChartHeight),
+                        )
+                    }
+                }
+                item {
+                    ChartCard(
+                        title = stringResource(R.string.stats_combined_title),
+                        subtitle = stringResource(R.string.stats_combined_sub),
+                    ) {
+                        CombinedStepsChart(
+                            labels = state.labels,
+                            steps = state.steps,
+                            calories = state.calories,
+                            modifier = Modifier.height(ChartHeight),
+                        )
+                    }
+                }
             }
-        }
 
-        item {
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                SummaryCard("体脂率", "18.6%", "-0.3%", Modifier.weight(1f))
-                SummaryCard("静息心率", "64 bpm", "-2", Modifier.weight(1f))
+            1 -> {
+                item {
+                    ChartCard(
+                        title = stringResource(R.string.stats_macro_title),
+                        subtitle = stringResource(R.string.stats_macro_sub),
+                    ) {
+                        MacroPieChart(
+                            protein = state.protein.toFloat(),
+                            carbs = state.carbs.toFloat(),
+                            fat = state.fat.toFloat(),
+                            labels = listOf("P", "C", "F"),
+                            modifier = Modifier.height(ChartHeight),
+                        )
+                    }
+                }
+                item {
+                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        MacroTile("Protein", state.protein, palette.accent, Modifier.weight(1f))
+                        MacroTile("Carbs", state.carbs, palette.warning, Modifier.weight(1f))
+                        MacroTile("Fat", state.fat, palette.accentAlt, Modifier.weight(1f))
+                    }
+                }
+            }
+
+            2 -> {
+                item {
+                    ChartCard(
+                        title = stringResource(R.string.stats_week_title),
+                        subtitle = stringResource(
+                            R.string.stats_week_sub,
+                            String.format(Locale.US, "%,d", state.stepGoal),
+                        ),
+                    ) {
+                        StepsBarChart(
+                            labels = state.labels,
+                            steps = state.steps,
+                            goal = state.stepGoal,
+                            modifier = Modifier.height(ChartHeight),
+                        )
+                    }
+                }
+                item {
+                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        SummaryCard(
+                            stringResource(R.string.stats_steps),
+                            String.format(Locale.US, "%,d", state.steps.sum()),
+                            Modifier.weight(1f),
+                        )
+                        SummaryCard(
+                            stringResource(R.string.stats_calories),
+                            "${state.calories.sum()} kcal",
+                            Modifier.weight(1f),
+                        )
+                    }
+                }
+            }
+
+            else -> {
+                item {
+                    ChartCard(
+                        title = stringResource(R.string.stats_radar_title),
+                        subtitle = stringResource(R.string.stats_radar_sub),
+                    ) {
+                        HealthRadarChart(
+                            labels = listOf(
+                                stringResource(R.string.dim_nutrition),
+                                stringResource(R.string.dim_activity),
+                                stringResource(R.string.dim_sleep),
+                                stringResource(R.string.dim_hydration),
+                                stringResource(R.string.dim_consistency),
+                            ),
+                            values = listOf(
+                                state.score.nutrition.toFloat(),
+                                state.score.activity.toFloat(),
+                                state.score.sleep.toFloat(),
+                                state.score.hydration.toFloat(),
+                                state.score.consistency.toFloat(),
+                            ),
+                            modifier = Modifier.height(ChartHeight + 24.dp),
+                        )
+                    }
+                }
+                item {
+                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        SummaryCard(
+                            stringResource(R.string.home_health_index),
+                            "${state.score.overall}",
+                            Modifier.weight(1f),
+                        )
+                        SummaryCard(
+                            stringResource(R.string.stats_sleep),
+                            String.format(Locale.US, "%.1f h", state.sleep.lastOrNull() ?: 0f),
+                            Modifier.weight(1f),
+                        )
+                    }
+                }
             }
         }
     }
 }
 
 @Composable
-private fun ChartPlaceholder(label: String) {
+private fun ChartCard(
+    title: String,
+    subtitle: String,
+    content: @Composable () -> Unit,
+) {
+    GlassCard(Modifier.fillMaxWidth(), contentPadding = PaddingValues(16.dp)) {
+        SectionHeader(title = title, subtitle = subtitle)
+        Spacer(Modifier.height(10.dp))
+        content()
+    }
+}
+
+@Composable
+private fun MacroTile(label: String, value: Int, color: Color, modifier: Modifier = Modifier) {
     val palette = OmniTheme.palette
-    Box(
-        Modifier
-            .fillMaxWidth()
-            .height(220.dp)
-            .clip(RoundedCornerShape(20.dp))
-            .background(
-                Brush.linearGradient(
-                    listOf(
-                        palette.accent.copy(alpha = 0.10f),
-                        palette.accentAlt.copy(alpha = 0.06f),
-                    ),
-                ),
-            ),
-        contentAlignment = Alignment.Center,
-    ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(label, color = palette.accent, fontSize = 15.sp, fontWeight = FontWeight.Bold)
-            Text(
-                "M6 里程碑接入 MPAndroidChart 真实渲染",
-                color = palette.textTertiary,
-                fontSize = 10.sp,
-                modifier = Modifier.padding(top = 4.dp),
-            )
-        }
+    GlassCard(modifier, contentPadding = PaddingValues(14.dp)) {
+        Text(label, color = palette.textTertiary, fontSize = 10.sp)
+        Text(
+            text = "$value g",
+            color = color,
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(top = 3.dp),
+        )
     }
 }
 
 @Composable
-private fun SummaryCard(title: String, value: String, delta: String, modifier: Modifier = Modifier) {
+private fun SummaryCard(title: String, value: String, modifier: Modifier = Modifier) {
     val palette = OmniTheme.palette
     GlassCard(modifier, contentPadding = PaddingValues(14.dp)) {
         Text(title, color = palette.textTertiary, fontSize = 10.sp)
         Text(
-            value,
+            text = value,
             color = palette.textPrimary,
             fontSize = 19.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(top = 3.dp),
         )
-        Text(delta, color = palette.success, fontSize = 10.sp, modifier = Modifier.padding(top = 2.dp))
     }
 }

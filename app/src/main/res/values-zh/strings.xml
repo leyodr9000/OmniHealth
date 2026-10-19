@@ -130,4 +130,27 @@
     <string name="sport_no_workout">暂无训练记录</string>
     <string name="sport_grant">授予运动权限</string>
     <string name="sport_burned">消耗 %1$d kcal</string>
+
+    <!-- 统计 -->
+    <string name="stats_title">数据洞察</string>
+    <string name="stats_subtitle">最近 7 天 · 点击标签切换图表</string>
+    <string name="stats_tab_trend">趋势</string>
+    <string name="stats_tab_macro">分布</string>
+    <string name="stats_tab_week">对比</string>
+    <string name="stats_tab_radar">雷达</string>
+    <string name="stats_weight">体重</string>
+    <string name="stats_steps">步数</string>
+    <string name="stats_sleep">睡眠</string>
+    <string name="stats_calories">摄入</string>
+    <string name="stats_line_title">体重与睡眠趋势</string>
+    <string name="stats_line_sub">近 7 天的 kg / h 变化</string>
+    <string name="stats_combined_title">步数与摄入对比</string>
+    <string name="stats_combined_sub">柱状：步数 · 折线：kcal</string>
+    <string name="stats_macro_title">三大宏量占比</string>
+    <string name="stats_macro_sub">今日蛋白 / 碳水 / 脂肪</string>
+    <string name="stats_week_title">本周步数</string>
+    <string name="stats_week_sub">目标线 %1$s 步</string>
+    <string name="stats_radar_title">健康五维雷达</string>
+    <string name="stats_radar_sub">今日五项得分</string>
+    <string name="stats_no_data">数据还不够，先记录几天吧。</string>
 </resources>

@@ -18,6 +18,7 @@ import com.example.omnihealth.data.local.entity.WorkoutEntity
 import com.example.omnihealth.domain.util.TimeUtils
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 
 /**
@@ -40,6 +41,13 @@ class HealthRepository(
 
     fun weightTrend(limit: Int = 30): Flow<List<VitalEntity>> =
         db.vitalDao().observeByType(VitalType.WEIGHT, limit)
+
+    fun sleepRange(days: Int = 7): Flow<List<VitalEntity>> {
+        val end = TimeUtils.epochDayNow()
+        val from = TimeUtils.startOfDayMillis(end - days + 1)
+        val to = TimeUtils.endOfDayMillis(end)
+        return flow { emit(db.vitalDao().between(VitalType.SLEEP, from, to)) }
+    }
 
     fun waterToday(): Flow<Float> {
         val day = TimeUtils.epochDayNow()

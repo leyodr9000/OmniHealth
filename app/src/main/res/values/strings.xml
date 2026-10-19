@@ -130,4 +130,27 @@
     <string name="sport_no_workout">No workout yet</string>
     <string name="sport_grant">Grant activity permission</string>
     <string name="sport_burned">Burned %1$d kcal</string>
+
+    <!-- Stats -->
+    <string name="stats_title">Insights</string>
+    <string name="stats_subtitle">Last 7 days · tap tabs to switch chart</string>
+    <string name="stats_tab_trend">Trend</string>
+    <string name="stats_tab_macro">Macros</string>
+    <string name="stats_tab_week">Compare</string>
+    <string name="stats_tab_radar">Radar</string>
+    <string name="stats_weight">Weight</string>
+    <string name="stats_steps">Steps</string>
+    <string name="stats_sleep">Sleep</string>
+    <string name="stats_calories">Intake</string>
+    <string name="stats_line_title">Weight &amp; sleep trend</string>
+    <string name="stats_line_sub">kg / h over the last 7 days</string>
+    <string name="stats_combined_title">Steps vs intake</string>
+    <string name="stats_combined_sub">bars: steps · line: kcal</string>
+    <string name="stats_macro_title">Macro split</string>
+    <string name="stats_macro_sub">protein / carbs / fat of today</string>
+    <string name="stats_week_title">Weekly steps</string>
+    <string name="stats_week_sub">goal line at %1$s steps</string>
+    <string name="stats_radar_title">Health radar</string>
+    <string name="stats_radar_sub">five dimensions of today</string>
+    <string name="stats_no_data">Not enough data yet — log a few days first.</string>
 </resources>
