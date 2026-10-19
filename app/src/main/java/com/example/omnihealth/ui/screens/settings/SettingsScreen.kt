@@ -54,6 +54,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.omnihealth.BuildConfig
 import com.example.omnihealth.R
 import com.example.omnihealth.data.datastore.ActivityLevel
 import com.example.omnihealth.data.datastore.AppSettings
@@ -71,7 +72,7 @@ import java.util.Locale
 
 private enum class SettingsPage { ROOT, APPEARANCE }
 
-private enum class SettingsSheet { NONE, PROFILE, API, GOALS, REMINDERS }
+private enum class SettingsSheet { NONE, PROFILE, API, GOALS, REMINDERS, ABOUT }
 
 @Composable
 fun SettingsScreen(
@@ -245,8 +246,8 @@ fun SettingsScreen(
                 SettingItem(
                     icon = Icons.Rounded.Info,
                     title = stringResource(R.string.settings_row_about),
-                    value = stringResource(R.string.settings_version),
-                    onClick = {},
+                    value = BuildConfig.VERSION_NAME,
+                    onClick = { sheet = SettingsSheet.ABOUT },
                 )
             }
         }
@@ -307,6 +308,11 @@ fun SettingsScreen(
                 scope.launch { repository.setSleepReminder(enabled) }
                 ReminderScheduler.setSleepReminder(context, enabled)
             },
+        )
+
+        SettingsSheet.ABOUT -> AboutSheet(
+            version = BuildConfig.VERSION_NAME,
+            onDismiss = { sheet = SettingsSheet.NONE },
         )
 
         SettingsSheet.NONE -> Unit

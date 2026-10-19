@@ -245,4 +245,9 @@
     <string name="settings_row_export">导出数据</string>
     <string name="export_done">已保存到 %1$s</string>
     <string name="export_failed">导出失败</string>
+    <string name="about_title">关于 OmniHealth</string>
+    <string name="about_version">版本 %1$s</string>
+    <string name="about_privacy">所有记录保存在本机 Room 数据库，不会上传；只有你配置了 API Key 后，AI 请求才会离开设备。</string>
+    <string name="about_licenses_title">开源组件</string>
+    <string name="about_licenses">Jetpack Compose · Room · DataStore · WorkManager · Retrofit/OkHttp · kotlinx.serialization · MPAndroidChart</string>
 </resources>

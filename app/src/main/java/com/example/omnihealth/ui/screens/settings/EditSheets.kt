@@ -518,3 +518,68 @@ private fun ReminderRow(
         )
     }
 }
+
+/* ------------------------------------------------------------------ */
+/* 关于                                                                */
+/* ------------------------------------------------------------------ */
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AboutSheet(
+    version: String,
+    onDismiss: () -> Unit,
+) {
+    val palette = OmniTheme.palette
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        sheetState = sheetState,
+        shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
+        containerColor = palette.barFill,
+        tonalElevation = 0.dp,
+        scrimColor = palette.textPrimary.copy(alpha = 0.28f),
+    ) {
+        LocalizedApp(LocalAppLanguage.current) {
+            Column(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 22.dp)
+                    .padding(bottom = 30.dp),
+            ) {
+                SheetHeader(
+                    title = stringResource(R.string.about_title),
+                    subtitle = stringResource(R.string.about_version, version),
+                )
+
+                Text(
+                    text = stringResource(R.string.about_privacy),
+                    color = palette.textSecondary,
+                    fontSize = 12.sp,
+                    lineHeight = 18.sp,
+                )
+
+                Spacer(Modifier.height(16.dp))
+                Text(
+                    text = stringResource(R.string.about_licenses_title),
+                    color = palette.textTertiary,
+                    fontSize = 10.sp,
+                )
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    text = stringResource(R.string.about_licenses),
+                    color = palette.textSecondary,
+                    fontSize = 11.sp,
+                    lineHeight = 17.sp,
+                )
+
+                Spacer(Modifier.height(16.dp))
+                Text(
+                    text = "github.com/leyodr9000/OmniHealth",
+                    color = palette.accent,
+                    fontSize = 11.sp,
+                )
+            }
+        }
+    }
+}

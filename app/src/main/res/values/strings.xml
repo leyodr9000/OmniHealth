@@ -245,4 +245,9 @@
     <string name="settings_row_export">Export data</string>
     <string name="export_done">Saved to %1$s</string>
     <string name="export_failed">Export failed</string>
+    <string name="about_title">About OmniHealth</string>
+    <string name="about_version">Version %1$s</string>
+    <string name="about_privacy">All records stay in a local Room database on this device. Nothing is uploaded; AI requests only leave the device when you set an API key.</string>
+    <string name="about_licenses_title">Open source</string>
+    <string name="about_licenses">Jetpack Compose · Room · DataStore · WorkManager · Retrofit/OkHttp · kotlinx.serialization · MPAndroidChart</string>
 </resources>
