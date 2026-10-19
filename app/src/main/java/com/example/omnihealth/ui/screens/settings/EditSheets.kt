@@ -39,6 +39,7 @@ import com.example.omnihealth.data.datastore.ApiConfig
 import com.example.omnihealth.data.datastore.Gender
 import com.example.omnihealth.data.datastore.HealthGoal
 import com.example.omnihealth.data.datastore.UserProfile
+import com.example.omnihealth.ui.components.AppPrimaryButton
 import com.example.omnihealth.ui.i18n.LocalAppLanguage
 import com.example.omnihealth.ui.i18n.LocalizedApp
 import com.example.omnihealth.ui.theme.OmniTheme
@@ -429,16 +430,5 @@ private fun <T> ChipGroup(
 
 @Composable
 private fun PrimaryButton(label: String, onClick: () -> Unit) {
-    val palette = OmniTheme.palette
-    Box(
-        Modifier
-            .fillMaxWidth()
-            .height(50.dp)
-            .clip(RoundedCornerShape(18.dp))
-            .background(palette.accent)
-            .bounceClick(pressScale = 0.97f, onClick = onClick),
-        contentAlignment = Alignment.Center,
-    ) {
-        Text(label, color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Bold)
-    }
+    AppPrimaryButton(text = label, onClick = onClick)
 }

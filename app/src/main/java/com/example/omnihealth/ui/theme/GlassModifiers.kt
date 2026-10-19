@@ -107,14 +107,15 @@ fun GlassCard(
     onClick: (() -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    // MIUIX 框架：卡片交给 miuix 官方组件渲染（HyperOS 的圆角、内边距与配色语言）。
+    // MIUIX 框架：卡片完全交给 miuix 组件渲染，用自己的圆角、内边距与按压反馈，
+    // 不再套我们的调色板，否则两套框架看起来会几乎一样。
     if (LocalUiFramework.current == UiFramework.MIUIX) {
         val clickable = if (onClick != null) modifier.bounceClick(onClick = onClick) else modifier
         MiuixCard(
             clickable,
-            palette.corner,
-            contentPadding,
-            palette.cardFill,
+            top.yukonga.miuix.kmp.basic.CardDefaults.ConorRadius,
+            top.yukonga.miuix.kmp.basic.CardDefaults.InsideMargin,
+            top.yukonga.miuix.kmp.basic.CardDefaults.DefaultColor(),
         ) {
             content()
         }

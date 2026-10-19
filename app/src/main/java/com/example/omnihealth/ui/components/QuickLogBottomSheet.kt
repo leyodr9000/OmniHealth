@@ -190,22 +190,10 @@ fun QuickLogBottomSheet(
 
                 Spacer(Modifier.height(22.dp))
 
-                Box(
-                    Modifier
-                        .fillMaxWidth()
-                        .height(52.dp)
-                        .clip(RoundedCornerShape(18.dp))
-                        .background(palette.accent)
-                        .bounceClick(pressScale = 0.97f) { onSave(type, value) },
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Text(
-                        text = stringResource(R.string.quick_log_save),
-                        color = androidx.compose.ui.graphics.Color.White,
-                        fontSize = 15.sp,
-                        fontWeight = FontWeight.Bold,
-                    )
-                }
+                AppPrimaryButton(
+                    text = stringResource(R.string.quick_log_save),
+                    onClick = { onSave(type, value) },
+                )
             }
         }
     }
