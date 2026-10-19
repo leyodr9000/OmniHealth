@@ -1,6 +1,7 @@
 package com.example.omnihealth.data.datastore
 
 import android.content.Context
+import com.example.omnihealth.data.security.SecretCipher
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
@@ -116,7 +117,7 @@ class SettingsPreferences(private val context: Context) {
             ),
             api = ApiConfig(
                 baseUrl = p[Keys.apiBaseUrl] ?: "https://api.deepseek.com",
-                apiKey = p[Keys.apiKey] ?: "",
+                apiKey = SecretCipher.decrypt(p[Keys.apiKey] ?: ""),
                 model = p[Keys.apiModel] ?: "deepseek-chat",
                 temperature = p[Keys.apiTemperature] ?: 0.7f,
             ),
@@ -152,7 +153,7 @@ class SettingsPreferences(private val context: Context) {
 
     suspend fun updateApi(api: ApiConfig) = context.omniDataStore.edit { p ->
         p[Keys.apiBaseUrl] = api.baseUrl
-        p[Keys.apiKey] = api.apiKey
+        p[Keys.apiKey] = SecretCipher.encrypt(api.apiKey)
         p[Keys.apiModel] = api.model
         p[Keys.apiTemperature] = api.temperature
     }
