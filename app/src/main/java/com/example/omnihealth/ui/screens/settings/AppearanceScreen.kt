@@ -46,12 +46,14 @@ fun AppearanceScreen(
     layoutMode: NavLayoutMode,
     language: AppLanguage,
     framework: UiFramework,
+    darkModeId: String,
     reduceMotion: Boolean,
     onThemeChange: (ThemeMode) -> Unit,
     onLayoutChange: (NavLayoutMode) -> Unit,
     onLanguageChange: (AppLanguage) -> Unit,
     onFrameworkChange: (UiFramework) -> Unit,
     onReduceMotionChange: (Boolean) -> Unit,
+    onDarkModeChange: (String) -> Unit,
     onBack: () -> Unit,
 ) {
     val palette = OmniTheme.palette
@@ -114,6 +116,23 @@ fun AppearanceScreen(
                         selected = item == framework,
                         modifier = Modifier.weight(1f),
                         onClick = { onFrameworkChange(item) },
+                    )
+                }
+            }
+        }
+
+        item {
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                listOf(
+                    "system" to stringResource(R.string.dark_system),
+                    "light" to stringResource(R.string.dark_light),
+                    "dark" to stringResource(R.string.dark_dark),
+                ).forEach { (id, label) ->
+                    FrameworkChip(
+                        label = label,
+                        selected = id == darkModeId,
+                        modifier = Modifier.weight(1f),
+                        onClick = { onDarkModeChange(id) },
                     )
                 }
             }

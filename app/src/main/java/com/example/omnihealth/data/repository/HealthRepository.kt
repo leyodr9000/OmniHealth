@@ -367,6 +367,8 @@ class HealthRepository(
 
     suspend fun setFramework(id: String) = preferences.setFrameworkId(id)
 
+    suspend fun setDarkMode(id: String) = preferences.setDarkMode(id)
+
     suspend fun setReduceMotion(enabled: Boolean) = preferences.setReduceMotion(enabled)
 
     suspend fun setWaterReminder(enabled: Boolean) = preferences.setWaterReminder(enabled)

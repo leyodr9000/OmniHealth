@@ -317,14 +317,48 @@ object OmniTheme {
         @Composable get() = LocalUiFramework.current
 }
 
+/** 与白色混合，用于在暗背景下提亮品牌色。 */
+private fun Color.lift(amount: Float): Color = Color(
+    red = red + (1f - red) * amount,
+    green = green + (1f - green) * amount,
+    blue = blue + (1f - blue) * amount,
+    alpha = alpha,
+)
+
+/**
+ * 深色变体：只覆盖背景、文本、卡片与栏，品牌色做轻微提亮。
+ * 集中在这里派生，避免三套配色各维护一份暗色硬编码。
+ */
+fun OmniPalette.toDark(): OmniPalette = copy(
+    dark = true,
+    bgTop = Color(0xFF0A0D14),
+    bgMid = Color(0xFF0D1119),
+    bgBottom = Color(0xFF080B10),
+    blobA = blobA.copy(alpha = 0.16f),
+    blobB = blobB.copy(alpha = 0.14f),
+    blobC = blobC.copy(alpha = 0.12f),
+    accent = accent.lift(0.12f),
+    accentAlt = accentAlt.lift(0.10f),
+    textPrimary = Color(0xFFF1F4F9),
+    textSecondary = Color(0xFFA7B2C4),
+    textTertiary = Color(0xFF6B7686),
+    cardFill = Color(0xFF161B24),
+    cardStroke = Color(0xFF2A3341),
+    cardHighlight = Color(0x14FFFFFF),
+    barFill = Color(0xFF11161F),
+    barStroke = Color(0xFF2A3341),
+)
+
 @Composable
 fun OmniHealthTheme(
     mode: ThemeMode = ThemeMode.MIUIX_GLASS,
     framework: UiFramework = UiFramework.MATERIAL3,
+    dark: Boolean = false,
     content: @Composable () -> Unit,
 ) {
-    val palette = remember(mode) { paletteFor(mode) }
-    val scheme = remember(mode) { colorSchemeFor(palette) }
+    val base = remember(mode) { paletteFor(mode) }
+    val palette = remember(mode, dark) { if (dark) base.toDark() else base }
+    val scheme = remember(palette) { colorSchemeFor(palette) }
     val typography = remember { omniTypography() }
     val shapes = remember(mode) { omniShapes(palette.corner) }
 

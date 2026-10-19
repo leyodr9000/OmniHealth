@@ -52,10 +52,12 @@ fun OmniApp(
     layoutMode: NavLayoutMode,
     language: AppLanguage,
     framework: UiFramework,
+    darkModeId: String,
     onThemeChange: (ThemeMode) -> Unit,
     onLayoutChange: (NavLayoutMode) -> Unit,
     onLanguageChange: (AppLanguage) -> Unit,
     onFrameworkChange: (UiFramework) -> Unit,
+    onDarkModeChange: (String) -> Unit,
     onReduceMotionChange: (Boolean) -> Unit,
 ) {
     val navController = rememberNavController()
@@ -170,10 +172,12 @@ fun OmniApp(
                         layoutMode = layoutMode,
                         language = language,
                         framework = framework,
+                        darkModeId = darkModeId,
                         onThemeChange = onThemeChange,
                         onLayoutChange = onLayoutChange,
                         onLanguageChange = onLanguageChange,
                         onFrameworkChange = onFrameworkChange,
+                        onDarkModeChange = onDarkModeChange,
                         reduceMotion = reduceMotion,
                         onReduceMotionChange = onReduceMotionChange,
                     )

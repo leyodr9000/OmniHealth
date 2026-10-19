@@ -3,6 +3,7 @@ package com.example.omnihealth
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.activity.enableEdgeToEdge
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.compose.runtime.CompositionLocalProvider
@@ -36,10 +37,16 @@ class MainActivity : ComponentActivity() {
             val layoutMode = remember(settings.layoutId) { NavLayoutMode.from(settings.layoutId) }
             val language = remember(settings.languageId) { AppLanguage.from(settings.languageId) }
             val framework = remember(settings.frameworkId) { UiFramework.from(settings.frameworkId) }
+            val systemDark = isSystemInDarkTheme()
+            val dark = when (settings.darkModeId) {
+                "dark" -> true
+                "light" -> false
+                else -> systemDark
+            }
             val scope = rememberCoroutineScope()
 
             LocalizedApp(language = language) {
-                OmniHealthTheme(mode = themeMode, framework = framework) {
+                OmniHealthTheme(mode = themeMode, framework = framework, dark = dark) {
                     CompositionLocalProvider(LocalHealthRepository provides repository) {
                         OmniApp(
                             reduceMotion = settings.reduceMotion,
@@ -47,10 +54,12 @@ class MainActivity : ComponentActivity() {
                             layoutMode = layoutMode,
                             language = language,
                             framework = framework,
+                            darkModeId = settings.darkModeId,
                             onThemeChange = { scope.launch { repository.setTheme(it.id) } },
                             onLayoutChange = { scope.launch { repository.setLayout(it.id) } },
                             onLanguageChange = { scope.launch { repository.setLanguage(it.id) } },
                             onFrameworkChange = { scope.launch { repository.setFramework(it.id) } },
+                            onDarkModeChange = { scope.launch { repository.setDarkMode(it) } },
                             onReduceMotionChange = { scope.launch { repository.setReduceMotion(it) } },
                         )
                     }

@@ -274,4 +274,7 @@
     <string name="ai_cloud_badge">在线 AI</string>
     <string name="ai_coverage">覆盖 %1$d 天</string>
     <string name="ai_gaps">缺少：%1$s，结论仅供参考</string>
+    <string name="dark_system">跟随系统</string>
+    <string name="dark_light">浅色</string>
+    <string name="dark_dark">深色</string>
 </resources>

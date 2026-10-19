@@ -274,4 +274,7 @@
     <string name="ai_cloud_badge">Online AI</string>
     <string name="ai_coverage">%1$d-day window</string>
     <string name="ai_gaps">Missing: %1$s — treat the conclusions with care</string>
+    <string name="dark_system">System</string>
+    <string name="dark_light">Light</string>
+    <string name="dark_dark">Dark</string>
 </resources>
