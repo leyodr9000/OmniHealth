@@ -4,37 +4,48 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.omnihealth.data.datastore.AppSettings
 import com.example.omnihealth.ui.OmniApp
+import com.example.omnihealth.ui.di.LocalHealthRepository
 import com.example.omnihealth.ui.i18n.AppLanguage
 import com.example.omnihealth.ui.i18n.LocalizedApp
 import com.example.omnihealth.ui.navigation.NavLayoutMode
 import com.example.omnihealth.ui.theme.OmniHealthTheme
 import com.example.omnihealth.ui.theme.ThemeMode
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        val repository = (application as OmniHealthApp).repository
+
         setContent {
-            // M0 骨架阶段：主题 / 布局 / 语言状态暂由 Compose 内存持有，M8 接入 DataStore 持久化。
-            var themeMode by remember { mutableStateOf(ThemeMode.MIUIX_GLASS) }
-            var layoutMode by remember { mutableStateOf(NavLayoutMode.A_FAB) }
-            var language by remember { mutableStateOf(AppLanguage.SYSTEM) }
+            val settings by repository.settings.collectAsStateWithLifecycle(initialValue = AppSettings())
+            val themeMode = remember(settings.themeId) { ThemeMode.from(settings.themeId) }
+            val layoutMode = remember(settings.layoutId) { NavLayoutMode.from(settings.layoutId) }
+            val language = remember(settings.languageId) { AppLanguage.from(settings.languageId) }
+            val scope = rememberCoroutineScope()
 
             LocalizedApp(language = language) {
                 OmniHealthTheme(mode = themeMode) {
-                    OmniApp(
-                        themeMode = themeMode,
-                        layoutMode = layoutMode,
-                        language = language,
-                        onThemeChange = { themeMode = it },
-                        onLayoutChange = { layoutMode = it },
-                        onLanguageChange = { language = it },
-                    )
+                    CompositionLocalProvider(LocalHealthRepository provides repository) {
+                        OmniApp(
+                            themeMode = themeMode,
+                            layoutMode = layoutMode,
+                            language = language,
+                            onThemeChange = { scope.launch { repository.setTheme(it.id) } },
+                            onLayoutChange = { scope.launch { repository.setLayout(it.id) } },
+                            onLanguageChange = { scope.launch { repository.setLanguage(it.id) } },
+                        )
+                    }
                 }
             }
         }

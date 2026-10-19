@@ -70,4 +70,35 @@
     <string name="layout_b_desc">5 Tab 经典玻璃底栏</string>
     <string name="layout_c_label">布局 C</string>
     <string name="layout_c_desc">3 Tab 胶囊 + Bento 概览</string>
+
+    <!-- 首页 -->
+    <string name="home_greeting">你好，%1$s</string>
+    <string name="home_status">%1$s · 保持节奏</string>
+    <string name="home_health_index">综合健康指数</string>
+    <string name="home_score_label">健康分</string>
+    <string name="home_score_delta">比上周 +%1$d 分</string>
+    <string name="home_section_today">今日概览</string>
+    <string name="home_section_today_sub">目标完成度</string>
+    <string name="home_view_stats">查看统计 →</string>
+    <string name="home_steps">步数</string>
+    <string name="home_water">饮水</string>
+    <string name="home_sleep">睡眠</string>
+    <string name="home_calories">热量</string>
+    <string name="home_goal_steps">目标 %1$s 步</string>
+    <string name="home_goal_water">目标 %1$s L</string>
+    <string name="home_goal_sleep">深睡 %1$s h</string>
+    <string name="home_remaining">剩余 %1$d kcal</string>
+    <string name="home_section_quick">快捷操作</string>
+    <string name="home_quick_hint">点一下就能记</string>
+    <string name="home_ai_title">AI 健康顾问</string>
+    <string name="home_ai_cta">生成 7 日报告 →</string>
+    <string name="home_bmi">BMI %1$s</string>
+    <string name="home_tdee">TDEE %1$d</string>
+    <string name="home_habits">习惯 %1$d/%2$d</string>
+
+    <string name="dim_nutrition">营养</string>
+    <string name="dim_activity">运动</string>
+    <string name="dim_sleep">睡眠</string>
+    <string name="dim_hydration">水分</string>
+    <string name="dim_consistency">习惯</string>
 </resources>

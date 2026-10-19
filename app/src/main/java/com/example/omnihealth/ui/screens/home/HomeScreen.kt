@@ -18,18 +18,26 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
+import com.example.omnihealth.R
 import com.example.omnihealth.ui.components.MetricTile
 import com.example.omnihealth.ui.components.ProgressRing
 import com.example.omnihealth.ui.components.SectionHeader
 import com.example.omnihealth.ui.components.StatChip
+import com.example.omnihealth.ui.di.LocalHealthRepository
 import com.example.omnihealth.ui.theme.GlassCard
 import com.example.omnihealth.ui.theme.OmniTheme
 import com.example.omnihealth.ui.theme.bounceClick
@@ -45,9 +53,20 @@ fun HomeScreen(
     onOpenAi: () -> Unit,
     onQuickLog: () -> Unit,
 ) {
+    val repository = LocalHealthRepository.current
+    val viewModel: HomeViewModel = viewModel(
+        factory = viewModelFactory { initializer { HomeViewModel(repository) } },
+    )
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
     val palette = OmniTheme.palette
-    val today = LocalDate.now()
-    val dateText = today.format(DateTimeFormatter.ofPattern("M月d日 EEEE", Locale.CHINA))
+    val locale = Locale.getDefault()
+    val dateText = LocalDate.now().format(
+        if (locale.language.startsWith("zh")) {
+            DateTimeFormatter.ofPattern("M月d日 EEEE", Locale.CHINA)
+        } else {
+            DateTimeFormatter.ofPattern("EEE, MMM d", Locale.ENGLISH)
+        },
+    )
 
     LazyColumn(
         modifier = Modifier
@@ -57,19 +76,16 @@ fun HomeScreen(
         verticalArrangement = Arrangement.spacedBy(14.dp),
     ) {
         item {
-            Row(
-                Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
                     Text(
-                        text = "下午好，Kai",
+                        text = stringResource(R.string.home_greeting, state.nickname),
                         color = palette.textPrimary,
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
                     )
                     Text(
-                        text = "$dateText · 保持节奏",
+                        text = stringResource(R.string.home_status, dateText),
                         color = palette.textTertiary,
                         fontSize = 12.sp,
                         modifier = Modifier.padding(top = 3.dp),
@@ -79,26 +95,29 @@ fun HomeScreen(
                     Modifier
                         .size(44.dp)
                         .clip(CircleShape)
-                        .background(
-                            Brush.linearGradient(listOf(palette.accent, palette.accentAlt)),
-                        )
+                        .background(Brush.linearGradient(listOf(palette.accent, palette.accentAlt)))
                         .bounceClick(pressScale = 0.9f, onClick = onOpenSettings),
                     contentAlignment = Alignment.Center,
                 ) {
-                    Text("K", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 17.sp)
+                    Text(
+                        text = state.nickname.take(1).uppercase(),
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 17.sp,
+                    )
                 }
             }
         }
 
-        item { HealthScoreCard(score = 78) }
+        item { HealthScoreCard(state) }
 
         item {
             SectionHeader(
-                title = "今日概览",
-                subtitle = "目标完成度",
+                title = stringResource(R.string.home_section_today),
+                subtitle = stringResource(R.string.home_section_today_sub),
                 action = {
                     Text(
-                        text = "查看统计 →",
+                        text = stringResource(R.string.home_view_stats),
                         color = palette.accent,
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Medium,
@@ -112,23 +131,26 @@ fun HomeScreen(
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 MetricTile(
                     emoji = "👟",
-                    title = "步数",
-                    value = "6,842",
-                    unit = "步",
+                    title = stringResource(R.string.home_steps),
+                    value = formatInt(state.steps),
+                    unit = "",
                     accent = palette.accent,
-                    progress = 0.68f,
-                    hint = "目标 10,000 步",
+                    progress = state.stepsProgress,
+                    hint = stringResource(R.string.home_goal_steps, formatInt(state.stepGoal)),
                     modifier = Modifier.weight(1f),
                     onClick = onQuickLog,
                 )
                 MetricTile(
                     emoji = "💧",
-                    title = "饮水",
-                    value = "1.35",
+                    title = stringResource(R.string.home_water),
+                    value = String.format(Locale.US, "%.2f", state.waterMl / 1000f),
                     unit = "L",
                     accent = Color(0xFF4FB3FF),
-                    progress = 0.54f,
-                    hint = "目标 2.5 L",
+                    progress = state.waterProgress,
+                    hint = stringResource(
+                        R.string.home_goal_water,
+                        String.format(Locale.US, "%.1f", state.waterGoalMl / 1000f),
+                    ),
                     modifier = Modifier.weight(1f),
                     onClick = onQuickLog,
                 )
@@ -139,23 +161,26 @@ fun HomeScreen(
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 MetricTile(
                     emoji = "🌙",
-                    title = "睡眠",
-                    value = "7.2",
+                    title = stringResource(R.string.home_sleep),
+                    value = String.format(Locale.US, "%.1f", state.sleepHours),
                     unit = "h",
                     accent = Color(0xFF8B7CFF),
-                    progress = 0.9f,
-                    hint = "深睡 1.8 h",
+                    progress = state.sleepProgress,
+                    hint = stringResource(
+                        R.string.home_goal_sleep,
+                        String.format(Locale.US, "%.1f", state.sleepGoalHours),
+                    ),
                     modifier = Modifier.weight(1f),
                     onClick = onQuickLog,
                 )
                 MetricTile(
                     emoji = "🔥",
-                    title = "热量",
-                    value = "1,486",
+                    title = stringResource(R.string.home_calories),
+                    value = formatInt(state.caloriesIn),
                     unit = "kcal",
                     accent = Color(0xFFFF8A5B),
-                    progress = 0.74f,
-                    hint = "剩余 514 kcal",
+                    progress = state.calorieProgress,
+                    hint = stringResource(R.string.home_remaining, state.caloriesLeft),
                     modifier = Modifier.weight(1f),
                     onClick = onOpenDiet,
                 )
@@ -165,58 +190,83 @@ fun HomeScreen(
         item { AiTipCard(onClick = onOpenAi) }
 
         item {
-            SectionHeader(title = "快捷操作", subtitle = "点一下就能记")
+            SectionHeader(
+                title = stringResource(R.string.home_section_quick),
+                subtitle = stringResource(R.string.home_quick_hint),
+            )
         }
 
         item {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                StatChip("体重", "62.4 kg", palette.accentAlt, Modifier.weight(1f))
-                StatChip("心率", "72 bpm", palette.danger, Modifier.weight(1f))
-                StatChip("心情", "不错", palette.success, Modifier.weight(1f))
+                StatChip(
+                    label = "BMI",
+                    value = String.format(Locale.US, "%.1f", state.bmi),
+                    color = palette.accentAlt,
+                    modifier = Modifier.weight(1f),
+                )
+                StatChip(
+                    label = "TDEE",
+                    value = "${state.tdee}",
+                    color = palette.danger,
+                    modifier = Modifier.weight(1f),
+                )
+                StatChip(
+                    label = stringResource(R.string.dim_consistency),
+                    value = "${state.habitDone}/${state.habitTotal}",
+                    color = palette.success,
+                    modifier = Modifier.weight(1f),
+                )
             }
         }
     }
 }
 
+private fun formatInt(value: Int): String = String.format(Locale.US, "%,d", value)
+
 @Composable
-private fun HealthScoreCard(score: Int) {
+private fun HealthScoreCard(state: HomeUiState) {
     val palette = OmniTheme.palette
     GlassCard(Modifier.fillMaxWidth(), contentPadding = PaddingValues(18.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             ProgressRing(
-                progress = score / 100f,
+                progress = state.scoreOverall / 100f,
                 modifier = Modifier.size(104.dp),
                 ringColor = palette.accent,
                 strokeWidth = 9.dp,
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
-                        text = "$score",
+                        text = "${state.scoreOverall}",
                         color = palette.textPrimary,
                         fontSize = 30.sp,
                         fontWeight = FontWeight.Bold,
                     )
-                    Text("健康分", color = palette.textTertiary, fontSize = 10.sp)
+                    Text(
+                        text = stringResource(R.string.home_score_label),
+                        color = palette.textTertiary,
+                        fontSize = 10.sp,
+                    )
                 }
             }
             Spacer(Modifier.width(18.dp))
             Column(Modifier.weight(1f)) {
                 Text(
-                    text = "综合健康指数",
+                    text = stringResource(R.string.home_health_index),
                     color = palette.textPrimary,
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Bold,
                 )
                 Text(
-                    text = "比上周 +4 分，继续保持",
+                    text = stringResource(R.string.home_score_delta, 4),
                     color = palette.success,
                     fontSize = 11.sp,
                     modifier = Modifier.padding(top = 3.dp),
                 )
-                Spacer(Modifier.height(10.dp))
-                ScoreBar("营养", 0.82f, palette.accent)
-                ScoreBar("运动", 0.66f, palette.accentAlt)
-                ScoreBar("睡眠", 0.90f, Color(0xFF8B7CFF))
+                Spacer(Modifier.height(8.dp))
+                ScoreBar(stringResource(R.string.dim_nutrition), state.score.nutrition / 100f, palette.accent)
+                ScoreBar(stringResource(R.string.dim_activity), state.score.activity / 100f, palette.accentAlt)
+                ScoreBar(stringResource(R.string.dim_sleep), state.score.sleep / 100f, Color(0xFF8B7CFF))
+                ScoreBar(stringResource(R.string.dim_hydration), state.score.hydration / 100f, Color(0xFF4FB3FF))
             }
         }
     }
@@ -231,7 +281,7 @@ private fun ScoreBar(label: String, fraction: Float, color: Color) {
             .padding(vertical = 2.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(label, color = palette.textTertiary, fontSize = 10.sp, modifier = Modifier.width(34.dp))
+        Text(label, color = palette.textTertiary, fontSize = 10.sp, modifier = Modifier.width(42.dp))
         Box(
             Modifier
                 .weight(1f)
@@ -241,7 +291,7 @@ private fun ScoreBar(label: String, fraction: Float, color: Color) {
         ) {
             Box(
                 Modifier
-                    .fillMaxWidth(fraction)
+                    .fillMaxWidth(fraction.coerceIn(0f, 1f))
                     .height(5.dp)
                     .clip(RoundedCornerShape(3.dp))
                     .background(color),
@@ -259,10 +309,7 @@ private fun AiTipCard(onClick: () -> Unit) {
             .clip(RoundedCornerShape(palette.corner))
             .background(
                 Brush.linearGradient(
-                    listOf(
-                        palette.accent.copy(alpha = 0.92f),
-                        palette.accentAlt.copy(alpha = 0.92f),
-                    ),
+                    listOf(palette.accent.copy(alpha = 0.92f), palette.accentAlt.copy(alpha = 0.92f)),
                 ),
             )
             .bounceClick(pressScale = 0.97f, onClick = onClick)
@@ -273,21 +320,18 @@ private fun AiTipCard(onClick: () -> Unit) {
                 Text("✨", fontSize = 14.sp)
                 Spacer(Modifier.width(6.dp))
                 Text(
-                    text = "AI 健康顾问",
+                    text = stringResource(R.string.home_ai_title),
                     color = Color.White,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.weight(1f),
                 )
-                Text("生成 7 日报告 →", color = Color.White.copy(alpha = 0.85f), fontSize = 10.sp)
+                Text(
+                    text = stringResource(R.string.home_ai_cta),
+                    color = Color.White.copy(alpha = 0.85f),
+                    fontSize = 10.sp,
+                )
             }
-            Spacer(Modifier.height(8.dp))
-            Text(
-                text = "你今天蛋白质还差 28 g，晚餐建议鸡胸肉 120 g + 无糖酸奶 200 ml；\n睡前 40 分钟放下手机可提升深睡比例。",
-                color = Color.White.copy(alpha = 0.95f),
-                fontSize = 12.sp,
-                lineHeight = 18.sp,
-            )
         }
     }
 }

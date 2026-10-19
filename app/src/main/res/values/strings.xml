@@ -70,4 +70,35 @@
     <string name="layout_b_desc">5 tabs classic glass bar</string>
     <string name="layout_c_label">Layout C</string>
     <string name="layout_c_desc">3 tabs pill + Bento overview</string>
+
+    <!-- Home -->
+    <string name="home_greeting">Hi, %1$s</string>
+    <string name="home_status">%1$s · keep the rhythm</string>
+    <string name="home_health_index">Health index</string>
+    <string name="home_score_label">Score</string>
+    <string name="home_score_delta">+%1$d vs last week</string>
+    <string name="home_section_today">Today</string>
+    <string name="home_section_today_sub">Goal completion</string>
+    <string name="home_view_stats">Stats →</string>
+    <string name="home_steps">Steps</string>
+    <string name="home_water">Water</string>
+    <string name="home_sleep">Sleep</string>
+    <string name="home_calories">Calories</string>
+    <string name="home_goal_steps">Goal %1$s steps</string>
+    <string name="home_goal_water">Goal %1$s L</string>
+    <string name="home_goal_sleep">Deep sleep %1$s h</string>
+    <string name="home_remaining">%1$d kcal left</string>
+    <string name="home_section_quick">Quick actions</string>
+    <string name="home_quick_hint">One tap to log</string>
+    <string name="home_ai_title">AI health advisor</string>
+    <string name="home_ai_cta">7-day report →</string>
+    <string name="home_bmi">BMI %1$s</string>
+    <string name="home_tdee">TDEE %1$d</string>
+    <string name="home_habits">Habits %1$d/%2$d</string>
+
+    <string name="dim_nutrition">Nutrition</string>
+    <string name="dim_activity">Activity</string>
+    <string name="dim_sleep">Sleep</string>
+    <string name="dim_hydration">Water</string>
+    <string name="dim_consistency">Habits</string>
 </resources>

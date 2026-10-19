@@ -8,6 +8,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -17,7 +18,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.omnihealth.ui.components.QuickLogBottomSheet
+import com.example.omnihealth.ui.components.QuickLogType
+import com.example.omnihealth.ui.di.LocalHealthRepository
 import com.example.omnihealth.ui.i18n.AppLanguage
+import kotlinx.coroutines.launch
 import com.example.omnihealth.ui.navigation.AdaptiveBottomBar
 import com.example.omnihealth.ui.navigation.NavLayoutMode
 import com.example.omnihealth.ui.navigation.OmniDest
@@ -103,9 +107,22 @@ fun OmniApp(
     }
 
     if (quickLogOpen) {
+        val repository = LocalHealthRepository.current
+        val scope = rememberCoroutineScope()
         QuickLogBottomSheet(
             onDismiss = { quickLogOpen = false },
-            onSave = { _, _ -> quickLogOpen = false },
+            onSave = { type, value ->
+                scope.launch {
+                    when (type) {
+                        QuickLogType.WEIGHT -> repository.logWeight(value)
+                        QuickLogType.WATER -> repository.logWater(value)
+                        QuickLogType.SLEEP -> repository.logSleep(value)
+                        QuickLogType.STEPS -> repository.saveSteps(value.toInt())
+                        QuickLogType.MOOD -> repository.logMood(value)
+                    }
+                }
+                quickLogOpen = false
+            },
         )
     }
 }
