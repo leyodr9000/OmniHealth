@@ -169,4 +169,44 @@
     <string name="ai_error">出了点问题，已切换为离线回答。</string>
     <string name="ai_clear">清空</string>
     <string name="ai_score">健康分 %1$d / 100</string>
+
+    <!-- 编辑弹窗 -->
+    <string name="edit_save">保存</string>
+    <string name="edit_cancel">取消</string>
+    <string name="profile_edit_title">编辑个人资料</string>
+    <string name="profile_edit_sub">影响 BMI、BMR 与热量目标</string>
+    <string name="field_nickname">昵称</string>
+    <string name="field_age">年龄</string>
+    <string name="field_height">身高（cm）</string>
+    <string name="field_weight">体重（kg）</string>
+    <string name="gender_male">男</string>
+    <string name="gender_female">女</string>
+    <string name="activity_sedentary">久坐</string>
+    <string name="activity_light">轻度</string>
+    <string name="activity_moderate">中等</string>
+    <string name="activity_active">活跃</string>
+    <string name="activity_athlete">运动员</string>
+    <string name="goal_lose">减脂</string>
+    <string name="goal_maintain">维持</string>
+    <string name="goal_gain">增肌</string>
+    <string name="api_edit_title">AI 接口配置</string>
+    <string name="api_edit_sub">Key 留空则使用离线引擎</string>
+    <string name="field_base_url">Base URL</string>
+    <string name="field_api_key">API Key</string>
+    <string name="field_model">模型</string>
+    <string name="field_temperature">温度</string>
+    <string name="goals_edit_title">每日目标</string>
+    <string name="goals_edit_sub">用于评分与提醒</string>
+    <string name="field_steps_goal">步数</string>
+    <string name="field_water_goal">饮水（ml）</string>
+    <string name="field_sleep_goal">睡眠（小时）</string>
+    <string name="field_calorie_goal">热量</string>
+
+    <!-- 习惯 -->
+    <string name="habits_title">习惯打卡</string>
+    <string name="habits_sub">今日完成 %1$d / %2$d</string>
+    <string name="habits_add">添加习惯</string>
+    <string name="habits_empty">还没有习惯，加一个来点亮「一致性」评分。</string>
+    <string name="habit_name">习惯名称</string>
+    <string name="habit_delete">删除</string>
 </resources>

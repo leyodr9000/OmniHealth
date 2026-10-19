@@ -34,6 +34,9 @@ interface VitalDao {
     @Query("SELECT SUM(value) FROM vitals WHERE type = :type AND recordedAt BETWEEN :from AND :to")
     suspend fun sumBetween(type: String, from: Long, to: Long): Float?
 
+    @Query("SELECT SUM(value) FROM vitals WHERE type = :type AND recordedAt BETWEEN :from AND :to")
+    fun observeSumBetween(type: String, from: Long, to: Long): Flow<Float?>
+
     @Query("SELECT * FROM vitals WHERE type = :type ORDER BY recordedAt DESC LIMIT 1")
     suspend fun latest(type: String): VitalEntity?
 }

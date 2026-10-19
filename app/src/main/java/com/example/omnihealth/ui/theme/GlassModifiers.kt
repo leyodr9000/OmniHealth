@@ -42,7 +42,7 @@ import kotlin.math.sin
 fun MeshGradientBackground(
     palette: OmniPalette = OmniTheme.palette,
     modifier: Modifier = Modifier,
-    animated: Boolean = true,
+    animated: Boolean = false,
     content: @Composable BoxScope.() -> Unit,
 ) {
     val t: Float = if (animated) {

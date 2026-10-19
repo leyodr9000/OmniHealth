@@ -59,8 +59,11 @@ class HealthRepository(
 
     fun waterToday(): Flow<Float> {
         val day = TimeUtils.epochDayNow()
-        return db.vitalDao().observeByType(VitalType.WATER, 200)
-            .map { list -> list.filter { TimeUtils.epochDayOf(it.recordedAt) == day }.sumOf { it.value.toDouble() }.toFloat() }
+        return db.vitalDao().observeSumBetween(
+            VitalType.WATER,
+            TimeUtils.startOfDayMillis(day),
+            TimeUtils.endOfDayMillis(day),
+        ).map { it ?: 0f }
     }
 
     suspend fun logWeight(kg: Float) = db.vitalDao().insert(
@@ -336,4 +339,21 @@ class HealthRepository(
     suspend fun updateProfile(profile: UserProfile) = preferences.updateProfile(profile)
 
     suspend fun updateApi(api: ApiConfig) = preferences.updateApi(api)
+
+    suspend fun updateGoals(steps: Int, waterMl: Int, sleepMin: Int, calories: Int) =
+        preferences.updateGoals(steps, waterMl, sleepMin, calories)
+
+    /* ---------------- 习惯维护 ---------------- */
+
+    suspend fun addHabit(name: String, emoji: String, targetPerDay: Int = 1) {
+        db.habitDao().insertHabit(
+            HabitEntity(
+                name = name,
+                emoji = emoji,
+                targetPerDay = targetPerDay,
+            ),
+        )
+    }
+
+    suspend fun deleteHabit(habit: HabitEntity) = db.habitDao().deleteHabit(habit)
 }

@@ -169,4 +169,44 @@
     <string name="ai_error">Something went wrong. Offline answer shown instead.</string>
     <string name="ai_clear">Clear</string>
     <string name="ai_score">Score %1$d / 100</string>
+
+    <!-- Edit sheets -->
+    <string name="edit_save">Save</string>
+    <string name="edit_cancel">Cancel</string>
+    <string name="profile_edit_title">Edit profile</string>
+    <string name="profile_edit_sub">Drives BMI, BMR and calorie targets</string>
+    <string name="field_nickname">Nickname</string>
+    <string name="field_age">Age</string>
+    <string name="field_height">Height (cm)</string>
+    <string name="field_weight">Weight (kg)</string>
+    <string name="gender_male">Male</string>
+    <string name="gender_female">Female</string>
+    <string name="activity_sedentary">Sedentary</string>
+    <string name="activity_light">Light</string>
+    <string name="activity_moderate">Moderate</string>
+    <string name="activity_active">Active</string>
+    <string name="activity_athlete">Athlete</string>
+    <string name="goal_lose">Lose</string>
+    <string name="goal_maintain">Maintain</string>
+    <string name="goal_gain">Gain</string>
+    <string name="api_edit_title">AI endpoint</string>
+    <string name="api_edit_sub">Leave key empty to use the offline engine</string>
+    <string name="field_base_url">Base URL</string>
+    <string name="field_api_key">API key</string>
+    <string name="field_model">Model</string>
+    <string name="field_temperature">Temperature</string>
+    <string name="goals_edit_title">Daily goals</string>
+    <string name="goals_edit_sub">Used by scores and reminders</string>
+    <string name="field_steps_goal">Steps</string>
+    <string name="field_water_goal">Water (ml)</string>
+    <string name="field_sleep_goal">Sleep (h)</string>
+    <string name="field_calorie_goal">Calories</string>
+
+    <!-- Habits -->
+    <string name="habits_title">Habits</string>
+    <string name="habits_sub">%1$d of %2$d done today</string>
+    <string name="habits_add">Add habit</string>
+    <string name="habits_empty">No habits yet — add one to build the consistency score.</string>
+    <string name="habit_name">Habit name</string>
+    <string name="habit_delete">Delete</string>
 </resources>

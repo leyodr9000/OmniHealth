@@ -62,10 +62,17 @@ fun OmniApp(
                 )
             },
         ) { innerPadding ->
+            // 悬浮胶囊（布局 C）与中央 FAB（布局 A）都会向上溢出底栏自身高度，
+            // 这里按布局补足余量，避免最后一行内容被压住。
+            val extraBottom = when (layoutMode) {
+                NavLayoutMode.A_FAB -> 6.dp
+                NavLayoutMode.B_FIVE -> 2.dp
+                NavLayoutMode.C_BENTO -> 16.dp
+            }
             NavHost(
                 navController = navController,
                 startDestination = OmniDest.Home.route,
-                modifier = Modifier.padding(bottom = innerPadding.calculateBottomPadding() - 8.dp),
+                modifier = Modifier.padding(bottom = innerPadding.calculateBottomPadding() + extraBottom),
             ) {
                 composable(OmniDest.Home.route) {
                     HomeScreen(
