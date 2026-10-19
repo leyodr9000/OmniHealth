@@ -173,6 +173,35 @@ fun AiAdvisorScreen() {
                                 fontWeight = FontWeight.SemiBold,
                             )
                         }
+                        Spacer(Modifier.height(6.dp))
+                        Text(
+                            text = buildString {
+                                append(
+                                    stringResource(
+                                        if (state.reportOffline) R.string.ai_local_badge else R.string.ai_cloud_badge,
+                                    ),
+                                )
+                                append(" · ")
+                                append(stringResource(R.string.ai_coverage, state.reportCoverageDays))
+                                if (state.reportGeneratedAt > 0L) {
+                                    append(" · ")
+                                    append(
+                                        java.text.SimpleDateFormat("HH:mm", java.util.Locale.getDefault())
+                                            .format(java.util.Date(state.reportGeneratedAt)),
+                                    )
+                                }
+                            },
+                            color = palette.textTertiary,
+                            fontSize = 10.sp,
+                        )
+                        if (state.reportGaps.isNotEmpty()) {
+                            Spacer(Modifier.height(6.dp))
+                            Text(
+                                text = stringResource(R.string.ai_gaps, gapText(state.reportGaps)),
+                                color = palette.warning,
+                                fontSize = 10.sp,
+                            )
+                        }
                         Spacer(Modifier.height(10.dp))
                         Text(
                             text = state.report,
@@ -336,6 +365,22 @@ private fun InputBar(
                 .padding(horizontal = 14.dp, vertical = 8.dp),
         ) {
             Text(sendLabel, color = Color.White, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+        }
+    }
+}
+/** 缺失维度文案：先用 @Composable 取字符串，再拼一句提示。 */
+@Composable
+private fun gapText(gaps: List<String>): String {
+    val sleep = stringResource(R.string.dim_sleep)
+    val water = stringResource(R.string.dim_hydration)
+    val diet = stringResource(R.string.dim_nutrition)
+    val activity = stringResource(R.string.dim_activity)
+    return gaps.joinToString("、") { gap ->
+        when (gap) {
+            "sleep" -> sleep
+            "water" -> water
+            "diet" -> diet
+            else -> activity
         }
     }
 }

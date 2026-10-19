@@ -30,6 +30,10 @@ data class AiUiState(
     val hasApiKey: Boolean = false,
     val modelName: String = "",
     val offlineHint: Boolean = false,
+    val reportOffline: Boolean = false,
+    val reportGeneratedAt: Long = 0L,
+    val reportCoverageDays: Int = 7,
+    val reportGaps: List<String> = emptyList(),
     val error: String? = null,
 )
 
@@ -65,6 +69,14 @@ class AiAdvisorViewModel(private val repository: HealthRepository) : ViewModel()
                     report = answer?.text ?: "",
                     reportScore = context?.score ?: it.reportScore,
                     offlineHint = answer?.offline == true,
+            reportOffline = answer?.offline == true,
+            reportGeneratedAt = System.currentTimeMillis(),
+            reportGaps = buildList {
+                if ((context?.avgSleepHours ?: 0f) <= 0f) add("sleep")
+                if ((context?.waterMl ?: 0f) <= 0f) add("water")
+                if ((context?.avgCalories ?: 0) <= 0) add("diet")
+                if ((context?.avgSteps ?: 0) <= 0) add("steps")
+            },
                     error = answer?.error,
                 )
             }

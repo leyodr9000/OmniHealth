@@ -270,4 +270,8 @@
     <string name="score_basis">基于 %1$d/5 项数据</string>
     <string name="score_basis_hint">缺失维度不计入，不按 0 分处理</string>
     <string name="estimate_note">BMI · BMR · TDEE 为估算值</string>
+    <string name="ai_local_badge">本地分析</string>
+    <string name="ai_cloud_badge">在线 AI</string>
+    <string name="ai_coverage">覆盖 %1$d 天</string>
+    <string name="ai_gaps">缺少：%1$s，结论仅供参考</string>
 </resources>

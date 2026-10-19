@@ -270,4 +270,8 @@
     <string name="score_basis">Based on %1$d/5 metrics</string>
     <string name="score_basis_hint">Missing metrics are excluded, not scored zero</string>
     <string name="estimate_note">BMI · BMR · TDEE are estimates</string>
+    <string name="ai_local_badge">Local analysis</string>
+    <string name="ai_cloud_badge">Online AI</string>
+    <string name="ai_coverage">%1$d-day window</string>
+    <string name="ai_gaps">Missing: %1$s — treat the conclusions with care</string>
 </resources>
