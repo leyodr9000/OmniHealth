@@ -113,6 +113,7 @@ dependencies {
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.profileinstaller)
+    implementation(libs.androidx.splashscreen)
 
     implementation(libs.retrofit)
     implementation(libs.retrofit.kotlinx.serialization)

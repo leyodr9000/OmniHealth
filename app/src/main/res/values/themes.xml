@@ -8,4 +8,9 @@
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>
     </style>
+    <style name="Theme.OmniHealth.Starting" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/omni_window_bg</item>
+        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher</item>
+        <item name="postSplashScreenTheme">@style/Theme.OmniHealth</item>
+    </style>
 </resources>
