@@ -1,6 +1,7 @@
 package com.example.omnihealth.ui.screens.home
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,16 +17,22 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -36,6 +43,7 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.AutoAwesome
 import androidx.compose.material.icons.rounded.Bedtime
+import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.DirectionsWalk
 import androidx.compose.material.icons.rounded.LocalFireDepartment
 import androidx.compose.material.icons.rounded.WaterDrop
@@ -49,6 +57,7 @@ import com.example.omnihealth.ui.di.activityScopedViewModelOwner
 import com.example.omnihealth.ui.theme.GlassCard
 import com.example.omnihealth.ui.theme.OmniTheme
 import com.example.omnihealth.ui.theme.bounceClick
+import com.example.omnihealth.ui.theme.quietClick
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -68,6 +77,7 @@ fun HomeScreen(
     )
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val palette = OmniTheme.palette
+    var showAddHabit by remember { mutableStateOf(false) }
     val insightText = when {
         state.steps < state.stepGoal -> stringResource(
             R.string.insight_steps_left,
@@ -242,7 +252,184 @@ fun HomeScreen(
                 )
             }
         }
+
+        item {
+            SectionHeader(
+                title = stringResource(R.string.habits_title),
+                subtitle = stringResource(R.string.habits_sub, state.habitDone, state.habitTotal),
+                action = {
+                    Text(
+                        text = "+ " + stringResource(R.string.habits_add),
+                        color = palette.accent,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Medium,
+                        modifier = Modifier.bounceClick(
+                            pressScale = 0.94f,
+                            haptics = false,
+                        ) { showAddHabit = true },
+                    )
+                },
+            )
+        }
+
+        item {
+            GlassCard(
+                Modifier.fillMaxWidth(),
+                contentPadding = PaddingValues(vertical = 4.dp),
+            ) {
+                if (state.habits.isEmpty()) {
+                    Text(
+                        text = stringResource(R.string.habits_empty),
+                        color = palette.textTertiary,
+                        fontSize = 11.sp,
+                        modifier = Modifier.padding(horizontal = 14.dp, vertical = 12.dp),
+                    )
+                } else {
+                    state.habits.forEach { habit ->
+                        HabitRow(
+                            name = habit.name,
+                            checked = habit.id in state.checkedHabitIds,
+                            onToggle = { viewModel.toggleHabit(habit.id) },
+                            onDelete = { viewModel.deleteHabit(habit) },
+                        )
+                    }
+                }
+            }
+        }
     }
+
+    if (showAddHabit) {
+        AddHabitDialog(
+            onDismiss = { showAddHabit = false },
+            onConfirm = { name ->
+                viewModel.addHabit(name)
+                showAddHabit = false
+            },
+        )
+    }
+}
+
+@Composable
+private fun HabitRow(
+    name: String,
+    checked: Boolean,
+    onToggle: () -> Unit,
+    onDelete: () -> Unit,
+) {
+    val palette = OmniTheme.palette
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .quietClick(onClick = onToggle)
+            .padding(horizontal = 14.dp, vertical = 11.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Box(
+            Modifier
+                .size(22.dp)
+                .clip(CircleShape)
+                .background(if (checked) palette.accent else Color.Transparent)
+                .border(
+                    width = if (checked) 0.dp else 1.5.dp,
+                    color = if (checked) palette.accent else palette.textTertiary.copy(alpha = 0.5f),
+                    shape = CircleShape,
+                ),
+            contentAlignment = Alignment.Center,
+        ) {
+            if (checked) {
+                Icon(
+                    imageVector = Icons.Rounded.Check,
+                    contentDescription = null,
+                    tint = Color.White,
+                    modifier = Modifier.size(14.dp),
+                )
+            }
+        }
+        Spacer(Modifier.width(12.dp))
+        Text(
+            text = name,
+            color = if (checked) palette.textTertiary else palette.textPrimary,
+            fontSize = 13.sp,
+            fontWeight = FontWeight.Medium,
+            modifier = Modifier.weight(1f),
+        )
+        Text(
+            text = "✕",
+            color = palette.textTertiary.copy(alpha = 0.6f),
+            fontSize = 12.sp,
+            modifier = Modifier
+                .quietClick(onClick = onDelete)
+                .padding(6.dp),
+        )
+    }
+}
+
+@Composable
+private fun AddHabitDialog(
+    onDismiss: () -> Unit,
+    onConfirm: (String) -> Unit,
+) {
+    val palette = OmniTheme.palette
+    var text by remember { mutableStateOf("") }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        containerColor = palette.cardFill,
+        title = {
+            Text(
+                text = stringResource(R.string.habits_add),
+                color = palette.textPrimary,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.SemiBold,
+            )
+        },
+        text = {
+            Column {
+                Text(
+                    text = stringResource(R.string.habit_name),
+                    color = palette.textTertiary,
+                    fontSize = 11.sp,
+                )
+                Box(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(top = 6.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(palette.textPrimary.copy(alpha = 0.05f))
+                        .padding(horizontal = 12.dp, vertical = 10.dp),
+                ) {
+                    BasicTextField(
+                        value = text,
+                        onValueChange = { text = it.take(20) },
+                        singleLine = true,
+                        textStyle = TextStyle(color = palette.textPrimary, fontSize = 13.sp),
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
+            }
+        },
+        confirmButton = {
+            Text(
+                text = stringResource(R.string.edit_save),
+                color = palette.accent,
+                fontSize = 13.sp,
+                fontWeight = FontWeight.SemiBold,
+                modifier = Modifier
+                    .quietClick { onConfirm(text) }
+                    .padding(8.dp),
+            )
+        },
+        dismissButton = {
+            Text(
+                text = stringResource(R.string.edit_cancel),
+                color = palette.textTertiary,
+                fontSize = 13.sp,
+                modifier = Modifier
+                    .quietClick(onClick = onDismiss)
+                    .padding(8.dp),
+            )
+        },
+    )
 }
 
 private fun formatInt(value: Int): String = String.format(Locale.US, "%,d", value)

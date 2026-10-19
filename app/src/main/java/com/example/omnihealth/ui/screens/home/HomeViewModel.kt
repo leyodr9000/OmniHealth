@@ -3,6 +3,7 @@ package com.example.omnihealth.ui.screens.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.omnihealth.data.datastore.Gender
+import com.example.omnihealth.data.local.entity.HabitEntity
 import com.example.omnihealth.data.local.entity.WorkoutEntity
 import com.example.omnihealth.data.repository.HealthRepository
 import com.example.omnihealth.domain.util.HealthCalculator
@@ -27,6 +28,8 @@ data class HomeUiState(
     val tdee: Int = 0,
     val habitDone: Int = 0,
     val habitTotal: Int = 0,
+    val habits: List<HabitEntity> = emptyList(),
+    val checkedHabitIds: Set<Long> = emptySet(),
     val workouts: List<WorkoutEntity> = emptyList(),
     val score: HealthCalculator.ScoreBreakdown = HealthCalculator.ScoreBreakdown(0, 0, 0, 0, 0),
 ) {
@@ -82,6 +85,8 @@ class HomeViewModel(private val repository: HealthRepository) : ViewModel() {
             tdee = tdee.toInt(),
             habitDone = logs.size,
             habitTotal = habits.size,
+            habits = habits,
+            checkedHabitIds = logs.map { it.habitId }.toSet(),
             workouts = workouts,
             score = score,
         )
@@ -98,6 +103,12 @@ class HomeViewModel(private val repository: HealthRepository) : ViewModel() {
     fun logSleep(hours: Float) = launch { repository.logSleep(hours) }
 
     fun toggleHabit(id: Long) = launch { repository.toggleHabit(id) }
+
+    fun addHabit(name: String) = launch {
+        if (name.isNotBlank()) repository.addHabit(name.trim(), "✅")
+    }
+
+    fun deleteHabit(habit: HabitEntity) = launch { repository.deleteHabit(habit) }
 
     private fun launch(block: suspend () -> Unit) {
         viewModelScope.launch { block() }
