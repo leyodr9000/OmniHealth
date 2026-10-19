@@ -106,20 +106,9 @@ fun GlassCard(
     onClick: (() -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit,
 ) {
+    // 刻意不用 Modifier.shadow：在部分真机上 elevation 阴影视图形不被裁切，
+    // 会在卡片/底栏后透出一个方形硬边框，破坏玻璃质感。这里只用描边 + 高光表达层次。
     val base = modifier
-        .then(
-            if (palette.elevation > 0.dp) {
-                Modifier.shadow(
-                    elevation = palette.elevation,
-                    shape = shape,
-                    clip = false,
-                    ambientColor = Color.Black.copy(alpha = 0.10f),
-                    spotColor = Color.Black.copy(alpha = 0.14f),
-                )
-            } else {
-                Modifier
-            },
-        )
         .clip(shape)
         .background(
             brush = Brush.verticalGradient(

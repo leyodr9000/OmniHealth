@@ -82,7 +82,9 @@ fun QuickLogBottomSheet(
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
+        shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
         containerColor = palette.barFill,
+        tonalElevation = 0.dp,
         scrimColor = palette.textPrimary.copy(alpha = 0.28f),
         dragHandle = {
             Box(

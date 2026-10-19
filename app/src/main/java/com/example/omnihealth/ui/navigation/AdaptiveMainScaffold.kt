@@ -153,7 +153,6 @@ private fun FabNavBar(
                 .align(Alignment.TopCenter)
                 .offset(y = (-22).dp)
                 .size(58.dp)
-                .shadow(14.dp, CircleShape, ambientColor = palette.accent, spotColor = palette.accent)
                 .background(
                     brush = Brush.linearGradient(listOf(palette.accent, palette.accentAlt)),
                     shape = CircleShape,
@@ -211,7 +210,6 @@ private fun PillNavBar(
         modifier = Modifier
             .width(280.dp)
             .height(64.dp)
-            .shadow(18.dp, RoundedCornerShape(32.dp))
             .frostBar(palette, RoundedCornerShape(32.dp))
             .padding(horizontal = 10.dp, vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically,
