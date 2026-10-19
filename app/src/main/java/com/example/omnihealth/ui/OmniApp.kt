@@ -4,8 +4,8 @@ import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
@@ -93,19 +93,36 @@ fun OmniApp(
             NavHost(
                 navController = navController,
                 startDestination = OmniDest.Home.route,
-                // Tab 切换：淡入 + 轻微上浮，220ms。短时长、单属性位移，
-                // 在 120Hz 上不会与首帧合成抢出明显掉帧。
+                // 底栏左右切换：纯水平位移，不做透明度过渡。
+                // 淡入淡出会让两个页面在半透明状态下重叠（重影），位移则是一进一出、互不干扰。
                 enterTransition = {
-                    slideInVertically(tween(180, easing = FastOutSlowInEasing)) { it / 36 }
+                    val forward = pageIndex(targetState.destination.route) >=
+                        pageIndex(initialState.destination.route)
+                    slideInHorizontally(tween(240, easing = FastOutSlowInEasing)) { full ->
+                        if (forward) full else -full
+                    }
                 },
                 exitTransition = {
-                    slideOutVertically(tween(160, easing = FastOutSlowInEasing)) { -it / 36 }
+                    val forward = pageIndex(targetState.destination.route) >=
+                        pageIndex(initialState.destination.route)
+                    // 旧页面只位移 1/4，形成轻微视差，不会盖住新页面
+                    slideOutHorizontally(tween(240, easing = FastOutSlowInEasing)) { full ->
+                        if (forward) -full / 4 else full / 4
+                    }
                 },
                 popEnterTransition = {
-                    slideInVertically(tween(180, easing = FastOutSlowInEasing)) { -it / 36 }
+                    val forward = pageIndex(targetState.destination.route) >=
+                        pageIndex(initialState.destination.route)
+                    slideInHorizontally(tween(240, easing = FastOutSlowInEasing)) { full ->
+                        if (forward) full else -full
+                    }
                 },
                 popExitTransition = {
-                    slideOutVertically(tween(160, easing = FastOutSlowInEasing)) { it / 36 }
+                    val forward = pageIndex(targetState.destination.route) >=
+                        pageIndex(initialState.destination.route)
+                    slideOutHorizontally(tween(240, easing = FastOutSlowInEasing)) { full ->
+                        if (forward) -full / 4 else full / 4
+                    }
                 },
                 modifier = Modifier.padding(bottom = innerPadding.calculateBottomPadding() + extraBottom),
             ) {
@@ -170,6 +187,13 @@ fun OmniApp(
             },
         )
     }
+}
+
+
+/** Tab 顺序，用于判断切换方向（右移还是左移）。 */
+private fun pageIndex(route: String?): Int {
+    val index = OmniDest.entries.indexOfFirst { it.route == route }
+    return if (index < 0) 0 else index
 }
 
 private fun NavHostController.navigateSingleTop(dest: OmniDest) {
