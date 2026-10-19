@@ -229,4 +229,8 @@
     <string name="framework_md3">Material 3</string>
     <string name="settings_section_framework">UI framework</string>
     <string name="settings_section_framework_sub">Component system, not just colors</string>
+    <string name="insight_steps_left">%1$s steps left to hit today\'s goal</string>
+    <string name="insight_water_left">Drink %1$s more to reach your water goal</string>
+    <string name="insight_calories_left">%1$s kcal left today</string>
+    <string name="insight_all_good">All targets on track — keep the pace</string>
 </resources>

@@ -229,4 +229,8 @@
     <string name="framework_md3">Material 3</string>
     <string name="settings_section_framework">界面框架</string>
     <string name="settings_section_framework_sub">切换整套组件体系，而非只换配色</string>
+    <string name="insight_steps_left">距离今日目标还差 %1$s 步</string>
+    <string name="insight_water_left">再喝 %1$s 就达饮水目标</string>
+    <string name="insight_calories_left">今日还可摄入 %1$s kcal</string>
+    <string name="insight_all_good">各项目标都在轨道上，保持即可</string>
 </resources>

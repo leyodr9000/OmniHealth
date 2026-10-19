@@ -68,6 +68,21 @@ fun HomeScreen(
     )
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val palette = OmniTheme.palette
+    val insightText = when {
+        state.steps < state.stepGoal -> stringResource(
+            R.string.insight_steps_left,
+            formatInt(state.stepGoal - state.steps),
+        )
+        state.waterProgress < 0.7f -> stringResource(
+            R.string.insight_water_left,
+            "${(((state.waterGoalMl - state.waterMl).coerceAtLeast(0f)) / 50).toInt() * 50} ml",
+        )
+        state.caloriesLeft > 0 -> stringResource(
+            R.string.insight_calories_left,
+            formatInt(state.caloriesLeft),
+        )
+        else -> stringResource(R.string.insight_all_good)
+    }
     val locale = Locale.getDefault()
     val dateText = LocalDate.now().format(
         if (locale.language.startsWith("zh")) {
@@ -196,7 +211,7 @@ fun HomeScreen(
             }
         }
 
-        item { AiTipCard(onClick = onOpenAi) }
+        item { AiTipCard(insight = insightText, onClick = onOpenAi) }
 
         item {
             SectionHeader(
@@ -310,7 +325,7 @@ private fun ScoreBar(label: String, fraction: Float, color: Color) {
 }
 
 @Composable
-private fun AiTipCard(onClick: () -> Unit) {
+private fun AiTipCard(insight: String, onClick: () -> Unit) {
     val palette = OmniTheme.palette
     Box(
         Modifier
@@ -337,6 +352,13 @@ private fun AiTipCard(onClick: () -> Unit) {
                     fontSize = 10.sp,
                 )
             }
+            Spacer(Modifier.height(8.dp))
+            Text(
+                text = insight,
+                color = Color.White.copy(alpha = 0.95f),
+                fontSize = 12.sp,
+                lineHeight = 18.sp,
+            )
         }
     }
 }
