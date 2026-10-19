@@ -20,6 +20,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -45,10 +46,12 @@ fun AppearanceScreen(
     layoutMode: NavLayoutMode,
     language: AppLanguage,
     framework: UiFramework,
+    reduceMotion: Boolean,
     onThemeChange: (ThemeMode) -> Unit,
     onLayoutChange: (NavLayoutMode) -> Unit,
     onLanguageChange: (AppLanguage) -> Unit,
     onFrameworkChange: (UiFramework) -> Unit,
+    onReduceMotionChange: (Boolean) -> Unit,
     onBack: () -> Unit,
 ) {
     val palette = OmniTheme.palette
@@ -113,6 +116,37 @@ fun AppearanceScreen(
                         onClick = { onFrameworkChange(item) },
                     )
                 }
+            }
+        }
+
+        item {
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(14.dp))
+                    .background(palette.cardFill)
+                    .border(1.dp, palette.cardStroke, RoundedCornerShape(14.dp))
+                    .padding(horizontal = 14.dp, vertical = 12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Column(Modifier.weight(1f)) {
+                    Text(
+                        text = stringResource(R.string.motion_title),
+                        color = palette.textPrimary,
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Medium,
+                    )
+                    Text(
+                        text = stringResource(R.string.motion_desc),
+                        color = palette.textTertiary,
+                        fontSize = 10.sp,
+                        modifier = Modifier.padding(top = 2.dp),
+                    )
+                }
+                Switch(
+                    checked = reduceMotion,
+                    onCheckedChange = onReduceMotionChange,
+                )
             }
         }
 

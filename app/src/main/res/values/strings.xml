@@ -250,4 +250,6 @@
     <string name="about_privacy">All records stay in a local Room database on this device. Nothing is uploaded; AI requests only leave the device when you set an API key.</string>
     <string name="about_licenses_title">Open source</string>
     <string name="about_licenses">Jetpack Compose · Room · DataStore · WorkManager · Retrofit/OkHttp · kotlinx.serialization · MPAndroidChart</string>
+    <string name="motion_title">Reduce motion</string>
+    <string name="motion_desc">Turn off page slide animations</string>
 </resources>

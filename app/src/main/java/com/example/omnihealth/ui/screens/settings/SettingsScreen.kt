@@ -81,10 +81,12 @@ fun SettingsScreen(
     layoutMode: NavLayoutMode,
     language: AppLanguage,
     framework: UiFramework,
+    reduceMotion: Boolean,
     onThemeChange: (ThemeMode) -> Unit,
     onLayoutChange: (NavLayoutMode) -> Unit,
     onLanguageChange: (AppLanguage) -> Unit,
     onFrameworkChange: (UiFramework) -> Unit,
+    onReduceMotionChange: (Boolean) -> Unit,
 ) {
     val palette = OmniTheme.palette
     val repository = LocalHealthRepository.current
@@ -115,10 +117,12 @@ fun SettingsScreen(
             layoutMode = layoutMode,
             language = language,
             framework = framework,
+            reduceMotion = reduceMotion,
             onThemeChange = onThemeChange,
             onLayoutChange = onLayoutChange,
             onLanguageChange = onLanguageChange,
             onFrameworkChange = onFrameworkChange,
+            onReduceMotionChange = onReduceMotionChange,
             onBack = { page = SettingsPage.ROOT },
         )
         return

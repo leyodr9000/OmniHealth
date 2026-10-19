@@ -47,6 +47,7 @@ import com.example.omnihealth.ui.theme.LocalLiquidGlass
 
 @Composable
 fun OmniApp(
+    reduceMotion: Boolean,
     themeMode: ThemeMode,
     layoutMode: NavLayoutMode,
     language: AppLanguage,
@@ -55,6 +56,7 @@ fun OmniApp(
     onLayoutChange: (NavLayoutMode) -> Unit,
     onLanguageChange: (AppLanguage) -> Unit,
     onFrameworkChange: (UiFramework) -> Unit,
+    onReduceMotionChange: (Boolean) -> Unit,
 ) {
     val navController = rememberNavController()
     val palette = OmniTheme.palette
@@ -95,33 +97,49 @@ fun OmniApp(
                 startDestination = OmniDest.Home.route,
                 // 底栏左右切换：纯水平位移，不做透明度过渡。
                 // 淡入淡出会让两个页面在半透明状态下重叠（重影），位移则是一进一出、互不干扰。
-                enterTransition = {
-                    val forward = pageIndex(targetState.destination.route) >=
-                        pageIndex(initialState.destination.route)
-                    slideInHorizontally(tween(240, easing = FastOutSlowInEasing)) { full ->
-                        if (forward) full else -full
+                enterTransition = if (reduceMotion) {
+                    { EnterTransition.None }
+                } else {
+                    {
+                        val forward = pageIndex(targetState.destination.route) >=
+                            pageIndex(initialState.destination.route)
+                        slideInHorizontally(tween(240, easing = FastOutSlowInEasing)) { full ->
+                            if (forward) full else -full
+                        }
                     }
                 },
-                exitTransition = {
-                    val forward = pageIndex(targetState.destination.route) >=
-                        pageIndex(initialState.destination.route)
-                    // 旧页面只位移 1/4，形成轻微视差，不会盖住新页面
-                    slideOutHorizontally(tween(240, easing = FastOutSlowInEasing)) { full ->
-                        if (forward) -full / 4 else full / 4
+                exitTransition = if (reduceMotion) {
+                    { ExitTransition.None }
+                } else {
+                    {
+                        val forward = pageIndex(targetState.destination.route) >=
+                            pageIndex(initialState.destination.route)
+                        // 旧页面同样整屏滑出：两页并排像翻页，不会出现「新页盖在旧页上」的重叠。
+                        slideOutHorizontally(tween(240, easing = FastOutSlowInEasing)) { full ->
+                            if (forward) -full else full
+                        }
                     }
                 },
-                popEnterTransition = {
-                    val forward = pageIndex(targetState.destination.route) >=
-                        pageIndex(initialState.destination.route)
-                    slideInHorizontally(tween(240, easing = FastOutSlowInEasing)) { full ->
-                        if (forward) full else -full
+                popEnterTransition = if (reduceMotion) {
+                    { EnterTransition.None }
+                } else {
+                    {
+                        val forward = pageIndex(targetState.destination.route) >=
+                            pageIndex(initialState.destination.route)
+                        slideInHorizontally(tween(240, easing = FastOutSlowInEasing)) { full ->
+                            if (forward) full else -full
+                        }
                     }
                 },
-                popExitTransition = {
-                    val forward = pageIndex(targetState.destination.route) >=
-                        pageIndex(initialState.destination.route)
-                    slideOutHorizontally(tween(240, easing = FastOutSlowInEasing)) { full ->
-                        if (forward) -full / 4 else full / 4
+                popExitTransition = if (reduceMotion) {
+                    { ExitTransition.None }
+                } else {
+                    {
+                        val forward = pageIndex(targetState.destination.route) >=
+                            pageIndex(initialState.destination.route)
+                        slideOutHorizontally(tween(240, easing = FastOutSlowInEasing)) { full ->
+                            if (forward) -full else full
+                        }
                     }
                 },
                 modifier = Modifier.padding(bottom = innerPadding.calculateBottomPadding() + extraBottom),
@@ -161,6 +179,8 @@ fun OmniApp(
                         onLayoutChange = onLayoutChange,
                         onLanguageChange = onLanguageChange,
                         onFrameworkChange = onFrameworkChange,
+                        reduceMotion = reduceMotion,
+                        onReduceMotionChange = onReduceMotionChange,
                     )
                 }
             }

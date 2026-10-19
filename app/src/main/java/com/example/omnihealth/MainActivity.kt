@@ -42,6 +42,7 @@ class MainActivity : ComponentActivity() {
                 OmniHealthTheme(mode = themeMode, framework = framework) {
                     CompositionLocalProvider(LocalHealthRepository provides repository) {
                         OmniApp(
+                            reduceMotion = settings.reduceMotion,
                             themeMode = themeMode,
                             layoutMode = layoutMode,
                             language = language,
@@ -50,6 +51,7 @@ class MainActivity : ComponentActivity() {
                             onLayoutChange = { scope.launch { repository.setLayout(it.id) } },
                             onLanguageChange = { scope.launch { repository.setLanguage(it.id) } },
                             onFrameworkChange = { scope.launch { repository.setFramework(it.id) } },
+                            onReduceMotionChange = { scope.launch { repository.setReduceMotion(it) } },
                         )
                     }
                 }

@@ -54,6 +54,7 @@ data class AppSettings(
     val layoutId: String = "layout_a",
     val languageId: String = "system",
     val frameworkId: String = "material3",
+    val reduceMotion: Boolean = false,
     val profile: UserProfile = UserProfile(),
     val api: ApiConfig = ApiConfig(),
     val stepGoal: Int = 10_000,
@@ -72,6 +73,7 @@ class SettingsPreferences(private val context: Context) {
         val layout = stringPreferencesKey("layout_id")
         val language = stringPreferencesKey("language_id")
         val framework = stringPreferencesKey("framework_id")
+        val reduceMotion = booleanPreferencesKey("reduce_motion")
 
         val nickname = stringPreferencesKey("profile_nickname")
         val gender = stringPreferencesKey("profile_gender")
@@ -101,6 +103,7 @@ class SettingsPreferences(private val context: Context) {
             layoutId = p[Keys.layout] ?: "layout_a",
             languageId = p[Keys.language] ?: "system",
             frameworkId = p[Keys.framework] ?: "material3",
+            reduceMotion = p[Keys.reduceMotion] ?: false,
             profile = UserProfile(
                 nickname = p[Keys.nickname] ?: "Kai",
                 gender = p[Keys.gender]?.let { runCatching { Gender.valueOf(it) }.getOrNull() } ?: Gender.MALE,
@@ -134,6 +137,8 @@ class SettingsPreferences(private val context: Context) {
     suspend fun setLanguageId(id: String) = context.omniDataStore.edit { it[Keys.language] = id }
 
     suspend fun setFrameworkId(id: String) = context.omniDataStore.edit { it[Keys.framework] = id }
+
+    suspend fun setReduceMotion(enabled: Boolean) = context.omniDataStore.edit { it[Keys.reduceMotion] = enabled }
 
     suspend fun updateProfile(profile: UserProfile) = context.omniDataStore.edit { p ->
         p[Keys.nickname] = profile.nickname

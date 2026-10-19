@@ -250,4 +250,6 @@
     <string name="about_privacy">所有记录保存在本机 Room 数据库，不会上传；只有你配置了 API Key 后，AI 请求才会离开设备。</string>
     <string name="about_licenses_title">开源组件</string>
     <string name="about_licenses">Jetpack Compose · Room · DataStore · WorkManager · Retrofit/OkHttp · kotlinx.serialization · MPAndroidChart</string>
+    <string name="motion_title">减少动效</string>
+    <string name="motion_desc">关闭页面滑动动画，切换零延迟</string>
 </resources>
