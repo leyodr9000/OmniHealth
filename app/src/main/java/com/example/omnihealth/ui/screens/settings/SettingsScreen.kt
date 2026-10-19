@@ -1,7 +1,10 @@
 package com.example.omnihealth.ui.screens.settings
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
+import androidx.core.content.FileProvider
+import java.io.File
 import android.widget.Toast
 import android.os.Build
 import androidx.activity.compose.BackHandler
@@ -241,12 +244,15 @@ fun SettingsScreen(
                     onClick = {
                         scope.launch {
                             val file = runCatching { repository.exportCsv(context) }.getOrNull()
-                            val message = if (file != null) {
-                                context.getString(R.string.export_done, file.absolutePath)
+                            if (file != null) {
+                                shareCsv(context, file)
                             } else {
-                                context.getString(R.string.export_failed)
+                                Toast.makeText(
+                                    context,
+                                    context.getString(R.string.export_failed),
+                                    Toast.LENGTH_LONG,
+                                ).show()
                             }
-                            Toast.makeText(context, message, Toast.LENGTH_LONG).show()
                         }
                     },
                 )
@@ -454,3 +460,19 @@ private fun goalLabel(goal: HealthGoal): String = stringResource(
         HealthGoal.GAIN -> R.string.goal_gain
     },
 )
+/** 通过系统分享面板导出 CSV（微信 / 邮件 / 文件管理器都能接收）。 */
+private fun shareCsv(context: android.content.Context, file: File) {
+    val uri = runCatching {
+        FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
+    }.getOrNull() ?: return
+    val intent = Intent(Intent.ACTION_SEND).apply {
+        type = "text/csv"
+        putExtra(Intent.EXTRA_STREAM, uri)
+        putExtra(Intent.EXTRA_SUBJECT, file.name)
+        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+    }
+    val chooser = Intent.createChooser(intent, context.getString(R.string.settings_row_export)).apply {
+        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    }
+    runCatching { context.startActivity(chooser) }
+}
