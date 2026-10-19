@@ -161,6 +161,8 @@ class HealthRepository(
 
     suspend fun deleteDietLog(log: DietLogEntity) = db.dietDao().deleteLog(log)
 
+    suspend fun restoreDietLog(log: DietLogEntity) = db.dietDao().restoreLog(log)
+
     /* ---------------- 习惯 ---------------- */
 
     fun habits(): Flow<List<HabitEntity>> = db.habitDao().observeHabits()

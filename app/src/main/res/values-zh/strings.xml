@@ -254,4 +254,6 @@
     <string name="motion_desc">关闭页面滑动动画，切换零延迟</string>
     <string name="score_insufficient">数据不足</string>
     <string name="score_insufficient_hint">记录睡眠、饮水或饮食后才计算分数</string>
+    <string name="deleted_hint">已删除「%1$s」</string>
+    <string name="undo">撤销</string>
 </resources>

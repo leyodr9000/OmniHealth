@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -105,6 +106,9 @@ fun DietSportScreen(
         contract = ActivityResultContracts.RequestPermission(),
     ) { viewModel.refreshSensorPermission() }
 
+    val pendingUndo by viewModel.pendingUndo.collectAsStateWithLifecycle()
+
+    Box(Modifier.fillMaxSize()) {
     LazyColumn(
         modifier = Modifier
             .fillMaxWidth()
@@ -146,6 +150,21 @@ fun DietSportScreen(
                 )
             }
 
+            // 今日记录放在字典之前：录完能马上看到、马上改。
+            if (diet.logs.isNotEmpty()) {
+                item {
+                    SectionHeader(
+                        title = stringResource(R.string.diet_logged_title),
+                        subtitle = "${diet.calories} kcal",
+                    )
+                }
+                items(diet.logs, key = { "l-${it.id}" }, contentType = { "log" }) { log ->
+                    Box(Modifier.animateItem()) {
+                        LogRow(log) { viewModel.deleteLog(log) }
+                    }
+                }
+            }
+
             if (query.isNotBlank()) {
                 if (results.isEmpty()) {
                     item {
@@ -173,20 +192,6 @@ fun DietSportScreen(
                 items(dictionary.take(40), key = { "d-${it.id}" }, contentType = { "food" }) { food ->
                     Box(Modifier.animateItem()) {
                         FoodRow(food) { pending = food }
-                    }
-                }
-            }
-
-            if (diet.logs.isNotEmpty()) {
-                item {
-                    SectionHeader(
-                        title = stringResource(R.string.diet_logged_title),
-                        subtitle = "${diet.calories} kcal",
-                    )
-                }
-                items(diet.logs, key = { "l-${it.id}" }, contentType = { "log" }) { log ->
-                    Box(Modifier.animateItem()) {
-                        LogRow(log) { viewModel.deleteLog(log) }
                     }
                 }
             }
@@ -265,6 +270,18 @@ fun DietSportScreen(
                 }
             }
         }
+    }
+
+    pendingUndo?.let { log ->
+        UndoBar(
+            text = stringResource(R.string.deleted_hint, log.foodName),
+            actionLabel = stringResource(R.string.undo),
+            onAction = { viewModel.undoDelete() },
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(horizontal = 18.dp, vertical = 12.dp),
+        )
+    }
     }
 
     pending?.let { food ->
@@ -728,3 +745,37 @@ private fun WorkoutRow(workout: WorkoutEntity) {
 
 private fun formatTime(seconds: Int): String =
     String.format(Locale.US, "%02d:%02d", seconds / 60, seconds % 60)
+/** 删除后的撤销条：5 秒内可恢复，避免误删无法找回。 */
+@Composable
+private fun UndoBar(
+    text: String,
+    actionLabel: String,
+    onAction: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val palette = OmniTheme.palette
+    Row(
+        modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(14.dp))
+            .background(palette.textPrimary.copy(alpha = 0.92f))
+            .padding(horizontal = 16.dp, vertical = 12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            text = text,
+            color = Color.White,
+            fontSize = 12.sp,
+            modifier = Modifier.weight(1f),
+        )
+        Text(
+            text = actionLabel,
+            color = palette.accent,
+            fontSize = 12.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier
+                .quietClick(onClick = onAction)
+                .padding(start = 12.dp, top = 4.dp, bottom = 4.dp),
+        )
+    }
+}

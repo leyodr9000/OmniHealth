@@ -138,8 +138,23 @@ class DietSportViewModel(
         viewModelScope.launch { repository.logFood(food, grams, mealType) }
     }
 
+    private val _pendingUndo = MutableStateFlow<DietLogEntity?>(null)
+    val pendingUndo: StateFlow<DietLogEntity?> = _pendingUndo
+
+    /** 删除后给 5 秒撤销窗口；窗口内恢复按原 id 写回。 */
     fun deleteLog(log: DietLogEntity) {
-        viewModelScope.launch { repository.deleteDietLog(log) }
+        viewModelScope.launch {
+            repository.deleteDietLog(log)
+            _pendingUndo.value = log
+            delay(5_000)
+            if (_pendingUndo.value?.id == log.id) _pendingUndo.value = null
+        }
+    }
+
+    fun undoDelete() {
+        val log = _pendingUndo.value ?: return
+        _pendingUndo.value = null
+        viewModelScope.launch { repository.restoreDietLog(log) }
     }
 
     fun startTimer() {

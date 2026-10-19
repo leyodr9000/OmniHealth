@@ -46,6 +46,10 @@ interface DietDao {
     @Delete
     suspend fun deleteLog(log: DietLogEntity)
 
+    /** 撤销删除：按原 id 写回，保证各页面的聚合结果一致。 */
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun restoreLog(log: DietLogEntity): Long
+
     @Query("SELECT * FROM diet_logs WHERE epochDay = :epochDay ORDER BY timestamp ASC")
     fun observeLogs(epochDay: Long): Flow<List<DietLogEntity>>
 
