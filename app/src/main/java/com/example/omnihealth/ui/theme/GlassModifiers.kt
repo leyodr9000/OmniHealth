@@ -42,53 +42,21 @@ import kotlin.math.sin
 fun MeshGradientBackground(
     palette: OmniPalette = OmniTheme.palette,
     modifier: Modifier = Modifier,
-    animated: Boolean = false,
     content: @Composable BoxScope.() -> Unit,
 ) {
-    val t: Float = if (animated) {
-        val transition = rememberInfiniteTransition(label = "mesh")
-        val value by transition.animateFloat(
-            initialValue = 0f,
-            targetValue = (2 * Math.PI).toFloat(),
-            animationSpec = infiniteRepeatable(
-                animation = tween(durationMillis = 26_000, easing = LinearEasing),
-                repeatMode = RepeatMode.Restart,
-            ),
-            label = "meshPhase",
-        )
-        value
-    } else {
-        0f
-    }
-
-    Box(modifier = modifier.fillMaxSize()) {
-        Canvas(Modifier.fillMaxSize()) {
-            drawRect(
-                brush = Brush.verticalGradient(
+    // 单个线性渐变即可：原来 3 个覆盖全屏的径向渐变在低端机上是实打实的填充率开销，
+    // 而 12% 透明度的色斑肉眼几乎不可见，删掉不损失观感。
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .background(
+                Brush.verticalGradient(
                     colors = listOf(palette.bgTop, palette.bgMid, palette.bgBottom),
                 ),
-                size = size,
-            )
-            drawBlob(palette.blobA, size.width * 0.18f, size.height * 0.12f, size.minDimension * 0.95f, t)
-            drawBlob(palette.blobB, size.width * 0.92f, size.height * 0.28f, size.minDimension * 0.85f, t + 1.9f)
-            drawBlob(palette.blobC, size.width * 0.45f, size.height * 0.86f, size.minDimension * 0.9f, t + 3.6f)
-        }
+            ),
+    ) {
         content()
     }
-}
-
-private fun DrawScope.drawBlob(color: Color, cx: Float, cy: Float, radius: Float, phase: Float) {
-    val dx = cos(phase) * radius * 0.16f
-    val dy = sin(phase * 0.8f) * radius * 0.13f
-    drawCircle(
-        brush = Brush.radialGradient(
-            colors = listOf(color, color.copy(alpha = 0f)),
-            center = Offset(cx + dx, cy + dy),
-            radius = radius,
-        ),
-        radius = radius,
-        center = Offset(cx + dx, cy + dy),
-    )
 }
 
 /**
@@ -117,7 +85,7 @@ fun GlassCard(
         )
 
     Column(
-        modifier = if (onClick != null) base.bounceClick(onClick = onClick) else base,
+        modifier = if (onClick != null) base.quietClick(onClick = onClick) else base,
     ) {
         Column(Modifier.padding(contentPadding), content = content)
     }

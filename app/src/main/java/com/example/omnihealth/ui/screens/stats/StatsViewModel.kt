@@ -1,5 +1,6 @@
 package com.example.omnihealth.ui.screens.stats
 
+import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.omnihealth.data.datastore.AppSettings
@@ -18,6 +19,7 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
+@Immutable
 data class StatsUiState(
     val labels: List<String> = emptyList(),
     val weight: List<Float> = emptyList(),

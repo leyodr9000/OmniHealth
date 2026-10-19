@@ -12,3 +12,8 @@ local.properties
 *.hprof
 *.log
 .staging/
+
+keystore.properties
+keystore/
+*.jks
+*.keystore

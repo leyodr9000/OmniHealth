@@ -1,5 +1,6 @@
 package com.example.omnihealth.ui.screens.home
 
+import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.omnihealth.data.datastore.Gender
@@ -13,6 +14,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
+@Immutable
 data class HomeUiState(
     val nickname: String = "Kai",
     val steps: Int = 0,

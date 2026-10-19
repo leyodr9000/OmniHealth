@@ -1,5 +1,6 @@
 package com.example.omnihealth.ui.screens.ai_advisor
 
+import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.omnihealth.data.local.entity.AiReportEntity
@@ -12,12 +13,14 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+@Immutable
 data class ChatItem(
     val text: String,
     val fromUser: Boolean,
     val offline: Boolean = false,
 )
 
+@Immutable
 data class AiUiState(
     val report: String = "",
     val reportScore: Int = 0,

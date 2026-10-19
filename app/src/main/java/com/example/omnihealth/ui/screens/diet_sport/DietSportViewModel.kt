@@ -1,6 +1,7 @@
 package com.example.omnihealth.ui.screens.diet_sport
 
 import android.app.Application
+import androidx.compose.runtime.Immutable
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.omnihealth.data.datastore.Gender
@@ -28,6 +29,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
+@Immutable
 data class DietUiState(
     val logs: List<DietLogEntity> = emptyList(),
     val calories: Int = 0,
@@ -40,6 +42,7 @@ data class DietUiState(
     val progress: Float get() = if (calorieGoal > 0) calories / calorieGoal.toFloat() else 0f
 }
 
+@Immutable
 data class SportUiState(
     val steps: Int = 0,
     val stepGoal: Int = 10_000,

@@ -43,7 +43,8 @@ OmniHealth 是一个「开箱即用」的 Android 个人健康管理应用：体
 
 每次里程碑构建都会上传到 [Releases](https://github.com/leyodr9000/OmniHealth/releases)：
 
-- 最新直达：`https://github.com/leyodr9000/OmniHealth/releases/latest/download/OmniHealth-debug.apk`
+- **正式包（推荐，R8 优化，1.9 MB）**：`https://github.com/leyodr9000/OmniHealth/releases/latest/download/OmniHealth-release.apk`
+- 调试包：`https://github.com/leyodr9000/OmniHealth/releases/latest/download/OmniHealth-debug.apk`
 
 ## 里程碑
 
