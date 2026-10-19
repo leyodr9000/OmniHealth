@@ -11,12 +11,14 @@ import com.example.omnihealth.data.local.entity.MealType
 import com.example.omnihealth.data.local.entity.WorkoutEntity
 import com.example.omnihealth.data.repository.HealthRepository
 import com.example.omnihealth.domain.util.HealthCalculator
+import com.example.omnihealth.domain.util.TimeUtils
 import com.example.omnihealth.domain.util.StepSensorManager
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
@@ -31,6 +33,7 @@ import kotlinx.coroutines.launch
 
 @Immutable
 data class DietUiState(
+    val day: Long = 0L,
     val logs: List<DietLogEntity> = emptyList(),
     val calories: Int = 0,
     val protein: Int = 0,
@@ -89,8 +92,18 @@ class DietSportViewModel(
 
     /* ---------------- 饮食 ---------------- */
 
+    /** 当前查看的日期（epochDay），默认今天；历史补录与查看都走这里。 */
+    private val _selectedDay = MutableStateFlow(TimeUtils.epochDayNow())
+    val selectedDay: StateFlow<Long> = _selectedDay.asStateFlow()
+
+    fun setDay(epochDay: Long) {
+        _selectedDay.value = epochDay.coerceAtMost(TimeUtils.epochDayNow())
+    }
+
+    fun shiftDay(deltaDays: Long) = setDay(_selectedDay.value + deltaDays)
+
     val dietState: StateFlow<DietUiState> = combine(
-        repository.todayDietLogs(),
+        _selectedDay.flatMapLatest { repository.dietLogsForDay(it) },
         repository.settings,
     ) { logs, settings ->
         val profile = settings.profile
@@ -98,6 +111,7 @@ class DietSportViewModel(
         val bmr = HealthCalculator.bmr(profile.weightKg, profile.heightCm, profile.age, isMale)
         val tdee = HealthCalculator.tdee(bmr, profile.activityLevel.factor)
         DietUiState(
+            day = _selectedDay.value,
             logs = logs,
             calories = logs.sumOf { it.calories.toDouble() }.toInt(),
             protein = logs.sumOf { it.protein.toDouble() }.toInt(),
@@ -134,8 +148,18 @@ class DietSportViewModel(
         _query.value = text
     }
 
-    fun logFood(food: FoodEntity, grams: Float, mealType: String = MealType.LUNCH) {
-        viewModelScope.launch { repository.logFood(food, grams, mealType) }
+    fun logFood(
+        food: FoodEntity,
+        grams: Float,
+        mealType: String = MealType.LUNCH,
+        epochDay: Long = _selectedDay.value,
+    ) {
+        viewModelScope.launch { repository.logFood(food, grams, mealType, epochDay) }
+    }
+
+    /** 编辑已有记录：只改克数与餐次，日期与时间保持不变。 */
+    fun updateLog(log: DietLogEntity, grams: Float, mealType: String) {
+        viewModelScope.launch { repository.updateDietLog(log, grams, mealType) }
     }
 
     private val _pendingUndo = MutableStateFlow<DietLogEntity?>(null)

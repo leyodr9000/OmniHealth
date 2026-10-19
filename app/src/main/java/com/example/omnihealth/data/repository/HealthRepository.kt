@@ -129,6 +129,9 @@ class HealthRepository(
 
     fun todayDietLogs(): Flow<List<DietLogEntity>> = db.dietDao().observeLogs(TimeUtils.epochDayNow())
 
+    /** 指定日期的饮食记录（历史补录/查看）。 */
+    fun dietLogsForDay(epochDay: Long): Flow<List<DietLogEntity>> = db.dietDao().observeLogs(epochDay)
+
     fun todayCalories(): Flow<Float> =
         db.dietDao().observeCalories(TimeUtils.epochDayNow()).map { it ?: 0f }
 
@@ -142,7 +145,12 @@ class HealthRepository(
 
     fun allFoods(): Flow<List<FoodEntity>> = db.dietDao().observeFoods()
 
-    suspend fun logFood(food: FoodEntity, grams: Float, mealType: String = MealType.LUNCH) {
+    suspend fun logFood(
+        food: FoodEntity,
+        grams: Float,
+        mealType: String = MealType.LUNCH,
+        epochDay: Long = TimeUtils.epochDayNow(),
+    ) {
         val ratio = grams / 100f
         db.dietDao().insertLog(
             DietLogEntity(
@@ -154,7 +162,7 @@ class HealthRepository(
                 protein = food.protein * ratio,
                 carbs = food.carbs * ratio,
                 fat = food.fat * ratio,
-                epochDay = TimeUtils.epochDayNow(),
+                epochDay = epochDay,
             ),
         )
     }
@@ -162,6 +170,21 @@ class HealthRepository(
     suspend fun deleteDietLog(log: DietLogEntity) = db.dietDao().deleteLog(log)
 
     suspend fun restoreDietLog(log: DietLogEntity) = db.dietDao().restoreLog(log)
+
+    /** 修改克数或餐次：营养值按比例重算，保留原时间与日期。 */
+    suspend fun updateDietLog(log: DietLogEntity, grams: Float, mealType: String) {
+        val ratio = if (log.grams > 0f) grams / log.grams else 1f
+        db.dietDao().updateLog(
+            log.copy(
+                grams = grams,
+                mealType = mealType,
+                calories = log.calories * ratio,
+                protein = log.protein * ratio,
+                carbs = log.carbs * ratio,
+                fat = log.fat * ratio,
+            ),
+        )
+    }
 
     /* ---------------- 习惯 ---------------- */
 

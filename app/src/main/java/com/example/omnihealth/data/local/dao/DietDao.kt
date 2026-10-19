@@ -5,6 +5,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Update
 import com.example.omnihealth.data.local.entity.DietLogEntity
 import com.example.omnihealth.data.local.entity.FoodEntity
 import kotlinx.coroutines.flow.Flow
@@ -52,6 +53,9 @@ interface DietDao {
 
     @Query("SELECT * FROM diet_logs WHERE epochDay = :epochDay ORDER BY timestamp ASC")
     fun observeLogs(epochDay: Long): Flow<List<DietLogEntity>>
+
+    @Update
+    suspend fun updateLog(log: DietLogEntity)
 
     @Query("SELECT * FROM diet_logs WHERE epochDay BETWEEN :from AND :to ORDER BY epochDay ASC, timestamp ASC")
     fun observeLogsBetween(from: Long, to: Long): Flow<List<DietLogEntity>>

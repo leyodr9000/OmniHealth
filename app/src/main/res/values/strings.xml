@@ -256,4 +256,6 @@
     <string name="score_insufficient_hint">Log sleep, water or meals to get a score</string>
     <string name="deleted_hint">Deleted “%1$s”</string>
     <string name="undo">Undo</string>
+    <string name="day_today">Today</string>
+    <string name="diet_edit_title">Edit record</string>
 </resources>

@@ -63,6 +63,7 @@ import com.example.omnihealth.data.local.entity.DietLogEntity
 import com.example.omnihealth.data.local.entity.FoodEntity
 import com.example.omnihealth.data.local.entity.MealType
 import com.example.omnihealth.data.local.entity.WorkoutEntity
+import com.example.omnihealth.domain.util.TimeUtils
 import com.example.omnihealth.ui.components.AppearOnScreen
 import com.example.omnihealth.ui.components.animatedInt
 import com.example.omnihealth.ui.components.MetricTile
@@ -101,6 +102,7 @@ fun DietSportScreen(
 
     var tab by remember { mutableIntStateOf(initialTab) }
     var pending by remember { mutableStateOf<FoodEntity?>(null) }
+    var editing by remember { mutableStateOf<DietLogEntity?>(null) }
 
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
@@ -129,6 +131,24 @@ fun DietSportScreen(
                 fontSize = 12.sp,
                 modifier = Modifier.padding(top = 3.dp),
             )
+            if (tab == 0) {
+                Spacer(Modifier.height(10.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    DayStepper(label = "‹", enabled = true, onClick = { viewModel.shiftDay(-1) })
+                    Text(
+                        text = dayLabel(diet.day),
+                        color = palette.textPrimary,
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Medium,
+                        modifier = Modifier.padding(horizontal = 14.dp),
+                    )
+                    DayStepper(
+                        label = "›",
+                        enabled = diet.day < TimeUtils.epochDayNow(),
+                        onClick = { viewModel.shiftDay(1) },
+                    )
+                }
+            }
         }
 
         item {
@@ -160,7 +180,11 @@ fun DietSportScreen(
                 }
                 items(diet.logs, key = { "l-${it.id}" }, contentType = { "log" }) { log ->
                     Box(Modifier.animateItem()) {
-                        LogRow(log) { viewModel.deleteLog(log) }
+                        LogRow(
+                            log = log,
+                            onEdit = { editing = log },
+                            onDelete = { viewModel.deleteLog(log) },
+                        )
                     }
                 }
             }
@@ -284,6 +308,28 @@ fun DietSportScreen(
     }
     }
 
+    editing?.let { log ->
+        val per100 = if (log.grams > 0f) 100f / log.grams else 1f
+        FoodAmountSheet(
+            food = FoodEntity(
+                name = log.foodName,
+                category = "",
+                calories = log.calories * per100,
+                protein = log.protein * per100,
+                carbs = log.carbs * per100,
+                fat = log.fat * per100,
+            ),
+            initialGrams = log.grams,
+            initialMeal = log.mealType,
+            isEdit = true,
+            onDismiss = { editing = null },
+            onConfirm = { grams, meal ->
+                viewModel.updateLog(log, grams, meal)
+                editing = null
+            },
+        )
+    }
+
     pending?.let { food ->
         FoodAmountSheet(
             food = food,
@@ -302,11 +348,14 @@ private fun FoodAmountSheet(
     food: FoodEntity,
     onDismiss: () -> Unit,
     onConfirm: (Float, String) -> Unit,
+    initialGrams: Float = food.servingGrams.coerceAtLeast(50f),
+    initialMeal: String = MealType.LUNCH,
+    isEdit: Boolean = false,
 ) {
     val palette = OmniTheme.palette
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    var grams by remember { mutableStateOf(food.servingGrams.coerceAtLeast(50f)) }
-    var meal by remember { mutableStateOf(MealType.LUNCH) }
+    var grams by remember { mutableStateOf(initialGrams) }
+    var meal by remember { mutableStateOf(initialMeal) }
 
     val meals = listOf(
         MealType.BREAKFAST to stringResource(R.string.meal_breakfast),
@@ -331,7 +380,7 @@ private fun FoodAmountSheet(
                     .padding(bottom = 28.dp),
             ) {
                 Text(
-                    text = stringResource(R.string.diet_add_title),
+                    text = stringResource(if (isEdit) R.string.diet_edit_title else R.string.diet_add_title),
                     color = palette.textPrimary,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
@@ -435,7 +484,7 @@ private fun FoodAmountSheet(
                     contentAlignment = Alignment.Center,
                 ) {
                     Text(
-                        text = stringResource(R.string.diet_add_confirm),
+                        text = stringResource(if (isEdit) R.string.edit_save else R.string.diet_add_confirm),
                         color = Color.White,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
@@ -618,13 +667,18 @@ private fun FoodRow(food: FoodEntity, onClick: () -> Unit) {
 }
 
 @Composable
-private fun LogRow(log: DietLogEntity, onDelete: () -> Unit) {
+private fun LogRow(
+    log: DietLogEntity,
+    onEdit: () -> Unit,
+    onDelete: () -> Unit,
+) {
     val palette = OmniTheme.palette
     Row(
         Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(18.dp))
             .background(palette.cardFill)
+            .quietClick(onClick = onEdit)
             .padding(horizontal = 14.dp, vertical = 11.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -778,4 +832,39 @@ private fun UndoBar(
                 .padding(start = 12.dp, top = 4.dp, bottom = 4.dp),
         )
     }
+}
+/** 日期步进按钮。 */
+@Composable
+private fun DayStepper(label: String, enabled: Boolean, onClick: () -> Unit) {
+    val palette = OmniTheme.palette
+    Box(
+        Modifier
+            .size(28.dp)
+            .clip(CircleShape)
+            .background(palette.textPrimary.copy(alpha = if (enabled) 0.06f else 0.03f))
+            .then(if (enabled) Modifier.quietClick(onClick = onClick) else Modifier),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(
+            text = label,
+            color = if (enabled) palette.textSecondary else palette.textTertiary.copy(alpha = 0.5f),
+            fontSize = 16.sp,
+        )
+    }
+}
+
+/** 今天显示「今天」，其他日期显示 M月d日。 */
+@Composable
+private fun dayLabel(epochDay: Long): String {
+    val locale = java.util.Locale.getDefault()
+    val today = TimeUtils.epochDayNow()
+    if (epochDay == today) return stringResource(R.string.day_today)
+    val date = java.time.LocalDate.ofEpochDay(epochDay)
+    return date.format(
+        if (locale.language.startsWith("zh")) {
+            java.time.format.DateTimeFormatter.ofPattern("M月d日", java.util.Locale.CHINA)
+        } else {
+            java.time.format.DateTimeFormatter.ofPattern("MMM d", java.util.Locale.ENGLISH)
+        },
+    )
 }

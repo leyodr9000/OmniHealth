@@ -256,4 +256,6 @@
     <string name="score_insufficient_hint">记录睡眠、饮水或饮食后才计算分数</string>
     <string name="deleted_hint">已删除「%1$s」</string>
     <string name="undo">撤销</string>
+    <string name="day_today">今天</string>
+    <string name="diet_edit_title">编辑记录</string>
 </resources>
