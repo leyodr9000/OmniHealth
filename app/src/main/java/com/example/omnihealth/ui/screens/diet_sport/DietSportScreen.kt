@@ -1,5 +1,10 @@
 package com.example.omnihealth.ui.screens.diet_sport
 
+import android.Manifest
+import android.app.Application
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,11 +19,16 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -29,16 +39,31 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
+import com.example.omnihealth.R
+import com.example.omnihealth.data.local.entity.DietLogEntity
+import com.example.omnihealth.data.local.entity.FoodEntity
+import com.example.omnihealth.data.local.entity.MealType
+import com.example.omnihealth.data.local.entity.WorkoutEntity
 import com.example.omnihealth.ui.components.MetricTile
 import com.example.omnihealth.ui.components.ProgressRing
 import com.example.omnihealth.ui.components.SectionHeader
+import com.example.omnihealth.ui.di.LocalHealthRepository
+import com.example.omnihealth.ui.i18n.LocalAppLanguage
+import com.example.omnihealth.ui.i18n.LocalizedApp
 import com.example.omnihealth.ui.theme.GlassCard
 import com.example.omnihealth.ui.theme.OmniTheme
 import com.example.omnihealth.ui.theme.bounceClick
+import java.util.Locale
 
 @Composable
 fun DietSportScreen(
@@ -46,8 +71,26 @@ fun DietSportScreen(
     onQuickLog: () -> Unit,
     onOpenSport: () -> Unit,
 ) {
+    val repository = LocalHealthRepository.current
+    val app = LocalContext.current.applicationContext as Application
+    val viewModel: DietSportViewModel = viewModel(
+        factory = viewModelFactory { initializer { DietSportViewModel(app, repository) } },
+    )
+    LaunchedEffect(Unit) { viewModel.startSensorIfPossible() }
+
+    val diet by viewModel.dietState.collectAsStateWithLifecycle()
+    val sport by viewModel.sportState.collectAsStateWithLifecycle()
+    val results by viewModel.results.collectAsStateWithLifecycle()
+    val dictionary by viewModel.dictionary.collectAsStateWithLifecycle()
+    val query by viewModel.query.collectAsStateWithLifecycle()
     val palette = OmniTheme.palette
+
     var tab by remember { mutableIntStateOf(initialTab) }
+    var pending by remember { mutableStateOf<FoodEntity?>(null) }
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+    ) { viewModel.refreshSensorPermission() }
 
     LazyColumn(
         modifier = Modifier
@@ -58,13 +101,13 @@ fun DietSportScreen(
     ) {
         item {
             Text(
-                text = "饮食与运动",
+                text = if (tab == 0) stringResource(R.string.diet_tab).replace("🍽 ", "") else stringResource(R.string.sport_tab).replace("🏃 ", ""),
                 color = palette.textPrimary,
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
             )
             Text(
-                text = "记录每一口，也记录每一步",
+                text = stringResource(R.string.home_status, stringResource(R.string.diet_today_title)),
                 color = palette.textTertiary,
                 fontSize = 12.sp,
                 modifier = Modifier.padding(top = 3.dp),
@@ -73,71 +116,346 @@ fun DietSportScreen(
 
         item {
             SegmentedControl(
-                options = listOf("🍽 饮食", "🏃 运动"),
+                options = listOf(stringResource(R.string.diet_tab), stringResource(R.string.sport_tab)),
                 selected = tab,
                 onSelect = { tab = it },
             )
         }
 
         if (tab == 0) {
-            item { CalorieSummaryCard() }
+            item { CalorieSummaryCard(diet) }
+
             item {
-                SearchBar(placeholder = "搜索食物，如「鸡胸肉」「拿铁」")
-            }
-            item { SectionHeader(title = "常用食物", subtitle = "来自预置食物字典 · 200+ 条") }
-            items(6) { index ->
-                val foods = listOf(
-                    Triple("鸡胸肉（生）", "高蛋白 · 低脂", "133 kcal / 100 g"),
-                    Triple("燕麦片", "复合碳水 · 高纤维", "389 kcal / 100 g"),
-                    Triple("希腊酸奶", "蛋白 + 益生菌", "97 kcal / 100 g"),
-                    Triple("牛油果", "优质脂肪", "160 kcal / 100 g"),
-                    Triple("西兰花", "维生素 C · 膳食纤维", "34 kcal / 100 g"),
-                    Triple("美式咖啡", "0 糖 · 0 脂", "2 kcal / 100 ml"),
+                SearchBar(
+                    value = query,
+                    placeholder = stringResource(R.string.diet_search_hint),
+                    onValueChange = viewModel::onQueryChange,
                 )
-                val item = foods[index]
-                FoodRow(item.first, item.second, item.third)
+            }
+
+            if (query.isNotBlank()) {
+                if (results.isEmpty()) {
+                    item {
+                        Text(
+                            text = stringResource(R.string.diet_search_empty),
+                            color = palette.textTertiary,
+                            fontSize = 12.sp,
+                            modifier = Modifier.padding(vertical = 12.dp),
+                        )
+                    }
+                } else {
+                    items(results, key = { "s-${it.id}" }) { food ->
+                        FoodRow(food) { pending = food }
+                    }
+                }
+            } else {
+                item {
+                    SectionHeader(
+                        title = stringResource(R.string.diet_dict_title),
+                        subtitle = stringResource(R.string.diet_dict_sub, dictionary.size),
+                    )
+                }
+                items(dictionary.take(40), key = { "d-${it.id}" }) { food ->
+                    FoodRow(food) { pending = food }
+                }
+            }
+
+            if (diet.logs.isNotEmpty()) {
+                item {
+                    SectionHeader(
+                        title = stringResource(R.string.diet_logged_title),
+                        subtitle = "${diet.calories} kcal",
+                    )
+                }
+                items(diet.logs, key = { "l-${it.id}" }) { log ->
+                    LogRow(log) { viewModel.deleteLog(log) }
+                }
             }
         } else {
             item {
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     MetricTile(
                         emoji = "👟",
-                        title = "今日步数",
-                        value = "6,842",
-                        unit = "步",
+                        title = stringResource(R.string.sport_steps),
+                        value = String.format(Locale.US, "%,d", sport.steps),
+                        unit = "",
                         accent = palette.accent,
-                        progress = 0.68f,
-                        hint = "传感器已连接",
+                        progress = sport.progress,
+                        hint = if (sport.sensorAvailable) {
+                            stringResource(R.string.sport_steps_hint)
+                        } else {
+                            stringResource(R.string.sport_no_sensor)
+                        },
                         modifier = Modifier.weight(1f),
                     )
                     MetricTile(
                         emoji = "🔥",
-                        title = "活动消耗",
-                        value = "312",
+                        title = stringResource(R.string.sport_today_workouts),
+                        value = "${sport.burned}",
                         unit = "kcal",
                         accent = Color(0xFFFF8A5B),
-                        progress = 0.52f,
-                        hint = "目标 600 kcal",
+                        progress = (sport.burned / 400f).coerceIn(0f, 1f),
+                        hint = stringResource(R.string.sport_burned, sport.burned),
                         modifier = Modifier.weight(1f),
                     )
                 }
             }
-            item { WorkoutTimerCard() }
+
             item {
-                SectionHeader(title = "今日训练", subtitle = "计时器 · 组间休息")
+                Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    ActionButton(
+                        text = stringResource(R.string.sport_simulate),
+                        modifier = Modifier.weight(1f),
+                    ) { viewModel.simulateSteps() }
+
+                    if (!sport.hasPermission && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        ActionButton(
+                            text = stringResource(R.string.sport_grant),
+                            modifier = Modifier.weight(1f),
+                        ) { permissionLauncher.launch(Manifest.permission.ACTIVITY_RECOGNITION) }
+                    }
+                }
             }
+
+            item { WorkoutTimerCard(sport, onStart = viewModel::startTimer, onStop = viewModel::stopTimer) }
+
             item {
-                GlassCard(Modifier.fillMaxWidth()) {
-                    Text("暂无训练记录", color = palette.textSecondary, fontSize = 13.sp)
+                SectionHeader(
+                    title = stringResource(R.string.sport_today_workouts),
+                    subtitle = stringResource(R.string.sport_burned, sport.burned),
+                )
+            }
+
+            if (sport.workouts.isEmpty()) {
+                item {
+                    GlassCard(Modifier.fillMaxWidth()) {
+                        Text(
+                            text = stringResource(R.string.sport_no_workout),
+                            color = palette.textSecondary,
+                            fontSize = 13.sp,
+                        )
+                    }
+                }
+            } else {
+                items(sport.workouts, key = { "w-${it.id}" }) { workout ->
+                    WorkoutRow(workout)
+                }
+            }
+        }
+    }
+
+    pending?.let { food ->
+        FoodAmountSheet(
+            food = food,
+            onDismiss = { pending = null },
+            onConfirm = { grams, meal ->
+                viewModel.logFood(food, grams, meal)
+                pending = null
+            },
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun FoodAmountSheet(
+    food: FoodEntity,
+    onDismiss: () -> Unit,
+    onConfirm: (Float, String) -> Unit,
+) {
+    val palette = OmniTheme.palette
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    var grams by remember { mutableStateOf(food.servingGrams.coerceAtLeast(50f)) }
+    var meal by remember { mutableStateOf(MealType.LUNCH) }
+
+    val meals = listOf(
+        MealType.BREAKFAST to stringResource(R.string.meal_breakfast),
+        MealType.LUNCH to stringResource(R.string.meal_lunch),
+        MealType.DINNER to stringResource(R.string.meal_dinner),
+        MealType.SNACK to stringResource(R.string.meal_snack),
+    )
+
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        sheetState = sheetState,
+        containerColor = palette.barFill,
+        scrimColor = palette.textPrimary.copy(alpha = 0.28f),
+    ) {
+        LocalizedApp(LocalAppLanguage.current) {
+            Column(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 22.dp)
+                    .padding(bottom = 28.dp),
+            ) {
+                Text(
+                    text = stringResource(R.string.diet_add_title),
+                    color = palette.textPrimary,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                )
+                Text(
+                    text = food.name,
+                    color = palette.textSecondary,
+                    fontSize = 13.sp,
+                    modifier = Modifier.padding(top = 4.dp),
+                )
+
+                Spacer(Modifier.height(16.dp))
+
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    meals.forEach { (type, label) ->
+                        val active = type == meal
+                        Box(
+                            Modifier
+                                .weight(1f)
+                                .clip(RoundedCornerShape(14.dp))
+                                .then(
+                                    if (active) {
+                                        Modifier.background(Brush.horizontalGradient(listOf(palette.accent, palette.accentAlt)))
+                                    } else {
+                                        Modifier.background(palette.textPrimary.copy(alpha = 0.06f))
+                                    },
+                                )
+                                .bounceClick(pressScale = 0.95f, haptics = false) { meal = type }
+                                .padding(vertical = 9.dp),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            Text(
+                                text = label,
+                                color = if (active) Color.White else palette.textSecondary,
+                                fontSize = 11.sp,
+                                fontWeight = if (active) FontWeight.Bold else FontWeight.Medium,
+                            )
+                        }
+                    }
+                }
+
+                Spacer(Modifier.height(18.dp))
+
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                        "点击上方「开始训练」即可计时，完成后自动计入统计。",
-                        color = palette.textTertiary,
-                        fontSize = 11.sp,
-                        modifier = Modifier.padding(top = 6.dp),
+                        text = stringResource(R.string.diet_grams),
+                        color = palette.textSecondary,
+                        fontSize = 12.sp,
+                        modifier = Modifier.weight(1f),
+                    )
+                    Text(
+                        text = "${grams.toInt()} g",
+                        color = palette.textPrimary,
+                        fontSize = 22.sp,
+                        fontWeight = FontWeight.Bold,
+                    )
+                }
+
+                Spacer(Modifier.height(10.dp))
+
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    listOf(-50f, -10f, 10f, 50f).forEach { delta ->
+                        Box(
+                            Modifier
+                                .weight(1f)
+                                .clip(RoundedCornerShape(12.dp))
+                                .background(palette.textPrimary.copy(alpha = 0.05f))
+                                .bounceClick(pressScale = 0.93f, haptics = false) {
+                                    grams = (grams + delta).coerceIn(5f, 1000f)
+                                }
+                                .padding(vertical = 10.dp),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            Text(
+                                text = if (delta > 0) "+${delta.toInt()}" else "${delta.toInt()}",
+                                color = palette.textSecondary,
+                                fontSize = 12.sp,
+                            )
+                        }
+                    }
+                }
+
+                Spacer(Modifier.height(14.dp))
+
+                val kcal = (food.calories * grams / 100f).toInt()
+                Text(
+                    text = "$kcal kcal · P ${(food.protein * grams / 100f).toInt()} g · C ${(food.carbs * grams / 100f).toInt()} g · F ${(food.fat * grams / 100f).toInt()} g",
+                    color = palette.textTertiary,
+                    fontSize = 11.sp,
+                )
+
+                Spacer(Modifier.height(18.dp))
+
+                Box(
+                    Modifier
+                        .fillMaxWidth()
+                        .height(50.dp)
+                        .clip(RoundedCornerShape(18.dp))
+                        .background(Brush.horizontalGradient(listOf(palette.accent, palette.accentAlt)))
+                        .bounceClick(pressScale = 0.97f) { onConfirm(grams, meal) },
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text(
+                        text = stringResource(R.string.diet_add_confirm),
+                        color = Color.White,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Bold,
                     )
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun CalorieSummaryCard(diet: DietUiState) {
+    val palette = OmniTheme.palette
+    GlassCard(Modifier.fillMaxWidth()) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            ProgressRing(
+                progress = diet.progress,
+                modifier = Modifier.size(86.dp),
+                ringColor = Color(0xFFFF8A5B),
+                strokeWidth = 8.dp,
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = "${diet.calories}",
+                        color = palette.textPrimary,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                    )
+                    Text("kcal", color = palette.textTertiary, fontSize = 9.sp)
+                }
+            }
+            Spacer(Modifier.width(18.dp))
+            Column(Modifier.weight(1f)) {
+                Text(
+                    text = stringResource(R.string.diet_today_title),
+                    color = palette.textSecondary,
+                    fontSize = 12.sp,
+                )
+                Text(
+                    text = stringResource(R.string.diet_left, diet.left),
+                    color = palette.textPrimary,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(top = 2.dp),
+                )
+                Spacer(Modifier.height(8.dp))
+                Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    MacroPill("P", "${diet.protein} g", palette.accent)
+                    MacroPill("C", "${diet.carbs} g", palette.warning)
+                    MacroPill("F", "${diet.fat} g", palette.accentAlt)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun MacroPill(label: String, value: String, color: Color) {
+    val palette = OmniTheme.palette
+    Column {
+        Text(label, color = palette.textTertiary, fontSize = 9.sp)
+        Text(value, color = color, fontSize = 12.sp, fontWeight = FontWeight.Bold)
     }
 }
 
@@ -163,9 +481,7 @@ private fun SegmentedControl(
                     .clip(RoundedCornerShape(14.dp))
                     .then(
                         if (active) {
-                            Modifier.background(
-                                Brush.horizontalGradient(listOf(palette.accent, palette.accentAlt)),
-                            )
+                            Modifier.background(Brush.horizontalGradient(listOf(palette.accent, palette.accentAlt)))
                         } else {
                             Modifier
                         },
@@ -186,55 +502,12 @@ private fun SegmentedControl(
 }
 
 @Composable
-private fun CalorieSummaryCard() {
+private fun SearchBar(
+    value: String,
+    placeholder: String,
+    onValueChange: (String) -> Unit,
+) {
     val palette = OmniTheme.palette
-    GlassCard(Modifier.fillMaxWidth()) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            ProgressRing(
-                progress = 0.74f,
-                modifier = Modifier.size(86.dp),
-                ringColor = Color(0xFFFF8A5B),
-                strokeWidth = 8.dp,
-            ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("1,486", color = palette.textPrimary, fontSize = 16.sp, fontWeight = FontWeight.Bold)
-                    Text("kcal", color = palette.textTertiary, fontSize = 9.sp)
-                }
-            }
-            Spacer(Modifier.width(18.dp))
-            Column(Modifier.weight(1f)) {
-                Text("今日摄入", color = palette.textSecondary, fontSize = 12.sp)
-                Text(
-                    "剩余 514 kcal",
-                    color = palette.textPrimary,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(top = 2.dp),
-                )
-                Spacer(Modifier.height(8.dp))
-                Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    MacroPill("蛋白", "96 g", palette.accent)
-                    MacroPill("碳水", "168 g", palette.warning)
-                    MacroPill("脂肪", "52 g", palette.accentAlt)
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun MacroPill(label: String, value: String, color: Color) {
-    val palette = OmniTheme.palette
-    Column {
-        Text(label, color = palette.textTertiary, fontSize = 9.sp)
-        Text(value, color = color, fontSize = 12.sp, fontWeight = FontWeight.Bold)
-    }
-}
-
-@Composable
-private fun SearchBar(placeholder: String) {
-    val palette = OmniTheme.palette
-    var text by remember { mutableStateOf("") }
     Row(
         Modifier
             .fillMaxWidth()
@@ -246,12 +519,12 @@ private fun SearchBar(placeholder: String) {
         Text("🔍", fontSize = 13.sp)
         Spacer(Modifier.width(10.dp))
         Box(Modifier.weight(1f)) {
-            if (text.isEmpty()) {
+            if (value.isEmpty()) {
                 Text(placeholder, color = palette.textTertiary, fontSize = 12.sp)
             }
             BasicTextField(
-                value = text,
-                onValueChange = { text = it },
+                value = value,
+                onValueChange = onValueChange,
                 textStyle = TextStyle(color = palette.textPrimary, fontSize = 13.sp),
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth(),
@@ -261,14 +534,15 @@ private fun SearchBar(placeholder: String) {
 }
 
 @Composable
-private fun FoodRow(name: String, desc: String, kcal: String) {
+private fun FoodRow(food: FoodEntity, onClick: () -> Unit) {
     val palette = OmniTheme.palette
     Row(
         Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(20.dp))
             .background(palette.cardFill)
-            .padding(15.dp),
+            .bounceClick(pressScale = 0.985f, haptics = false, onClick = onClick)
+            .padding(14.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Box(
@@ -282,35 +556,158 @@ private fun FoodRow(name: String, desc: String, kcal: String) {
         }
         Spacer(Modifier.width(12.dp))
         Column(Modifier.weight(1f)) {
-            Text(name, color = palette.textPrimary, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
-            Text(desc, color = palette.textTertiary, fontSize = 10.sp, modifier = Modifier.padding(top = 2.dp))
+            Text(food.name, color = palette.textPrimary, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+            Text(
+                text = "${food.category} · P${food.protein.toInt()} C${food.carbs.toInt()} F${food.fat.toInt()}",
+                color = palette.textTertiary,
+                fontSize = 10.sp,
+                modifier = Modifier.padding(top = 2.dp),
+            )
         }
         Column(horizontalAlignment = Alignment.End) {
-            Text(kcal, color = palette.textSecondary, fontSize = 11.sp)
-            Text("＋", color = palette.accent, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+            Text(
+                text = "${food.calories.toInt()} kcal",
+                color = palette.textSecondary,
+                fontSize = 11.sp,
+            )
+            Text("/100g", color = palette.textTertiary, fontSize = 9.sp)
         }
     }
 }
 
 @Composable
-private fun WorkoutTimerCard() {
+private fun LogRow(log: DietLogEntity, onDelete: () -> Unit) {
+    val palette = OmniTheme.palette
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(18.dp))
+            .background(palette.cardFill)
+            .padding(horizontal = 14.dp, vertical = 11.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Column(Modifier.weight(1f)) {
+            Text(log.foodName, color = palette.textPrimary, fontSize = 12.sp, fontWeight = FontWeight.Medium)
+            Text(
+                text = "${log.grams.toInt()} g · ${mealLabel(log.mealType)}",
+                color = palette.textTertiary,
+                fontSize = 10.sp,
+            )
+        }
+        Text(
+            text = "${log.calories.toInt()} kcal",
+            color = palette.textSecondary,
+            fontSize = 11.sp,
+        )
+        Spacer(Modifier.width(10.dp))
+        Box(
+            Modifier
+                .size(26.dp)
+                .clip(CircleShape)
+                .background(palette.danger.copy(alpha = 0.12f))
+                .bounceClick(pressScale = 0.9f, haptics = false, onClick = onDelete),
+            contentAlignment = Alignment.Center,
+        ) {
+            Text("✕", color = palette.danger, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+        }
+    }
+}
+
+@Composable
+private fun mealLabel(type: String): String = when (type) {
+    MealType.BREAKFAST -> stringResource(R.string.meal_breakfast)
+    MealType.DINNER -> stringResource(R.string.meal_dinner)
+    MealType.SNACK -> stringResource(R.string.meal_snack)
+    else -> stringResource(R.string.meal_lunch)
+}
+
+@Composable
+private fun ActionButton(
+    text: String,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit,
+) {
+    val palette = OmniTheme.palette
+    Box(
+        modifier
+            .clip(RoundedCornerShape(14.dp))
+            .background(palette.accent.copy(alpha = 0.12f))
+            .bounceClick(pressScale = 0.94f, onClick = onClick)
+            .padding(vertical = 11.dp),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(text, color = palette.accent, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+    }
+}
+
+@Composable
+private fun WorkoutTimerCard(state: SportUiState, onStart: () -> Unit, onStop: () -> Unit) {
     val palette = OmniTheme.palette
     GlassCard(Modifier.fillMaxWidth()) {
-        Text("训练计时器", color = palette.textPrimary, fontSize = 14.sp, fontWeight = FontWeight.Bold)
-        Text("00:00", color = palette.textPrimary, fontSize = 40.sp, fontWeight = FontWeight.Bold)
-        Text("选择动作后开始计时 · 支持组间休息提醒", color = palette.textTertiary, fontSize = 11.sp)
-        Spacer(Modifier.height(12.dp))
-        Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            listOf("力量", "跑步", "骑行", "瑜伽").forEach { label ->
-                Box(
-                    Modifier
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(palette.accent.copy(alpha = 0.12f))
-                        .padding(horizontal = 12.dp, vertical = 7.dp),
-                ) {
-                    Text(label, color = palette.accent, fontSize = 11.sp, fontWeight = FontWeight.Medium)
-                }
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Column(Modifier.weight(1f)) {
+                Text(
+                    text = stringResource(R.string.sport_timer),
+                    color = palette.textSecondary,
+                    fontSize = 12.sp,
+                )
+                Text(
+                    text = formatTime(state.seconds),
+                    color = palette.textPrimary,
+                    fontSize = 34.sp,
+                    fontWeight = FontWeight.Bold,
+                )
+            }
+            Box(
+                Modifier
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(
+                        Brush.horizontalGradient(
+                            if (state.running) {
+                                listOf(palette.danger, palette.accentAlt)
+                            } else {
+                                listOf(palette.accent, palette.accentAlt)
+                            },
+                        ),
+                    )
+                    .bounceClick(pressScale = 0.95f) { if (state.running) onStop() else onStart() }
+                    .padding(horizontal = 18.dp, vertical = 11.dp),
+            ) {
+                Text(
+                    text = if (state.running) stringResource(R.string.sport_stop) else stringResource(R.string.sport_start),
+                    color = Color.White,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold,
+                )
             }
         }
     }
 }
+
+@Composable
+private fun WorkoutRow(workout: WorkoutEntity) {
+    val palette = OmniTheme.palette
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(18.dp))
+            .background(palette.cardFill)
+            .padding(horizontal = 14.dp, vertical = 11.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text("🏋️", fontSize = 14.sp)
+        Spacer(Modifier.width(10.dp))
+        Column(Modifier.weight(1f)) {
+            Text(workout.type, color = palette.textPrimary, fontSize = 12.sp, fontWeight = FontWeight.Medium)
+            Text(formatTime(workout.durationSec), color = palette.textTertiary, fontSize = 10.sp)
+        }
+        Text(
+            text = stringResource(R.string.sport_burned, workout.calories),
+            color = palette.success,
+            fontSize = 11.sp,
+        )
+    }
+}
+
+private fun formatTime(seconds: Int): String =
+    String.format(Locale.US, "%02d:%02d", seconds / 60, seconds % 60)

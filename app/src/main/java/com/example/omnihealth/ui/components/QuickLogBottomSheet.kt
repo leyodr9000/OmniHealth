@@ -35,6 +35,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.omnihealth.R
+import com.example.omnihealth.ui.i18n.LocalAppLanguage
+import com.example.omnihealth.ui.i18n.LocalizedApp
 import com.example.omnihealth.ui.theme.OmniTheme
 import com.example.omnihealth.ui.theme.bounceClick
 import com.example.omnihealth.ui.theme.frostBar
@@ -92,121 +94,123 @@ fun QuickLogBottomSheet(
             )
         },
     ) {
-        Column(
-            Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 22.dp)
-                .padding(bottom = 26.dp),
-        ) {
-            Text(
-                text = stringResource(R.string.quick_log_title),
-                color = palette.textPrimary,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-            )
-            Text(
-                text = stringResource(R.string.quick_log_subtitle),
-                color = palette.textTertiary,
-                fontSize = 12.sp,
-                modifier = Modifier.padding(top = 4.dp),
-            )
-
-            Spacer(Modifier.height(18.dp))
-
-            LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                items(QuickLogType.entries) { item ->
-                    TypeChip(
-                        emoji = item.emoji,
-                        label = stringResource(item.labelRes),
-                        selected = item == type,
-                        onClick = {
-                            type = item
-                            value = item.defaultValue
-                        },
-                    )
-                }
-            }
-
-            Spacer(Modifier.height(22.dp))
-
+        LocalizedApp(LocalAppLanguage.current) {
             Column(
                 Modifier
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(26.dp))
-                    .background(
-                        Brush.verticalGradient(
-                            listOf(
-                                palette.accent.copy(alpha = 0.10f),
-                                palette.accentAlt.copy(alpha = 0.06f),
-                            ),
-                        ),
-                    )
-                    .padding(vertical = 22.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
+                    .padding(horizontal = 22.dp)
+                    .padding(bottom = 26.dp),
             ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    StepperButton("−") { value = (value - type.step).coerceAtLeast(0f) }
-                    Text(
-                        text = type.format(value),
-                        color = palette.textPrimary,
-                        fontSize = 46.sp,
-                        fontWeight = FontWeight.Bold,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier
-                            .padding(horizontal = 22.dp)
-                            .width(130.dp),
-                    )
-                    StepperButton("+") { value += type.step }
-                }
                 Text(
-                    text = type.unit,
+                    text = stringResource(R.string.quick_log_title),
+                    color = palette.textPrimary,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                )
+                Text(
+                    text = stringResource(R.string.quick_log_subtitle),
                     color = palette.textTertiary,
                     fontSize = 12.sp,
+                    modifier = Modifier.padding(top = 4.dp),
                 )
-            }
 
-            Spacer(Modifier.height(14.dp))
+                Spacer(Modifier.height(18.dp))
 
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                type.deltas.forEach { delta ->
-                    Box(
-                        Modifier
-                            .weight(1f)
-                            .clip(RoundedCornerShape(14.dp))
-                            .background(palette.textPrimary.copy(alpha = 0.05f))
-                            .bounceClick(pressScale = 0.92f, haptics = false) {
-                                value = (value + delta).coerceAtLeast(0f)
-                            }
-                            .padding(vertical = 11.dp),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        Text(
-                            text = if (delta > 0) "+${type.format(delta)}" else type.format(delta),
-                            color = palette.textSecondary,
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.Medium,
+                LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    items(QuickLogType.entries) { item ->
+                        TypeChip(
+                            emoji = item.emoji,
+                            label = stringResource(item.labelRes),
+                            selected = item == type,
+                            onClick = {
+                                type = item
+                                value = item.defaultValue
+                            },
                         )
                     }
                 }
-            }
 
-            Spacer(Modifier.height(22.dp))
+                Spacer(Modifier.height(22.dp))
 
-            Box(
-                Modifier
-                    .fillMaxWidth()
-                    .height(52.dp)
-                    .clip(RoundedCornerShape(18.dp))
-                    .background(Brush.horizontalGradient(listOf(palette.accent, palette.accentAlt)))
-                    .bounceClick(pressScale = 0.97f) { onSave(type, value) },
-                contentAlignment = Alignment.Center,
-            ) {
-                Text(
-                    text = stringResource(R.string.quick_log_save),
-                    color = androidx.compose.ui.graphics.Color.White,
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.Bold,
-                )
+                Column(
+                    Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(26.dp))
+                        .background(
+                            Brush.verticalGradient(
+                                listOf(
+                                    palette.accent.copy(alpha = 0.10f),
+                                    palette.accentAlt.copy(alpha = 0.06f),
+                                ),
+                            ),
+                        )
+                        .padding(vertical = 22.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        StepperButton("−") { value = (value - type.step).coerceAtLeast(0f) }
+                        Text(
+                            text = type.format(value),
+                            color = palette.textPrimary,
+                            fontSize = 46.sp,
+                            fontWeight = FontWeight.Bold,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier
+                                .padding(horizontal = 22.dp)
+                                .width(130.dp),
+                        )
+                        StepperButton("+") { value += type.step }
+                    }
+                    Text(
+                        text = type.unit,
+                        color = palette.textTertiary,
+                        fontSize = 12.sp,
+                    )
+                }
+
+                Spacer(Modifier.height(14.dp))
+
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    type.deltas.forEach { delta ->
+                        Box(
+                            Modifier
+                                .weight(1f)
+                                .clip(RoundedCornerShape(14.dp))
+                                .background(palette.textPrimary.copy(alpha = 0.05f))
+                                .bounceClick(pressScale = 0.92f, haptics = false) {
+                                    value = (value + delta).coerceAtLeast(0f)
+                                }
+                                .padding(vertical = 11.dp),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            Text(
+                                text = if (delta > 0) "+${type.format(delta)}" else type.format(delta),
+                                color = palette.textSecondary,
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Medium,
+                            )
+                        }
+                    }
+                }
+
+                Spacer(Modifier.height(22.dp))
+
+                Box(
+                    Modifier
+                        .fillMaxWidth()
+                        .height(52.dp)
+                        .clip(RoundedCornerShape(18.dp))
+                        .background(Brush.horizontalGradient(listOf(palette.accent, palette.accentAlt)))
+                        .bounceClick(pressScale = 0.97f) { onSave(type, value) },
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text(
+                        text = stringResource(R.string.quick_log_save),
+                        color = androidx.compose.ui.graphics.Color.White,
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.Bold,
+                    )
+                }
             }
         }
     }

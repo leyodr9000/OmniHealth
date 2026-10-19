@@ -101,4 +101,33 @@
     <string name="dim_sleep">Sleep</string>
     <string name="dim_hydration">Water</string>
     <string name="dim_consistency">Habits</string>
+
+    <!-- Diet & Sport -->
+    <string name="diet_tab">🍽 Diet</string>
+    <string name="sport_tab">🏃 Sport</string>
+    <string name="diet_today_title">Today\'s intake</string>
+    <string name="diet_left">%1$d kcal left</string>
+    <string name="diet_search_hint">Search food, e.g. chicken breast</string>
+    <string name="diet_search_empty">No match. Try another keyword.</string>
+    <string name="diet_dict_title">Food dictionary</string>
+    <string name="diet_dict_sub">%1$d items · tap to add</string>
+    <string name="diet_logged_title">Logged today</string>
+    <string name="diet_add_title">Add food</string>
+    <string name="diet_grams">Grams</string>
+    <string name="diet_add_confirm">Add to log</string>
+    <string name="meal_breakfast">Breakfast</string>
+    <string name="meal_lunch">Lunch</string>
+    <string name="meal_dinner">Dinner</string>
+    <string name="meal_snack">Snack</string>
+    <string name="sport_steps">Today\'s steps</string>
+    <string name="sport_steps_hint">Sensor connected</string>
+    <string name="sport_no_sensor">No step sensor · use simulator</string>
+    <string name="sport_simulate">+1,000 steps</string>
+    <string name="sport_timer">Workout timer</string>
+    <string name="sport_start">Start</string>
+    <string name="sport_stop">Stop &amp; save</string>
+    <string name="sport_today_workouts">Today\'s workouts</string>
+    <string name="sport_no_workout">No workout yet</string>
+    <string name="sport_grant">Grant activity permission</string>
+    <string name="sport_burned">Burned %1$d kcal</string>
 </resources>

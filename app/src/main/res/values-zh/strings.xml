@@ -101,4 +101,33 @@
     <string name="dim_sleep">睡眠</string>
     <string name="dim_hydration">水分</string>
     <string name="dim_consistency">习惯</string>
+
+    <!-- 饮食与运动 -->
+    <string name="diet_tab">🍽 饮食</string>
+    <string name="sport_tab">🏃 运动</string>
+    <string name="diet_today_title">今日摄入</string>
+    <string name="diet_left">剩余 %1$d kcal</string>
+    <string name="diet_search_hint">搜索食物，如「鸡胸肉」</string>
+    <string name="diet_search_empty">没有匹配的食物，换个关键词试试</string>
+    <string name="diet_dict_title">食物字典</string>
+    <string name="diet_dict_sub">共 %1$d 条 · 点击添加</string>
+    <string name="diet_logged_title">今日已记录</string>
+    <string name="diet_add_title">添加食物</string>
+    <string name="diet_grams">克数</string>
+    <string name="diet_add_confirm">加入记录</string>
+    <string name="meal_breakfast">早餐</string>
+    <string name="meal_lunch">午餐</string>
+    <string name="meal_dinner">晚餐</string>
+    <string name="meal_snack">加餐</string>
+    <string name="sport_steps">今日步数</string>
+    <string name="sport_steps_hint">传感器已连接</string>
+    <string name="sport_no_sensor">无计步传感器 · 可用模拟</string>
+    <string name="sport_simulate">+1,000 步</string>
+    <string name="sport_timer">训练计时器</string>
+    <string name="sport_start">开始</string>
+    <string name="sport_stop">结束并保存</string>
+    <string name="sport_today_workouts">今日训练</string>
+    <string name="sport_no_workout">暂无训练记录</string>
+    <string name="sport_grant">授予运动权限</string>
+    <string name="sport_burned">消耗 %1$d kcal</string>
 </resources>
