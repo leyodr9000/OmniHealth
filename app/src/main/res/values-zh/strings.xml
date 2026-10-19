@@ -209,4 +209,20 @@
     <string name="habits_empty">还没有习惯，加一个来点亮「一致性」评分。</string>
     <string name="habit_name">习惯名称</string>
     <string name="habit_delete">删除</string>
+    <!-- 设置页 -->
+    <string name="settings_me">我的</string>
+    <string name="settings_group_personal">个人</string>
+    <string name="settings_group_preferences">偏好</string>
+    <string name="settings_group_about">数据与关于</string>
+    <string name="settings_row_profile">个人资料</string>
+    <string name="settings_row_goals">每日目标</string>
+    <string name="settings_row_appearance">外观</string>
+    <string name="settings_row_ai">AI 接口</string>
+    <string name="settings_row_reminders">提醒</string>
+    <string name="settings_row_about">关于 OmniHealth</string>
+    <string name="settings_reminders_off">未开启</string>
+    <string name="settings_version">版本 1.0.0</string>
+    <string name="settings_back">返回</string>
+    <string name="settings_appearance_title">外观</string>
+    <string name="settings_appearance_sub">主题框架、配色与语言</string>
 </resources>

@@ -1,9 +1,12 @@
 package com.example.omnihealth.ui.screens.settings
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -16,6 +19,15 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.AutoAwesome
+import androidx.compose.material.icons.rounded.ChevronRight
+import androidx.compose.material.icons.rounded.Flag
+import androidx.compose.material.icons.rounded.Info
+import androidx.compose.material.icons.rounded.Notifications
+import androidx.compose.material.icons.rounded.Palette
+import androidx.compose.material.icons.rounded.Person
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -26,8 +38,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -38,17 +49,18 @@ import com.example.omnihealth.data.datastore.ActivityLevel
 import com.example.omnihealth.data.datastore.AppSettings
 import com.example.omnihealth.data.datastore.Gender
 import com.example.omnihealth.data.datastore.HealthGoal
-import com.example.omnihealth.ui.components.SectionHeader
 import com.example.omnihealth.ui.di.LocalHealthRepository
 import com.example.omnihealth.ui.i18n.AppLanguage
 import com.example.omnihealth.ui.navigation.NavLayoutMode
-import com.example.omnihealth.ui.theme.GlassCard
 import com.example.omnihealth.ui.theme.OmniTheme
 import com.example.omnihealth.ui.theme.ThemeMode
 import com.example.omnihealth.ui.theme.bounceClick
-import com.example.omnihealth.ui.theme.paletteFor
 import kotlinx.coroutines.launch
 import java.util.Locale
+
+private enum class SettingsPage { ROOT, APPEARANCE }
+
+private enum class SettingsSheet { NONE, PROFILE, API, GOALS }
 
 @Composable
 fun SettingsScreen(
@@ -63,173 +75,155 @@ fun SettingsScreen(
     val repository = LocalHealthRepository.current
     val settings by repository.settings.collectAsStateWithLifecycle(initialValue = AppSettings())
     val scope = rememberCoroutineScope()
+
+    var page by remember { mutableStateOf(SettingsPage.ROOT) }
     var sheet by remember { mutableStateOf(SettingsSheet.NONE) }
+
+    BackHandler(enabled = page != SettingsPage.ROOT) { page = SettingsPage.ROOT }
+
+    if (page == SettingsPage.APPEARANCE) {
+        AppearanceScreen(
+            themeMode = themeMode,
+            layoutMode = layoutMode,
+            language = language,
+            onThemeChange = onThemeChange,
+            onLayoutChange = onLayoutChange,
+            onLanguageChange = onLanguageChange,
+            onBack = { page = SettingsPage.ROOT },
+        )
+        return
+    }
+
+    val profile = settings.profile
+    val bmi = if (profile.heightCm > 0f) {
+        profile.weightKg / ((profile.heightCm / 100f) * (profile.heightCm / 100f))
+    } else {
+        0f
+    }
 
     LazyColumn(
         modifier = Modifier
             .fillMaxWidth()
             .statusBarsPadding(),
         contentPadding = PaddingValues(start = 18.dp, end = 18.dp, top = 8.dp, bottom = 28.dp),
-        verticalArrangement = Arrangement.spacedBy(14.dp),
+        verticalArrangement = Arrangement.spacedBy(18.dp),
     ) {
         item {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(
+                    Modifier
+                        .size(56.dp)
+                        .clip(CircleShape)
+                        .background(palette.accent),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text(
+                        text = profile.nickname.take(1).uppercase(),
+                        color = androidx.compose.ui.graphics.Color.White,
+                        fontSize = 22.sp,
+                        fontWeight = FontWeight.Bold,
+                    )
+                }
+                Spacer(Modifier.width(14.dp))
+                Column {
+                    Text(
+                        text = profile.nickname,
+                        color = palette.textPrimary,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold,
+                    )
+                    Text(
+                        text = "BMI ${String.format(Locale.US, "%.1f", bmi)} · " +
+                            goalLabel(profile.goal),
+                        color = palette.textTertiary,
+                        fontSize = 11.sp,
+                        modifier = Modifier.padding(top = 3.dp),
+                    )
+                }
+            }
+        }
+
+        item {
+            SettingsGroup(title = stringResource(R.string.settings_group_personal)) {
+                SettingItem(
+                    icon = Icons.Rounded.Person,
+                    title = stringResource(R.string.settings_row_profile),
+                    subtitle = "${genderLabel(profile.gender)} · ${profile.age} · " +
+                        "${profile.heightCm.toInt()} cm · ${profile.weightKg} kg",
+                    onClick = { sheet = SettingsSheet.PROFILE },
+                )
+                SettingDivider()
+                SettingItem(
+                    icon = Icons.Rounded.Flag,
+                    title = stringResource(R.string.settings_row_goals),
+                    subtitle = "${String.format(Locale.US, "%,d", settings.stepGoal)} · " +
+                        "${settings.waterGoalMl} ml · " +
+                        String.format(Locale.US, "%.1f h", settings.sleepGoalMin / 60f) + " · " +
+                        "${settings.calorieGoal} kcal",
+                    onClick = { sheet = SettingsSheet.GOALS },
+                )
+            }
+        }
+
+        item {
+            SettingsGroup(title = stringResource(R.string.settings_group_preferences)) {
+                SettingItem(
+                    icon = Icons.Rounded.Palette,
+                    title = stringResource(R.string.settings_row_appearance),
+                    value = stringResource(themeMode.labelRes) + " · " +
+                        stringResource(layoutMode.labelRes) + " · " +
+                        stringResource(language.labelRes),
+                    onClick = { page = SettingsPage.APPEARANCE },
+                )
+                SettingDivider()
+                SettingItem(
+                    icon = Icons.Rounded.AutoAwesome,
+                    title = stringResource(R.string.settings_row_ai),
+                    value = if (settings.api.apiKey.isBlank()) {
+                        stringResource(R.string.ai_provider_offline)
+                    } else {
+                        settings.api.model
+                    },
+                    onClick = { sheet = SettingsSheet.API },
+                )
+            }
+        }
+
+        item {
+            SettingsGroup(title = stringResource(R.string.settings_group_about)) {
+                SettingItem(
+                    icon = Icons.Rounded.Notifications,
+                    title = stringResource(R.string.settings_row_reminders),
+                    value = stringResource(R.string.settings_reminders_off),
+                    onClick = {},
+                )
+                SettingDivider()
+                SettingItem(
+                    icon = Icons.Rounded.Info,
+                    title = stringResource(R.string.settings_row_about),
+                    value = stringResource(R.string.settings_version),
+                    onClick = {},
+                )
+            }
+        }
+
+        item {
             Text(
-                text = stringResource(R.string.settings_title),
-                color = palette.textPrimary,
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-            )
-            Text(
-                text = stringResource(R.string.settings_subtitle),
+                text = stringResource(R.string.settings_footer),
                 color = palette.textTertiary,
-                fontSize = 12.sp,
-                modifier = Modifier.padding(top = 3.dp),
+                fontSize = 10.sp,
+                lineHeight = 15.sp,
+                modifier = Modifier.padding(start = 4.dp),
             )
-        }
-
-        item {
-            SectionHeader(
-                title = stringResource(R.string.settings_section_language),
-                subtitle = stringResource(R.string.settings_section_language_sub),
-            )
-        }
-
-        item {
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                AppLanguage.entries.forEach { item ->
-                    LanguageChip(
-                        label = stringResource(item.labelRes),
-                        selected = item == language,
-                        modifier = Modifier.weight(1f),
-                        onClick = { onLanguageChange(item) },
-                    )
-                }
-            }
-        }
-
-        item {
-            SectionHeader(
-                title = stringResource(R.string.settings_section_theme),
-                subtitle = stringResource(R.string.settings_section_theme_sub),
-            )
-        }
-
-        item {
-            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                ThemeMode.entries.forEach { mode ->
-                    ThemeOption(
-                        mode = mode,
-                        selected = mode == themeMode,
-                        onClick = { onThemeChange(mode) },
-                    )
-                }
-            }
-        }
-
-        item {
-            SectionHeader(
-                title = stringResource(R.string.settings_section_layout),
-                subtitle = stringResource(R.string.settings_section_layout_sub),
-            )
-        }
-
-        item {
-            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                NavLayoutMode.entries.forEach { mode ->
-                    LayoutOption(
-                        mode = mode,
-                        selected = mode == layoutMode,
-                        onClick = { onLayoutChange(mode) },
-                    )
-                }
-            }
-        }
-
-        item {
-            SectionHeader(
-                title = stringResource(R.string.settings_section_profile),
-                subtitle = stringResource(R.string.settings_section_profile_sub),
-            )
-        }
-
-        item {
-            GlassCard(Modifier.fillMaxWidth(), onClick = { sheet = SettingsSheet.PROFILE }) {
-                ProfileRow(stringResource(R.string.profile_nickname), settings.profile.nickname)
-                ProfileRow(
-                    stringResource(R.string.profile_gender_age),
-                    "${genderLabel(settings.profile.gender)} · ${settings.profile.age}",
-                )
-                ProfileRow(
-                    stringResource(R.string.profile_body),
-                    "${settings.profile.heightCm.toInt()} cm · ${settings.profile.weightKg} kg",
-                )
-                ProfileRow(stringResource(R.string.profile_activity), activityLabel(settings.profile.activityLevel))
-                ProfileRow(stringResource(R.string.profile_goal), goalLabel(settings.profile.goal))
-            }
-        }
-
-        item {
-            SectionHeader(
-                title = stringResource(R.string.settings_section_api),
-                subtitle = stringResource(R.string.settings_section_api_sub),
-            )
-        }
-
-        item {
-            GlassCard(Modifier.fillMaxWidth(), onClick = { sheet = SettingsSheet.API }) {
-                ProfileRow("Provider", if (settings.api.apiKey.isBlank()) "Offline engine" else "Cloud")
-                ProfileRow("Base URL", settings.api.baseUrl)
-                ProfileRow("Model", settings.api.model)
-                ProfileRow(
-                    "API Key",
-                    if (settings.api.apiKey.isBlank()) "Not set" else "••••" + settings.api.apiKey.takeLast(4),
-                )
-            }
-        }
-
-        item {
-            SectionHeader(
-                title = stringResource(R.string.goals_edit_title),
-                subtitle = stringResource(R.string.goals_edit_sub),
-            )
-        }
-
-        item {
-            GlassCard(Modifier.fillMaxWidth(), onClick = { sheet = SettingsSheet.GOALS }) {
-                ProfileRow(stringResource(R.string.field_steps_goal), String.format(Locale.US, "%,d", settings.stepGoal))
-                ProfileRow(stringResource(R.string.field_water_goal), "${settings.waterGoalMl} ml")
-                ProfileRow(
-                    stringResource(R.string.field_sleep_goal),
-                    String.format(Locale.US, "%.1f h", settings.sleepGoalMin / 60f),
-                )
-                ProfileRow(stringResource(R.string.field_calorie_goal), "${settings.calorieGoal}")
-            }
-        }
-
-        item {
-            Box(
-                Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(18.dp))
-                    .background(palette.textPrimary.copy(alpha = 0.05f))
-                    .padding(14.dp),
-            ) {
-                Text(
-                    text = stringResource(R.string.settings_footer),
-                    color = palette.textTertiary,
-                    fontSize = 10.sp,
-                    lineHeight = 15.sp,
-                )
-            }
         }
     }
 
     when (sheet) {
         SettingsSheet.PROFILE -> ProfileEditSheet(
-            profile = settings.profile,
+            profile = profile,
             onDismiss = { sheet = SettingsSheet.NONE },
-            onSave = { profile ->
-                scope.launch { repository.updateProfile(profile) }
+            onSave = { updated ->
+                scope.launch { repository.updateProfile(updated) }
                 sheet = SettingsSheet.NONE
             },
         )
@@ -259,7 +253,108 @@ fun SettingsScreen(
     }
 }
 
-private enum class SettingsSheet { NONE, PROFILE, API, GOALS }
+@Composable
+private fun SettingsGroup(
+    title: String,
+    content: @Composable ColumnScope.() -> Unit,
+) {
+    val palette = OmniTheme.palette
+    Column {
+        Text(
+            text = title,
+            color = palette.textTertiary,
+            fontSize = 11.sp,
+            modifier = Modifier.padding(start = 4.dp, bottom = 6.dp),
+        )
+        Column(
+            Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(14.dp))
+                .background(palette.cardFill)
+                .border(1.dp, palette.cardStroke, RoundedCornerShape(14.dp)),
+        ) {
+            content()
+        }
+    }
+}
+
+@Composable
+private fun SettingItem(
+    icon: ImageVector,
+    title: String,
+    subtitle: String? = null,
+    value: String? = null,
+    onClick: () -> Unit,
+) {
+    val palette = OmniTheme.palette
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .bounceClick(pressScale = 0.99f, haptics = false, onClick = onClick)
+            .padding(horizontal = 14.dp, vertical = 13.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Box(
+            Modifier
+                .size(28.dp)
+                .clip(RoundedCornerShape(8.dp))
+                .background(palette.accent.copy(alpha = 0.10f)),
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = palette.accent,
+                modifier = Modifier.size(16.dp),
+            )
+        }
+        Spacer(Modifier.width(12.dp))
+        Column(Modifier.weight(1f)) {
+            Text(
+                text = title,
+                color = palette.textPrimary,
+                fontSize = 13.sp,
+                fontWeight = FontWeight.Medium,
+            )
+            if (subtitle != null) {
+                Text(
+                    text = subtitle,
+                    color = palette.textTertiary,
+                    fontSize = 10.sp,
+                    modifier = Modifier.padding(top = 2.dp),
+                )
+            }
+        }
+        if (value != null) {
+            Text(
+                text = value,
+                color = palette.textTertiary,
+                fontSize = 10.sp,
+                maxLines = 1,
+                modifier = Modifier.padding(start = 8.dp),
+            )
+        }
+        Spacer(Modifier.width(4.dp))
+        Icon(
+            imageVector = Icons.Rounded.ChevronRight,
+            contentDescription = null,
+            tint = palette.textTertiary.copy(alpha = 0.65f),
+            modifier = Modifier.size(16.dp),
+        )
+    }
+}
+
+@Composable
+private fun SettingDivider() {
+    val palette = OmniTheme.palette
+    Box(
+        Modifier
+            .fillMaxWidth()
+            .padding(start = 54.dp)
+            .height(0.6.dp)
+            .background(palette.cardStroke),
+    )
+}
 
 @Composable
 private fun genderLabel(gender: Gender): String = stringResource(
@@ -285,249 +380,3 @@ private fun goalLabel(goal: HealthGoal): String = stringResource(
         HealthGoal.GAIN -> R.string.goal_gain
     },
 )
-
-@Composable
-private fun LanguageChip(
-    label: String,
-    selected: Boolean,
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit,
-) {
-    val palette = OmniTheme.palette
-    Box(
-        modifier
-            .clip(RoundedCornerShape(14.dp))
-            .then(
-                if (selected) {
-                    Modifier.background(palette.accent)
-                } else {
-                    Modifier.background(palette.textPrimary.copy(alpha = 0.06f))
-                },
-            )
-            .bounceClick(pressScale = 0.94f, haptics = false, onClick = onClick)
-            .padding(vertical = 10.dp),
-        contentAlignment = Alignment.Center,
-    ) {
-        Text(
-            text = label,
-            color = if (selected) Color.White else palette.textSecondary,
-            fontSize = 12.sp,
-            fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium,
-        )
-    }
-}
-
-@Composable
-private fun ThemeOption(
-    mode: ThemeMode,
-    selected: Boolean,
-    onClick: () -> Unit,
-) {
-    val preview = paletteFor(mode)
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(preview.corner))
-            .background(preview.cardFill)
-            .bounceClick(pressScale = 0.97f, onClick = onClick)
-            .padding(14.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Box(
-            Modifier
-                .size(40.dp)
-                .clip(CircleShape)
-                .background(preview.accent),
-            contentAlignment = Alignment.Center,
-        ) {
-            Text(
-                text = stringResource(preview.mode.labelRes).take(1),
-                color = Color.White,
-                fontSize = 15.sp,
-                fontWeight = FontWeight.Bold,
-            )
-        }
-        Spacer(Modifier.width(12.dp))
-        Column(Modifier.weight(1f)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    text = stringResource(mode.labelRes),
-                    color = preview.textPrimary,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold,
-                )
-                Spacer(Modifier.width(6.dp))
-                Text(
-                    text = stringResource(mode.taglineRes),
-                    color = preview.textTertiary,
-                    fontSize = 9.sp,
-                )
-            }
-            Text(
-                text = stringResource(mode.blurbRes),
-                color = preview.textSecondary,
-                fontSize = 10.sp,
-                modifier = Modifier.padding(top = 3.dp),
-            )
-        }
-        Box(
-            Modifier
-                .size(20.dp)
-                .clip(CircleShape)
-                .background(if (selected) preview.accent else preview.textTertiary.copy(alpha = 0.18f)),
-            contentAlignment = Alignment.Center,
-        ) {
-            if (selected) Text("✓", color = preview.bgTop, fontSize = 11.sp, fontWeight = FontWeight.Bold)
-        }
-    }
-}
-
-@Composable
-private fun LayoutOption(
-    mode: NavLayoutMode,
-    selected: Boolean,
-    onClick: () -> Unit,
-) {
-    val palette = OmniTheme.palette
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(palette.corner))
-            .background(palette.cardFill)
-            .bounceClick(pressScale = 0.97f, onClick = onClick)
-            .padding(14.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        LayoutDiagram(mode)
-        Spacer(Modifier.width(14.dp))
-        Column(Modifier.weight(1f)) {
-            Text(
-                text = stringResource(mode.labelRes),
-                color = palette.textPrimary,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Bold,
-            )
-            Text(
-                text = stringResource(mode.descRes),
-                color = palette.textSecondary,
-                fontSize = 10.sp,
-                modifier = Modifier.padding(top = 3.dp),
-            )
-        }
-        Box(
-            Modifier
-                .size(20.dp)
-                .clip(CircleShape)
-                .background(if (selected) palette.accent else palette.textTertiary.copy(alpha = 0.18f)),
-            contentAlignment = Alignment.Center,
-        ) {
-            if (selected) Text("✓", color = Color.White, fontSize = 11.sp, fontWeight = FontWeight.Bold)
-        }
-    }
-}
-
-@Composable
-private fun LayoutDiagram(mode: NavLayoutMode) {
-    val palette = OmniTheme.palette
-    Box(
-        Modifier
-            .size(width = 46.dp, height = 46.dp)
-            .clip(RoundedCornerShape(12.dp))
-            .background(palette.textPrimary.copy(alpha = 0.06f))
-            .padding(6.dp),
-    ) {
-        when (mode) {
-            NavLayoutMode.A_FAB -> {
-                Row(
-                    Modifier
-                        .align(Alignment.BottomCenter)
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly,
-                ) {
-                    repeat(4) {
-                        Box(
-                            Modifier
-                                .size(5.dp)
-                                .clip(CircleShape)
-                                .background(palette.accent.copy(alpha = 0.7f)),
-                        )
-                    }
-                }
-                Box(
-                    Modifier
-                        .align(Alignment.BottomCenter)
-                        .size(13.dp)
-                        .clip(CircleShape)
-                        .background(palette.accentAlt),
-                )
-            }
-
-            NavLayoutMode.B_FIVE -> Row(
-                Modifier
-                    .align(Alignment.BottomCenter)
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly,
-            ) {
-                repeat(5) {
-                    Box(
-                        Modifier
-                            .size(5.dp)
-                            .clip(CircleShape)
-                            .background(palette.accent.copy(alpha = 0.7f)),
-                    )
-                }
-            }
-
-            NavLayoutMode.C_BENTO -> {
-                Row(
-                    Modifier
-                        .align(Alignment.TopCenter)
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(3.dp),
-                ) {
-                    Box(
-                        Modifier
-                            .size(width = 18.dp, height = 12.dp)
-                            .clip(RoundedCornerShape(3.dp))
-                            .background(palette.accent.copy(alpha = 0.35f)),
-                    )
-                    Box(
-                        Modifier
-                            .size(width = 12.dp, height = 12.dp)
-                            .clip(RoundedCornerShape(3.dp))
-                            .background(palette.accentAlt.copy(alpha = 0.35f)),
-                    )
-                }
-                Row(
-                    Modifier
-                        .align(Alignment.BottomCenter)
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly,
-                ) {
-                    repeat(3) {
-                        Box(
-                            Modifier
-                                .size(5.dp)
-                                .clip(CircleShape)
-                                .background(palette.accent.copy(alpha = 0.7f)),
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun ProfileRow(label: String, value: String) {
-    val palette = OmniTheme.palette
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .padding(vertical = 7.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text(label, color = palette.textSecondary, fontSize = 12.sp, modifier = Modifier.weight(1f))
-        Text(value, color = palette.textPrimary, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
-    }
-}

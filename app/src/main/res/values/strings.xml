@@ -209,4 +209,20 @@
     <string name="habits_empty">No habits yet — add one to build the consistency score.</string>
     <string name="habit_name">Habit name</string>
     <string name="habit_delete">Delete</string>
+    <!-- Settings page -->
+    <string name="settings_me">Me</string>
+    <string name="settings_group_personal">Personal</string>
+    <string name="settings_group_preferences">Preferences</string>
+    <string name="settings_group_about">Data &amp; about</string>
+    <string name="settings_row_profile">Profile</string>
+    <string name="settings_row_goals">Daily goals</string>
+    <string name="settings_row_appearance">Appearance</string>
+    <string name="settings_row_ai">AI endpoint</string>
+    <string name="settings_row_reminders">Reminders</string>
+    <string name="settings_row_about">About OmniHealth</string>
+    <string name="settings_reminders_off">Off</string>
+    <string name="settings_version">Version 1.0.0</string>
+    <string name="settings_back">Back</string>
+    <string name="settings_appearance_title">Appearance</string>
+    <string name="settings_appearance_sub">Theme framework, palette and language</string>
 </resources>
