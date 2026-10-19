@@ -120,6 +120,10 @@ class StatsViewModel(private val repository: HealthRepository) : ViewModel() {
             waterGoalMl = core.settings.waterGoalMl.toFloat(),
             habitChecks = core.habitDone,
             habitTarget = core.habitTotal.coerceAtLeast(1),
+            sleepRecorded = (sleepByDay[today] ?: 0f) > 0f,
+            waterRecorded = core.waterMl > 0f,
+            nutritionRecorded = (dietByDay[today] ?: 0) > 0,
+            habitsRecorded = core.habitTotal > 0,
         )
 
         return StatsUiState(

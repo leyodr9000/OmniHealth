@@ -56,6 +56,7 @@ import androidx.compose.material.icons.rounded.Restaurant
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material.icons.rounded.DirectionsWalk
 import androidx.compose.material.icons.rounded.LocalFireDepartment
+import com.example.omnihealth.BuildConfig
 import com.example.omnihealth.R
 import com.example.omnihealth.data.local.entity.DietLogEntity
 import com.example.omnihealth.data.local.entity.FoodEntity
@@ -221,10 +222,14 @@ fun DietSportScreen(
 
             item {
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    ActionButton(
-                        text = stringResource(R.string.sport_simulate),
-                        modifier = Modifier.weight(1f),
-                    ) { viewModel.simulateSteps() }
+                    // 模拟步数只在调试构建可见：正式版的步数必须来自传感器或手动补录，
+                    // 不能让模拟值混进真实统计。
+                    if (BuildConfig.DEBUG) {
+                        ActionButton(
+                            text = stringResource(R.string.sport_simulate),
+                            modifier = Modifier.weight(1f),
+                        ) { viewModel.simulateSteps() }
+                    }
 
                     if (!sport.hasPermission && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                         ActionButton(

@@ -110,10 +110,30 @@ object HealthCalculator {
         val sleep: Int,
         val hydration: Int,
         val consistency: Int,
+        /** 参与计算的数据维度占比：1 = 五项都有记录。 */
+        val completeness: Float = 1f,
+        val nutritionRecorded: Boolean = true,
+        val activityRecorded: Boolean = true,
+        val sleepRecorded: Boolean = true,
+        val hydrationRecorded: Boolean = true,
+        val consistencyRecorded: Boolean = true,
     ) {
+        /** 只在有数据的维度之间按权重归一化；缺失维度不按 0 分处理。 */
         val overall: Int
-            get() = (nutrition * 0.28f + activity * 0.26f + sleep * 0.20f +
-                hydration * 0.14f + consistency * 0.12f).roundToInt().coerceIn(0, 100)
+            get() {
+                var sum = 0.0
+                var weight = 0.0
+                if (nutritionRecorded) { sum += nutrition * 0.28; weight += 0.28 }
+                if (activityRecorded) { sum += activity * 0.26; weight += 0.26 }
+                if (sleepRecorded) { sum += sleep * 0.20; weight += 0.20 }
+                if (hydrationRecorded) { sum += hydration * 0.14; weight += 0.14 }
+                if (consistencyRecorded) { sum += consistency * 0.12; weight += 0.12 }
+                if (weight <= 0.0) return 0
+                return (sum / weight).roundToInt().coerceIn(0, 100)
+            }
+
+        /** 少于一半维度有数据时，不应展示总分。 */
+        val reliable: Boolean get() = completeness >= 0.5f
     }
 
     fun fiveDimensionScore(
@@ -127,13 +147,32 @@ object HealthCalculator {
         waterGoalMl: Float,
         habitChecks: Int,
         habitTarget: Int,
-    ): ScoreBreakdown = ScoreBreakdown(
-        nutrition = nutritionScore(caloriesIn, calorieTarget),
-        activity = ratioScore(steps.toFloat(), stepGoal.toFloat()),
-        sleep = sleepScore(sleepHours, sleepGoalHours),
-        hydration = ratioScore(waterMl, waterGoalMl.toFloat()),
-        consistency = ratioScore(habitChecks.toFloat(), habitTarget.toFloat()),
-    )
+        sleepRecorded: Boolean = true,
+        waterRecorded: Boolean = true,
+        nutritionRecorded: Boolean = true,
+        habitsRecorded: Boolean = true,
+    ): ScoreBreakdown {
+        val totalWeight = 0.28f + 0.26f + 0.20f + 0.14f + 0.12f
+        var availableWeight = 0.26f // 活动维度始终由步数决定
+        if (sleepRecorded) availableWeight += 0.20f
+        if (waterRecorded) availableWeight += 0.14f
+        if (nutritionRecorded) availableWeight += 0.28f
+        if (habitsRecorded) availableWeight += 0.12f
+
+        return ScoreBreakdown(
+            nutrition = nutritionScore(caloriesIn, calorieTarget),
+            activity = ratioScore(steps.toFloat(), stepGoal.toFloat()),
+            sleep = if (sleepRecorded) sleepScore(sleepHours, sleepGoalHours) else 0,
+            hydration = if (waterRecorded) ratioScore(waterMl, waterGoalMl.toFloat()) else 0,
+            consistency = if (habitsRecorded) ratioScore(habitChecks.toFloat(), habitTarget.toFloat()) else 0,
+            completeness = (availableWeight / totalWeight).coerceIn(0f, 1f),
+            nutritionRecorded = nutritionRecorded,
+            activityRecorded = true,
+            sleepRecorded = sleepRecorded,
+            hydrationRecorded = waterRecorded,
+            consistencyRecorded = habitsRecorded,
+        )
+    }
 
     /** 摄入越接近目标越高；偏差 50% 以上记 0 分。 */
     private fun nutritionScore(caloriesIn: Float, target: Int): Int {

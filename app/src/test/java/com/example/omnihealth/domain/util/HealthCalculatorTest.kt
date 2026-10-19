@@ -1,6 +1,7 @@
-﻿package com.example.omnihealth.domain.util
+package com.example.omnihealth.domain.util
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -94,5 +95,44 @@ class HealthCalculatorTest {
         val distance = HealthCalculator.distanceMeters(10_000, 178f)
         assertEquals(7_385f, distance, 20f)
         assertTrue(HealthCalculator.stepsToCalories(10_000, 62.4f) in 350..400)
+    }
+    @Test
+    fun missing_sleep_is_not_scored_as_zero() {
+        val withSleep = HealthCalculator.fiveDimensionScore(
+            caloriesIn = 2_000f, calorieTarget = 2_000,
+            steps = 10_000, stepGoal = 10_000,
+            sleepHours = 7.5f, sleepGoalHours = 7.5f,
+            waterMl = 2_500f, waterGoalMl = 2_500f,
+            habitChecks = 4, habitTarget = 4,
+        )
+        val withoutSleep = HealthCalculator.fiveDimensionScore(
+            caloriesIn = 2_000f, calorieTarget = 2_000,
+            steps = 10_000, stepGoal = 10_000,
+            sleepHours = 0f, sleepGoalHours = 7.5f,
+            waterMl = 2_500f, waterGoalMl = 2_500f,
+            habitChecks = 4, habitTarget = 4,
+            sleepRecorded = false,
+        )
+        assertEquals(100, withSleep.overall)
+        // 没记录睡眠不应该把总分拉低
+        assertEquals(100, withoutSleep.overall)
+        assertTrue(withoutSleep.completeness < 1f)
+        assertTrue(withoutSleep.reliable)
+    }
+
+    @Test
+    fun only_steps_is_not_enough_for_a_total_score() {
+        val stepsOnly = HealthCalculator.fiveDimensionScore(
+            caloriesIn = 0f, calorieTarget = 2_000,
+            steps = 5_000, stepGoal = 10_000,
+            sleepHours = 0f, sleepGoalHours = 8f,
+            waterMl = 0f, waterGoalMl = 2_500f,
+            habitChecks = 0, habitTarget = 4,
+            sleepRecorded = false, waterRecorded = false,
+            nutritionRecorded = false, habitsRecorded = false,
+        )
+        assertTrue(stepsOnly.completeness < 0.5f)
+        assertFalse(stepsOnly.reliable)
+        assertEquals(50, stepsOnly.overall)
     }
 }

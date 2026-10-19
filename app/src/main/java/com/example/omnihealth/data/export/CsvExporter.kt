@@ -84,6 +84,20 @@ object CsvExporter {
         runCatching { file.writeText(sb.toString()) }.map { file }.getOrNull()
     }
 
-    private fun escape(value: String): String =
-        if (value.contains(',') || value.contains('"')) "\"${value.replace("\"", "\"\"")}\"" else value
+    /**
+     * CSV 字段转义 + 公式注入防护。
+     *
+     * 以 `= + - @`、制表符或回车开头的单元格会被 Excel/WPS 当成公式执行，
+     * 这里统一在前面加单引号，使其按纯文本显示。
+     */
+    private fun escape(value: String): String {
+        val guarded = if (value.isNotEmpty() && value[0] in FORMULA_PREFIXES) "'$value" else value
+        return if (guarded.contains(',') || guarded.contains('"') || guarded.contains('\n')) {
+            "\"${guarded.replace("\"", "\"\"")}\""
+        } else {
+            guarded
+        }
+    }
+
+    private val FORMULA_PREFIXES = charArrayOf('=', '+', '-', '@', '\t', '\r')
 }

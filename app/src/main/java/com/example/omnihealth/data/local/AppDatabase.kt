@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.example.omnihealth.data.local.dao.AiReportDao
 import com.example.omnihealth.data.local.dao.DietDao
@@ -48,6 +49,14 @@ abstract class AppDatabase : RoomDatabase() {
         @Volatile
         private var INSTANCE: AppDatabase? = null
 
+        /**
+         * 显式迁移列表。
+         *
+         * 刻意不用 `fallbackToDestructiveMigration()`：健康数据的迁移失败必须暴露，
+         * 而不是静默清库。每次 schema 变更都要在这里补一条 Migration 并加迁移测试。
+         */
+        private val MIGRATIONS: Array<Migration> = emptyArray()
+
         fun build(context: Context, scope: CoroutineScope): AppDatabase =
             INSTANCE ?: synchronized(this) {
                 INSTANCE ?: Room.databaseBuilder(
@@ -56,7 +65,7 @@ abstract class AppDatabase : RoomDatabase() {
                     "omnihealth.db",
                 )
                     .addCallback(FoodSeedCallback(context.applicationContext, scope))
-                    .fallbackToDestructiveMigration()
+                    .addMigrations(*MIGRATIONS)
                     .build()
                     .also { INSTANCE = it }
             }

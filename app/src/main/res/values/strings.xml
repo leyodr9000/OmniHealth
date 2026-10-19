@@ -252,4 +252,6 @@
     <string name="about_licenses">Jetpack Compose · Room · DataStore · WorkManager · Retrofit/OkHttp · kotlinx.serialization · MPAndroidChart</string>
     <string name="motion_title">Reduce motion</string>
     <string name="motion_desc">Turn off page slide animations</string>
+    <string name="score_insufficient">Not enough data</string>
+    <string name="score_insufficient_hint">Log sleep, water or meals to get a score</string>
 </resources>

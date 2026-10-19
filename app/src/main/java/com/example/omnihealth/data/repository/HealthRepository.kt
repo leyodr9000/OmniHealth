@@ -236,6 +236,10 @@ class HealthRepository(
             waterGoalMl = settings.waterGoalMl.toFloat(),
             habitChecks = habitLogs.map { it.habitId }.distinct().size,
             habitTarget = habits.size.coerceAtLeast(1),
+            sleepRecorded = avgSleep > 0f,
+            waterRecorded = water > 0f,
+            nutritionRecorded = avgCalories > 0,
+            habitsRecorded = habits.isNotEmpty(),
         )
 
         return HealthContext(

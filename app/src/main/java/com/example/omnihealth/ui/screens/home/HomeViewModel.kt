@@ -70,6 +70,10 @@ class HomeViewModel(private val repository: HealthRepository) : ViewModel() {
             waterGoalMl = settings.waterGoalMl.toFloat(),
             habitChecks = logs.size,
             habitTarget = habits.size.coerceAtLeast(1),
+            sleepRecorded = snapshot.sleepHours > 0f,
+            waterRecorded = snapshot.waterMl > 0f,
+            nutritionRecorded = snapshot.caloriesIn > 0f,
+            habitsRecorded = habits.isNotEmpty(),
         )
 
         HomeUiState(

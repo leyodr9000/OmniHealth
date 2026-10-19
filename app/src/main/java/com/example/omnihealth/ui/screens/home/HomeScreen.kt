@@ -458,20 +458,22 @@ private fun HealthScoreCard(state: HomeUiState) {
     GlassCard(Modifier.fillMaxWidth(), contentPadding = PaddingValues(18.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             ProgressRing(
-                progress = state.scoreOverall / 100f,
+                progress = if (state.score.reliable) state.scoreOverall / 100f else 0f,
                 modifier = Modifier.size(104.dp),
                 ringColor = palette.accent,
                 strokeWidth = 9.dp,
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
-                        text = "${animatedInt(state.scoreOverall)}",
+                        text = if (state.score.reliable) "${animatedInt(state.scoreOverall)}" else "—",
                         color = palette.textPrimary,
                         fontSize = 30.sp,
                         fontWeight = FontWeight.Bold,
                     )
                     Text(
-                        text = stringResource(R.string.home_score_label),
+                        text = stringResource(
+                            if (state.score.reliable) R.string.home_score_label else R.string.score_insufficient,
+                        ),
                         color = palette.textTertiary,
                         fontSize = 10.sp,
                     )
