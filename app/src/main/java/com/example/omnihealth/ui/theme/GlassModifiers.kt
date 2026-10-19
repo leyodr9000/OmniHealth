@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -29,6 +30,10 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import dev.chrisbanes.haze.HazeState
+import dev.chrisbanes.haze.HazeStyle
+import dev.chrisbanes.haze.HazeTint
+import dev.chrisbanes.haze.hazeEffect
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -93,9 +98,57 @@ fun GlassCard(
 
 /**
  * 底部 / 顶部毛玻璃栏的背景修饰符（含顶部细描边）。
+ *
+ * 说明：真正的「液态玻璃」走 [liquidGlass]，这里保留一个不依赖背景采样的轻量版本，
+ * 供不支持 RenderEffect 的场景或预览使用。
  */
 fun Modifier.frostBar(palette: OmniPalette, shape: Shape = RoundedCornerShape(palette.corner)): Modifier =
     this
         .clip(shape)
         .background(color = palette.barFill, shape = shape)
         .border(1.dp, palette.barStroke, shape)
+
+/**
+ * Liquid Glass：采样背景 → 高斯模糊 → 叠色 + 边缘高光。
+ *
+ * 与 `Kyant0/AndroidLiquidGlass`（Backdrop）同一套原理：把下层内容录进离屏层再模糊，
+ * 这里用 haze 实现（兼容 Compose 1.7，不需要升级到 1.12）。
+ * Android 12 以下没有 RenderEffect 时会自动退化为半透明着色（fallbackTint）。
+ */
+@Composable
+fun Modifier.liquidGlass(
+    state: HazeState,
+    palette: OmniPalette = OmniTheme.palette,
+    shape: Shape = RoundedCornerShape(palette.corner),
+    blurRadius: Dp = 22.dp,
+): Modifier = this
+    .clip(shape)
+    .hazeEffect(state) {
+        style = HazeStyle(
+            backgroundColor = palette.barFill,
+            tints = listOf(
+                HazeTint(palette.cardFill.copy(alpha = 0.50f)),
+                HazeTint(palette.accent.copy(alpha = 0.05f)),
+            ),
+            blurRadius = blurRadius,
+            noiseFactor = 0.02f,
+            fallbackTint = HazeTint(palette.barFill),
+        )
+        blurEnabled = true
+        alpha = 1f
+    }
+    .border(
+        width = 1.dp,
+        brush = Brush.linearGradient(
+            colors = listOf(
+                Color.White.copy(alpha = 0.70f),
+                Color.White.copy(alpha = 0.18f),
+                palette.cardStroke.copy(alpha = 0.35f),
+            ),
+        ),
+        shape = shape,
+    )
+
+/** 背景采样源：把整块背景 + 内容标记成「可被玻璃采样」。 */
+@Composable
+fun rememberHazeState(): HazeState = remember { HazeState() }

@@ -70,6 +70,7 @@ fun LineTrendChart(
             }
             chart.xAxis.valueFormatter = IndexAxisValueFormatter(labels)
             chart.data = LineData(set)
+            if (chart.data?.dataSetCount ?: 0 > 0) chart.animateX(420)
             chart.setVisibleXRangeMaximum(labels.size.toFloat().coerceAtLeast(1f))
             chart.invalidate()
         },
@@ -185,6 +186,7 @@ fun MacroPieChart(
             }
             chart.setCenterText("${(protein + carbs + fat).toInt()} g")
             chart.data = PieData(set)
+            chart.animateY(620)
             chart.invalidate()
         },
     )
@@ -227,6 +229,7 @@ fun StepsBarChart(
             }
             chart.xAxis.valueFormatter = IndexAxisValueFormatter(labels)
             chart.data = BarData(set).apply { barWidth = 0.52f }
+            chart.animateY(520)
             chart.invalidate()
         },
     )
@@ -278,6 +281,7 @@ fun HealthRadarChart(
             }
             chart.xAxis.valueFormatter = IndexAxisValueFormatter(labels)
             chart.data = RadarData(set)
+            chart.animateY(620)
             chart.invalidate()
         },
     )

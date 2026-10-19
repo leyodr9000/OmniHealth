@@ -218,7 +218,7 @@ fun AiAdvisorScreen() {
             }
 
             items(state.chat) { item ->
-                ChatBubble(item)
+                Box(Modifier.animateItem()) { ChatBubble(item) }
             }
 
             if (state.sending) {

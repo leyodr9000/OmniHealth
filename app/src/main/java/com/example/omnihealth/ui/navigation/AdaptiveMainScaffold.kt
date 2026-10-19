@@ -49,6 +49,8 @@ import com.example.omnihealth.ui.theme.OmniTheme
 import com.example.omnihealth.ui.theme.SurfaceStyle
 import com.example.omnihealth.ui.theme.bounceClick
 import com.example.omnihealth.ui.theme.frostBar
+import com.example.omnihealth.ui.theme.liquidGlass
+import dev.chrisbanes.haze.HazeState
 import com.example.omnihealth.ui.theme.paletteFor
 
 /** 应用内所有目的地。 */
@@ -96,6 +98,7 @@ enum class NavLayoutMode(
 fun AdaptiveBottomBar(
     layout: NavLayoutMode,
     currentRoute: String?,
+    hazeState: HazeState,
     onSelect: (OmniDest) -> Unit,
     onQuickLog: () -> Unit,
     modifier: Modifier = Modifier,
@@ -111,9 +114,9 @@ fun AdaptiveBottomBar(
         contentAlignment = Alignment.Center,
     ) {
         when (layout) {
-            NavLayoutMode.A_FAB -> FabNavBar(items, currentRoute, onSelect, onQuickLog, palette)
-            NavLayoutMode.B_FIVE -> WideNavBar(items, currentRoute, onSelect, palette)
-            NavLayoutMode.C_BENTO -> PillNavBar(items, currentRoute, onSelect, palette)
+            NavLayoutMode.A_FAB -> FabNavBar(items, currentRoute, hazeState, onSelect, onQuickLog, palette)
+            NavLayoutMode.B_FIVE -> WideNavBar(items, currentRoute, hazeState, onSelect, palette)
+            NavLayoutMode.C_BENTO -> PillNavBar(items, currentRoute, hazeState, onSelect, palette)
         }
     }
 }
@@ -126,6 +129,7 @@ fun AdaptiveBottomBar(
 private fun FabNavBar(
     items: List<OmniDest>,
     currentRoute: String?,
+    hazeState: HazeState,
     onSelect: (OmniDest) -> Unit,
     onQuickLog: () -> Unit,
     palette: OmniPalette,
@@ -135,7 +139,7 @@ private fun FabNavBar(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(70.dp)
-                .frostBar(palette, RoundedCornerShape(28.dp))
+                .liquidGlass(hazeState, palette, RoundedCornerShape(28.dp))
                 .padding(horizontal = 6.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -178,6 +182,7 @@ private fun FabNavBar(
 private fun WideNavBar(
     items: List<OmniDest>,
     currentRoute: String?,
+    hazeState: HazeState,
     onSelect: (OmniDest) -> Unit,
     palette: OmniPalette,
 ) {
@@ -185,7 +190,7 @@ private fun WideNavBar(
         modifier = Modifier
             .fillMaxWidth()
             .height(72.dp)
-            .frostBar(palette, RoundedCornerShape(26.dp))
+            .liquidGlass(hazeState, palette, RoundedCornerShape(26.dp))
             .padding(horizontal = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -203,6 +208,7 @@ private fun WideNavBar(
 private fun PillNavBar(
     items: List<OmniDest>,
     currentRoute: String?,
+    hazeState: HazeState,
     onSelect: (OmniDest) -> Unit,
     palette: OmniPalette,
 ) {
@@ -210,7 +216,7 @@ private fun PillNavBar(
         modifier = Modifier
             .width(280.dp)
             .height(64.dp)
-            .frostBar(palette, RoundedCornerShape(32.dp))
+            .liquidGlass(hazeState, palette, RoundedCornerShape(32.dp))
             .padding(horizontal = 10.dp, vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceEvenly,

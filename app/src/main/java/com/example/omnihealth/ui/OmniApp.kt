@@ -2,6 +2,11 @@ package com.example.omnihealth.ui
 
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
@@ -12,6 +17,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import dev.chrisbanes.haze.hazeSource
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -33,6 +39,7 @@ import com.example.omnihealth.ui.screens.home.HomeScreen
 import com.example.omnihealth.ui.screens.settings.SettingsScreen
 import com.example.omnihealth.ui.screens.stats.ChartAnalyticsScreen
 import com.example.omnihealth.ui.theme.MeshGradientBackground
+import com.example.omnihealth.ui.theme.rememberHazeState
 import com.example.omnihealth.ui.theme.OmniTheme
 import com.example.omnihealth.ui.theme.ThemeMode
 
@@ -50,8 +57,12 @@ fun OmniApp(
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = backStackEntry?.destination?.route
     var quickLogOpen by remember { mutableStateOf(false) }
+    val hazeState = rememberHazeState()
 
-    MeshGradientBackground(palette = palette) {
+    MeshGradientBackground(
+        palette = palette,
+        modifier = Modifier.hazeSource(hazeState),
+    ) {
         Scaffold(
             containerColor = Color.Transparent,
             contentWindowInsets = WindowInsets(0, 0, 0, 0),
@@ -59,6 +70,7 @@ fun OmniApp(
                 AdaptiveBottomBar(
                     layout = layoutMode,
                     currentRoute = currentRoute,
+                    hazeState = hazeState,
                     onSelect = { dest -> navController.navigateSingleTop(dest) },
                     onQuickLog = { quickLogOpen = true },
                 )
@@ -74,12 +86,18 @@ fun OmniApp(
             NavHost(
                 navController = navController,
                 startDestination = OmniDest.Home.route,
-                // 底部 Tab 之间不做转场动画：动画期间新页首帧同时合成，
-                // 切完立刻滑动会明显掉帧；国内 App 的 Tab 切换也基本都是瞬切。
-                enterTransition = { EnterTransition.None },
-                exitTransition = { ExitTransition.None },
-                popEnterTransition = { EnterTransition.None },
-                popExitTransition = { ExitTransition.None },
+                // Tab 切换：淡入 + 轻微上浮，220ms。短时长、单属性位移，
+                // 在 120Hz 上不会与首帧合成抢出明显掉帧。
+                enterTransition = {
+                    fadeIn(tween(220, easing = FastOutSlowInEasing)) +
+                        slideInVertically(tween(220, easing = FastOutSlowInEasing)) { it / 28 }
+                },
+                exitTransition = { fadeOut(tween(150)) },
+                popEnterTransition = {
+                    fadeIn(tween(220, easing = FastOutSlowInEasing)) +
+                        slideInVertically(tween(220, easing = FastOutSlowInEasing)) { -it / 28 }
+                },
+                popExitTransition = { fadeOut(tween(150)) },
                 modifier = Modifier.padding(bottom = innerPadding.calculateBottomPadding() + extraBottom),
             ) {
                 composable(OmniDest.Home.route) {

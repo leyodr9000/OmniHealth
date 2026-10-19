@@ -61,6 +61,7 @@ import com.example.omnihealth.data.local.entity.DietLogEntity
 import com.example.omnihealth.data.local.entity.FoodEntity
 import com.example.omnihealth.data.local.entity.MealType
 import com.example.omnihealth.data.local.entity.WorkoutEntity
+import com.example.omnihealth.ui.components.AppearOnScreen
 import com.example.omnihealth.ui.components.MetricTile
 import com.example.omnihealth.ui.components.ProgressRing
 import com.example.omnihealth.ui.components.SectionHeader
@@ -133,7 +134,7 @@ fun DietSportScreen(
         }
 
         if (tab == 0) {
-            item { CalorieSummaryCard(diet) }
+            item { AppearOnScreen(0) { CalorieSummaryCard(diet) } }
 
             item {
                 SearchBar(
@@ -155,7 +156,9 @@ fun DietSportScreen(
                     }
                 } else {
                     items(results, key = { "s-${it.id}" }, contentType = { "food" }) { food ->
-                        FoodRow(food) { pending = food }
+                        Box(Modifier.animateItem()) {
+                            FoodRow(food) { pending = food }
+                        }
                     }
                 }
             } else {
@@ -166,7 +169,9 @@ fun DietSportScreen(
                     )
                 }
                 items(dictionary.take(40), key = { "d-${it.id}" }, contentType = { "food" }) { food ->
-                    FoodRow(food) { pending = food }
+                    Box(Modifier.animateItem()) {
+                        FoodRow(food) { pending = food }
+                    }
                 }
             }
 
@@ -178,7 +183,9 @@ fun DietSportScreen(
                     )
                 }
                 items(diet.logs, key = { "l-${it.id}" }, contentType = { "log" }) { log ->
-                    LogRow(log) { viewModel.deleteLog(log) }
+                    Box(Modifier.animateItem()) {
+                        LogRow(log) { viewModel.deleteLog(log) }
+                    }
                 }
             }
         } else {

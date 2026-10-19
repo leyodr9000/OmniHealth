@@ -1,5 +1,7 @@
 package com.example.omnihealth.ui.screens.home
 
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -31,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -48,8 +51,11 @@ import androidx.compose.material.icons.rounded.DirectionsWalk
 import androidx.compose.material.icons.rounded.LocalFireDepartment
 import androidx.compose.material.icons.rounded.WaterDrop
 import com.example.omnihealth.R
+import com.example.omnihealth.ui.components.AppearOnScreen
 import com.example.omnihealth.ui.components.MetricTile
 import com.example.omnihealth.ui.components.ProgressRing
+import com.example.omnihealth.ui.components.animatedFraction
+import com.example.omnihealth.ui.components.animatedInt
 import com.example.omnihealth.ui.components.SectionHeader
 import com.example.omnihealth.ui.components.StatChip
 import com.example.omnihealth.ui.di.LocalHealthRepository
@@ -110,7 +116,8 @@ fun HomeScreen(
         verticalArrangement = Arrangement.spacedBy(14.dp),
     ) {
         item {
-            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            AppearOnScreen(index = 0) {
+                Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
                     Text(
                         text = stringResource(R.string.home_greeting, state.nickname),
@@ -140,10 +147,11 @@ fun HomeScreen(
                         fontSize = 17.sp,
                     )
                 }
+                }
             }
         }
 
-        item { HealthScoreCard(state) }
+        item { AppearOnScreen(index = 1) { HealthScoreCard(state) } }
 
         item {
             SectionHeader(
@@ -324,9 +332,18 @@ private fun HabitRow(
             .padding(horizontal = 14.dp, vertical = 11.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
+        val checkScale by animateFloatAsState(
+            targetValue = if (checked) 1f else 0.86f,
+            animationSpec = spring(dampingRatio = 0.42f, stiffness = 620f),
+            label = "habitCheck",
+        )
         Box(
             Modifier
                 .size(22.dp)
+                .graphicsLayer {
+                    scaleX = checkScale
+                    scaleY = checkScale
+                }
                 .clip(CircleShape)
                 .background(if (checked) palette.accent else Color.Transparent)
                 .border(
@@ -447,7 +464,7 @@ private fun HealthScoreCard(state: HomeUiState) {
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
-                        text = "${state.scoreOverall}",
+                        text = "${animatedInt(state.scoreOverall)}",
                         color = palette.textPrimary,
                         fontSize = 30.sp,
                         fontWeight = FontWeight.Bold,
@@ -496,7 +513,7 @@ private fun ScoreBar(label: String, fraction: Float, color: Color) {
         ) {
             Box(
                 Modifier
-                    .fillMaxWidth(fraction.coerceIn(0f, 1f))
+                    .fillMaxWidth(animatedFraction(fraction))
                     .height(5.dp)
                     .clip(RoundedCornerShape(3.dp))
                     .background(color),
