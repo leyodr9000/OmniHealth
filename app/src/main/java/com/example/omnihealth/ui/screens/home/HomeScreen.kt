@@ -152,8 +152,6 @@ fun HomeScreen(
             }
         }
 
-        item { AppearOnScreen(index = 1) { HealthScoreCard(state) } }
-
         item {
             SectionHeader(
                 title = stringResource(R.string.home_section_today),
@@ -178,8 +176,9 @@ fun HomeScreen(
                     value = formatInt(animatedInt(state.steps)),
                     unit = "",
                     accent = palette.accent,
-                    progress = state.stepsProgress,
-                    hint = stringResource(R.string.home_goal_steps, formatInt(state.stepGoal)),
+                    progress = if (state.hasSteps) state.stepsProgress else null,
+                    hint = if (state.hasSteps) stringResource(R.string.home_goal_steps, formatInt(state.stepGoal)) else stringResource(R.string.home_not_recorded),
+                    unrecorded = !state.hasSteps,
                     modifier = Modifier.weight(1f),
                     onClick = onQuickLog,
                 )
@@ -189,11 +188,12 @@ fun HomeScreen(
                     value = String.format(Locale.US, "%.2f", animatedFloat(state.waterMl / 1000f)),
                     unit = "L",
                     accent = Color(0xFF4FB3FF),
-                    progress = state.waterProgress,
-                    hint = stringResource(
+                    progress = if (state.hasWater) state.waterProgress else null,
+                    hint = if (state.hasWater) stringResource(
                         R.string.home_goal_water,
                         String.format(Locale.US, "%.1f", state.waterGoalMl / 1000f),
-                    ),
+                    ) else stringResource(R.string.home_not_recorded),
+                    unrecorded = !state.hasWater,
                     modifier = Modifier.weight(1f),
                     onClick = onQuickLog,
                 )
@@ -208,11 +208,12 @@ fun HomeScreen(
                     value = String.format(Locale.US, "%.1f", animatedFloat(state.sleepHours)),
                     unit = "h",
                     accent = Color(0xFF8B7CFF),
-                    progress = state.sleepProgress,
-                    hint = stringResource(
+                    progress = if (state.hasSleep) state.sleepProgress else null,
+                    hint = if (state.hasSleep) stringResource(
                         R.string.home_goal_sleep,
                         String.format(Locale.US, "%.1f", state.sleepGoalHours),
-                    ),
+                    ) else stringResource(R.string.home_not_recorded),
+                    unrecorded = !state.hasSleep,
                     modifier = Modifier.weight(1f),
                     onClick = onQuickLog,
                 )
@@ -222,13 +223,17 @@ fun HomeScreen(
                     value = formatInt(animatedInt(state.caloriesIn)),
                     unit = "kcal",
                     accent = Color(0xFFFF8A5B),
-                    progress = state.calorieProgress,
-                    hint = stringResource(R.string.home_remaining, state.caloriesLeft),
+                    progress = if (state.hasCalories) state.calorieProgress else null,
+                    hint = if (state.hasCalories) stringResource(R.string.home_remaining, state.caloriesLeft) else stringResource(R.string.home_not_recorded),
+                    unrecorded = !state.hasCalories,
                     modifier = Modifier.weight(1f),
                     onClick = onOpenDiet,
                 )
             }
         }
+
+        // 健康分放在「今日已记录什么」之后：先给事实，再给结论。
+        item { AppearOnScreen(index = 1) { HealthScoreCard(state) } }
 
         item { AiTipCard(insight = insightText, onClick = onOpenAi) }
 

@@ -143,6 +143,7 @@ fun MetricTile(
     modifier: Modifier = Modifier,
     progress: Float? = null,
     hint: String? = null,
+    unrecorded: Boolean = false,
     onClick: (() -> Unit)? = null,
 ) {
     val palette = OmniTheme.palette
@@ -178,18 +179,20 @@ fun MetricTile(
         Spacer(Modifier.height(8.dp))
         Row(verticalAlignment = Alignment.Bottom) {
             Text(
-                text = value,
-                color = palette.textPrimary,
+                text = if (unrecorded) "—" else value,
+                color = if (unrecorded) palette.textTertiary else palette.textPrimary,
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Bold,
             )
-            Spacer(Modifier.width(3.dp))
-            Text(
-                text = unit,
-                color = palette.textTertiary,
-                fontSize = 10.sp,
-                modifier = Modifier.padding(bottom = 3.dp),
-            )
+            if (!unrecorded) {
+                Spacer(Modifier.width(3.dp))
+                Text(
+                    text = unit,
+                    color = palette.textTertiary,
+                    fontSize = 10.sp,
+                    modifier = Modifier.padding(bottom = 3.dp),
+                )
+            }
         }
         if (progress != null) {
             Spacer(Modifier.height(8.dp))

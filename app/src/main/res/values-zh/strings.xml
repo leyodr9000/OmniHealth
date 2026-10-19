@@ -266,4 +266,5 @@
     <string name="restore_done">已恢复 %1$d 条记录</string>
     <string name="restore_failed">恢复失败：%1$s</string>
     <string name="restore_read_failed">无法读取该文件</string>
+    <string name="home_not_recorded">未记录</string>
 </resources>

@@ -32,6 +32,10 @@ data class HomeUiState(
     val habitTotal: Int = 0,
     val habits: List<HabitEntity> = emptyList(),
     val checkedHabitIds: Set<Long> = emptySet(),
+    val hasSteps: Boolean = false,
+    val hasWater: Boolean = false,
+    val hasSleep: Boolean = false,
+    val hasCalories: Boolean = false,
     val workouts: List<WorkoutEntity> = emptyList(),
     val score: HealthCalculator.ScoreBreakdown = HealthCalculator.ScoreBreakdown(0, 0, 0, 0, 0),
 ) {
@@ -93,6 +97,10 @@ class HomeViewModel(private val repository: HealthRepository) : ViewModel() {
             habitTotal = habits.size,
             habits = habits,
             checkedHabitIds = logs.map { it.habitId }.toSet(),
+            hasSteps = snapshot.steps > 0,
+            hasWater = snapshot.waterMl > 0f,
+            hasSleep = snapshot.sleepHours > 0f,
+            hasCalories = snapshot.caloriesIn > 0f,
             workouts = workouts,
             score = score,
         )
