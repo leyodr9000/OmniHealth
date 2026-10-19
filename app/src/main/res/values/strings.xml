@@ -242,4 +242,7 @@
     <string name="reminder_on">On</string>
     <string name="reminder_off">Off</string>
     <string name="reminder_permission_hint">Allow notifications to receive reminders</string>
+    <string name="settings_row_export">Export data</string>
+    <string name="export_done">Saved to %1$s</string>
+    <string name="export_failed">Export failed</string>
 </resources>

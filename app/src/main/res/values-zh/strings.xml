@@ -242,4 +242,7 @@
     <string name="reminder_on">已开启</string>
     <string name="reminder_off">未开启</string>
     <string name="reminder_permission_hint">需要通知权限才能收到提醒</string>
+    <string name="settings_row_export">导出数据</string>
+    <string name="export_done">已保存到 %1$s</string>
+    <string name="export_failed">导出失败</string>
 </resources>

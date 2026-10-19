@@ -2,6 +2,7 @@ package com.example.omnihealth.ui.screens.settings
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.widget.Toast
 import android.os.Build
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -30,6 +31,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.AutoAwesome
 import androidx.compose.material.icons.rounded.ChevronRight
+import androidx.compose.material.icons.rounded.Download
 import androidx.compose.material.icons.rounded.Flag
 import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.Notifications
@@ -222,6 +224,22 @@ fun SettingsScreen(
                         stringResource(R.string.reminder_off)
                     },
                     onClick = { sheet = SettingsSheet.REMINDERS },
+                )
+                SettingDivider()
+                SettingItem(
+                    icon = Icons.Rounded.Download,
+                    title = stringResource(R.string.settings_row_export),
+                    onClick = {
+                        scope.launch {
+                            val file = runCatching { repository.exportCsv(context) }.getOrNull()
+                            val message = if (file != null) {
+                                context.getString(R.string.export_done, file.absolutePath)
+                            } else {
+                                context.getString(R.string.export_failed)
+                            }
+                            Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+                        }
+                    },
                 )
                 SettingDivider()
                 SettingItem(
