@@ -45,4 +45,16 @@ interface HabitDao {
 
     @Query("SELECT COUNT(*) FROM habit_logs WHERE epochDay BETWEEN :from AND :to")
     suspend fun totalChecks(from: Long, to: Long): Int
+
+    @Query("DELETE FROM habits")
+    suspend fun clearHabits()
+
+    @Query("DELETE FROM habit_logs")
+    suspend fun clearLogs()
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertHabits(items: List<HabitEntity>)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertLogs(items: List<HabitLogEntity>)
 }

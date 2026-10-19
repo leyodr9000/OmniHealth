@@ -258,4 +258,12 @@
     <string name="undo">撤销</string>
     <string name="day_today">今天</string>
     <string name="diet_edit_title">编辑记录</string>
+    <string name="settings_row_backup">备份数据</string>
+    <string name="settings_row_restore">恢复备份</string>
+    <string name="backup_detail">%1$d 条记录 · v%2$d</string>
+    <string name="restore_confirm_title">确认恢复这份备份？</string>
+    <string name="restore_confirm_body">文件包含 %1$d 条记录（格式 v%2$d）。恢复会覆盖当前全部数据。</string>
+    <string name="restore_done">已恢复 %1$d 条记录</string>
+    <string name="restore_failed">恢复失败：%1$s</string>
+    <string name="restore_read_failed">无法读取该文件</string>
 </resources>

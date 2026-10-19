@@ -3,6 +3,7 @@ package com.example.omnihealth.data.local.dao
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.example.omnihealth.data.local.entity.VitalEntity
 import kotlinx.coroutines.flow.Flow
@@ -39,4 +40,13 @@ interface VitalDao {
 
     @Query("SELECT * FROM vitals WHERE type = :type ORDER BY recordedAt DESC LIMIT 1")
     suspend fun latest(type: String): VitalEntity?
+
+    @Query("SELECT * FROM vitals ORDER BY recordedAt ASC")
+    suspend fun all(): List<VitalEntity>
+
+    @Query("DELETE FROM vitals")
+    suspend fun clear()
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAll(items: List<VitalEntity>)
 }

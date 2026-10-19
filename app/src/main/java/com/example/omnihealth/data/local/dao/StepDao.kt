@@ -45,4 +45,22 @@ interface StepDao {
 
     @Query("DELETE FROM workouts WHERE id = :id")
     suspend fun deleteWorkout(id: Long)
+
+    @Query("SELECT * FROM steps ORDER BY epochDay ASC")
+    suspend fun allSteps(): List<StepEntity>
+
+    @Query("DELETE FROM steps")
+    suspend fun clearSteps()
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertSteps(items: List<StepEntity>)
+
+    @Query("SELECT * FROM workouts ORDER BY timestamp ASC")
+    suspend fun allWorkouts(): List<WorkoutEntity>
+
+    @Query("DELETE FROM workouts")
+    suspend fun clearWorkouts()
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertWorkouts(items: List<WorkoutEntity>)
 }

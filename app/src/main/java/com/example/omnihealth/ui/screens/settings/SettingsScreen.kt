@@ -35,12 +35,15 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.AutoAwesome
 import androidx.compose.material.icons.rounded.ChevronRight
 import androidx.compose.material.icons.rounded.Download
+import androidx.compose.material.icons.rounded.Restore
+import androidx.compose.material.icons.rounded.Save
 import androidx.compose.material.icons.rounded.Flag
 import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.Notifications
 import androidx.compose.material.icons.rounded.Palette
 import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material3.Icon
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -99,6 +102,22 @@ fun SettingsScreen(
     val permissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission(),
     ) { }
+
+    var restoreCandidate by remember { mutableStateOf<Pair<android.net.Uri, com.example.omnihealth.data.backup.BackupBundle>?>(null) }
+    val restoreLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.OpenDocument(),
+    ) { uri ->
+        if (uri != null) {
+            scope.launch {
+                val bundle = runCatching { repository.inspectBackup(context, uri) }.getOrNull()
+                if (bundle == null) {
+                    Toast.makeText(context, context.getString(R.string.restore_read_failed), Toast.LENGTH_LONG).show()
+                } else {
+                    restoreCandidate = uri to bundle
+                }
+            }
+        }
+    }
 
     fun ensureNotificationPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
@@ -239,13 +258,34 @@ fun SettingsScreen(
                 )
                 SettingDivider()
                 SettingItem(
+                    icon = Icons.Rounded.Save,
+                    title = stringResource(R.string.settings_row_backup),
+                    onClick = {
+                        scope.launch {
+                            val file = runCatching { repository.exportBackup(context) }.getOrNull()
+                            if (file != null) {
+                                shareFile(context, file, "application/json")
+                            } else {
+                                Toast.makeText(context, context.getString(R.string.export_failed), Toast.LENGTH_LONG).show()
+                            }
+                        }
+                    },
+                )
+                SettingDivider()
+                SettingItem(
+                    icon = Icons.Rounded.Restore,
+                    title = stringResource(R.string.settings_row_restore),
+                    onClick = { restoreLauncher.launch(arrayOf("application/json", "text/plain", "*/*")) },
+                )
+                SettingDivider()
+                SettingItem(
                     icon = Icons.Rounded.Download,
                     title = stringResource(R.string.settings_row_export),
                     onClick = {
                         scope.launch {
                             val file = runCatching { repository.exportCsv(context) }.getOrNull()
                             if (file != null) {
-                                shareCsv(context, file)
+                                shareFile(context, file)
                             } else {
                                 Toast.makeText(
                                     context,
@@ -275,6 +315,63 @@ fun SettingsScreen(
                 modifier = Modifier.padding(start = 4.dp),
             )
         }
+    }
+
+    restoreCandidate?.let { (uri, bundle) ->
+        AlertDialog(
+            onDismissRequest = { restoreCandidate = null },
+            containerColor = palette.cardFill,
+            title = {
+                Text(
+                    text = stringResource(R.string.restore_confirm_title),
+                    color = palette.textPrimary,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.SemiBold,
+                )
+            },
+            text = {
+                Text(
+                    text = stringResource(R.string.restore_confirm_body, bundle.totalRecords, bundle.version),
+                    color = palette.textSecondary,
+                    fontSize = 12.sp,
+                )
+            },
+            confirmButton = {
+                Text(
+                    text = stringResource(R.string.edit_save),
+                    color = palette.accent,
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier
+                        .quietClick {
+                            restoreCandidate = null
+                            scope.launch {
+                                val result = runCatching { repository.restoreBackup(context, uri) }
+                                    .getOrNull()
+                                val message = when (result) {
+                                    is com.example.omnihealth.data.backup.RestoreResult.Success ->
+                                        context.getString(R.string.restore_done, result.counts.values.sum())
+                                    is com.example.omnihealth.data.backup.RestoreResult.Failure ->
+                                        context.getString(R.string.restore_failed, result.reason)
+                                    null -> context.getString(R.string.restore_failed, "unknown")
+                                }
+                                Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+                            }
+                        }
+                        .padding(8.dp),
+                )
+            },
+            dismissButton = {
+                Text(
+                    text = stringResource(R.string.edit_cancel),
+                    color = palette.textTertiary,
+                    fontSize = 13.sp,
+                    modifier = Modifier
+                        .quietClick { restoreCandidate = null }
+                        .padding(8.dp),
+                )
+            },
+        )
     }
 
     when (sheet) {
@@ -461,12 +558,12 @@ private fun goalLabel(goal: HealthGoal): String = stringResource(
     },
 )
 /** 通过系统分享面板导出 CSV（微信 / 邮件 / 文件管理器都能接收）。 */
-private fun shareCsv(context: android.content.Context, file: File) {
+private fun shareFile(context: android.content.Context, file: File, mime: String = "text/csv") {
     val uri = runCatching {
         FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
     }.getOrNull() ?: return
     val intent = Intent(Intent.ACTION_SEND).apply {
-        type = "text/csv"
+        type = mime
         putExtra(Intent.EXTRA_STREAM, uri)
         putExtra(Intent.EXTRA_SUBJECT, file.name)
         addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)

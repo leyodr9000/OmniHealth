@@ -398,4 +398,21 @@ class HealthRepository(
     }
 
     suspend fun deleteHabit(habit: HabitEntity) = db.habitDao().deleteHabit(habit)
+
+    /* ---------------- backup / restore ---------------- */
+
+    suspend fun exportBackup(context: android.content.Context): java.io.File? =
+        com.example.omnihealth.data.backup.BackupManager.export(context, db)
+
+    suspend fun inspectBackup(
+        context: android.content.Context,
+        uri: android.net.Uri,
+    ): com.example.omnihealth.data.backup.BackupBundle? =
+        com.example.omnihealth.data.backup.BackupManager.inspect(context, uri)
+
+    suspend fun restoreBackup(
+        context: android.content.Context,
+        uri: android.net.Uri,
+    ): com.example.omnihealth.data.backup.RestoreResult =
+        com.example.omnihealth.data.backup.BackupManager.restore(context, db, uri)
 }

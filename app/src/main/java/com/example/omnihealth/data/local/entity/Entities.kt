@@ -4,11 +4,13 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import kotlinx.serialization.Serializable
 
 /* ------------------------------------------------------------------ */
 /* 体征                                                                */
 /* ------------------------------------------------------------------ */
 
+@Serializable
 @Entity(
     tableName = "vitals",
     indices = [Index("recordedAt"), Index("type")],
@@ -40,6 +42,7 @@ object VitalType {
 /* 习惯                                                                */
 /* ------------------------------------------------------------------ */
 
+@Serializable
 @Entity(tableName = "habits")
 data class HabitEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0L,
@@ -52,6 +55,7 @@ data class HabitEntity(
     val createdAt: Long = System.currentTimeMillis(),
 )
 
+@Serializable
 @Entity(
     tableName = "habit_logs",
     indices = [
@@ -79,6 +83,7 @@ data class HabitLogEntity(
 /* 食物字典 + 饮食记录                                                  */
 /* ------------------------------------------------------------------ */
 
+@Serializable
 @Entity(
     tableName = "foods",
     indices = [Index("name"), Index("category")],
@@ -99,6 +104,7 @@ data class FoodEntity(
     val isCustom: Boolean = false,
 )
 
+@Serializable
 @Entity(
     tableName = "diet_logs",
     indices = [Index("timestamp"), Index("epochDay"), Index("mealType")],
@@ -131,6 +137,7 @@ object MealType {
 /* 步数 + 训练                                                         */
 /* ------------------------------------------------------------------ */
 
+@Serializable
 @Entity(
     tableName = "steps",
     indices = [Index(value = ["epochDay"], unique = true)],
@@ -146,6 +153,7 @@ data class StepEntity(
     val updatedAt: Long = System.currentTimeMillis(),
 )
 
+@Serializable
 @Entity(
     tableName = "workouts",
     indices = [Index("epochDay"), Index("timestamp")],
@@ -164,6 +172,7 @@ data class WorkoutEntity(
 /* AI 报告                                                             */
 /* ------------------------------------------------------------------ */
 
+@Serializable
 @Entity(tableName = "ai_reports", indices = [Index("createdAt")])
 data class AiReportEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0L,

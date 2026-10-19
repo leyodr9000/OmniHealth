@@ -68,4 +68,13 @@ interface DietDao {
 
     @Query("SELECT SUM(calories) FROM diet_logs WHERE epochDay BETWEEN :from AND :to")
     suspend fun caloriesBetween(from: Long, to: Long): Float?
+
+    @Query("SELECT * FROM diet_logs ORDER BY timestamp ASC")
+    suspend fun allLogs(): List<DietLogEntity>
+
+    @Query("DELETE FROM diet_logs")
+    suspend fun clearLogs()
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertLogs(items: List<DietLogEntity>)
 }
