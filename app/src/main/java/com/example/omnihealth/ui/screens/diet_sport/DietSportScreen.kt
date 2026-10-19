@@ -62,6 +62,7 @@ import com.example.omnihealth.data.local.entity.FoodEntity
 import com.example.omnihealth.data.local.entity.MealType
 import com.example.omnihealth.data.local.entity.WorkoutEntity
 import com.example.omnihealth.ui.components.AppearOnScreen
+import com.example.omnihealth.ui.components.animatedInt
 import com.example.omnihealth.ui.components.MetricTile
 import com.example.omnihealth.ui.components.ProgressRing
 import com.example.omnihealth.ui.components.SectionHeader
@@ -194,7 +195,7 @@ fun DietSportScreen(
                     MetricTile(
                         icon = Icons.Rounded.DirectionsWalk,
                         title = stringResource(R.string.sport_steps),
-                        value = String.format(Locale.US, "%,d", sport.steps),
+                        value = String.format(Locale.US, "%,d", animatedInt(sport.steps)),
                         unit = "",
                         accent = palette.accent,
                         progress = sport.progress,
@@ -208,7 +209,7 @@ fun DietSportScreen(
                     MetricTile(
                         icon = Icons.Rounded.LocalFireDepartment,
                         title = stringResource(R.string.sport_today_workouts),
-                        value = "${sport.burned}",
+                        value = "${animatedInt(sport.burned)}",
                         unit = "kcal",
                         accent = Color(0xFFFF8A5B),
                         progress = (sport.burned / 400f).coerceIn(0f, 1f),

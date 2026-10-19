@@ -54,6 +54,7 @@ import com.example.omnihealth.R
 import com.example.omnihealth.ui.components.AppearOnScreen
 import com.example.omnihealth.ui.components.MetricTile
 import com.example.omnihealth.ui.components.ProgressRing
+import com.example.omnihealth.ui.components.animatedFloat
 import com.example.omnihealth.ui.components.animatedFraction
 import com.example.omnihealth.ui.components.animatedInt
 import com.example.omnihealth.ui.components.SectionHeader
@@ -174,7 +175,7 @@ fun HomeScreen(
                 MetricTile(
                     icon = Icons.Rounded.DirectionsWalk,
                     title = stringResource(R.string.home_steps),
-                    value = formatInt(state.steps),
+                    value = formatInt(animatedInt(state.steps)),
                     unit = "",
                     accent = palette.accent,
                     progress = state.stepsProgress,
@@ -185,7 +186,7 @@ fun HomeScreen(
                 MetricTile(
                     icon = Icons.Rounded.WaterDrop,
                     title = stringResource(R.string.home_water),
-                    value = String.format(Locale.US, "%.2f", state.waterMl / 1000f),
+                    value = String.format(Locale.US, "%.2f", animatedFloat(state.waterMl / 1000f)),
                     unit = "L",
                     accent = Color(0xFF4FB3FF),
                     progress = state.waterProgress,
@@ -204,7 +205,7 @@ fun HomeScreen(
                 MetricTile(
                     icon = Icons.Rounded.Bedtime,
                     title = stringResource(R.string.home_sleep),
-                    value = String.format(Locale.US, "%.1f", state.sleepHours),
+                    value = String.format(Locale.US, "%.1f", animatedFloat(state.sleepHours)),
                     unit = "h",
                     accent = Color(0xFF8B7CFF),
                     progress = state.sleepProgress,
@@ -218,7 +219,7 @@ fun HomeScreen(
                 MetricTile(
                     icon = Icons.Rounded.LocalFireDepartment,
                     title = stringResource(R.string.home_calories),
-                    value = formatInt(state.caloriesIn),
+                    value = formatInt(animatedInt(state.caloriesIn)),
                     unit = "kcal",
                     accent = Color(0xFFFF8A5B),
                     progress = state.calorieProgress,
@@ -242,13 +243,13 @@ fun HomeScreen(
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 StatChip(
                     label = "BMI",
-                    value = String.format(Locale.US, "%.1f", state.bmi),
+                    value = String.format(Locale.US, "%.1f", animatedFloat(state.bmi)),
                     color = palette.accentAlt,
                     modifier = Modifier.weight(1f),
                 )
                 StatChip(
                     label = "TDEE",
-                    value = "${state.tdee}",
+                    value = "${animatedInt(state.tdee)}",
                     color = palette.danger,
                     modifier = Modifier.weight(1f),
                 )

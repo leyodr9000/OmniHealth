@@ -63,3 +63,14 @@ fun animatedFraction(target: Float, durationMillis: Int = 600): Float {
     )
     return value
 }
+
+/** 浮点滚动（饮水 L、睡眠 h 这类小数指标）。 */
+@Composable
+fun animatedFloat(target: Float, durationMillis: Int = 600): Float {
+    val value by animateFloatAsState(
+        targetValue = target,
+        animationSpec = tween(durationMillis, easing = FastOutSlowInEasing),
+        label = "animatedFloat",
+    )
+    return value
+}
