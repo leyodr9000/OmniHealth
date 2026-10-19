@@ -4,10 +4,10 @@
 
     <!-- 导航 -->
     <string name="nav_home">首页</string>
-    <string name="nav_diet">饮食</string>
+    <string name="nav_diet">记录</string>
     <string name="nav_sport">运动</string>
-    <string name="nav_stats">统计</string>
-    <string name="nav_ai">AI 顾问</string>
+    <string name="nav_stats">趋势</string>
+    <string name="nav_ai">建议</string>
     <string name="nav_settings">我的</string>
     <string name="nav_quick_log">快捷记录</string>
 

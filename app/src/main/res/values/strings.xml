@@ -4,10 +4,10 @@
 
     <!-- Navigation -->
     <string name="nav_home">Home</string>
-    <string name="nav_diet">Diet</string>
+    <string name="nav_diet">Records</string>
     <string name="nav_sport">Sport</string>
-    <string name="nav_stats">Stats</string>
-    <string name="nav_ai">AI</string>
+    <string name="nav_stats">Trends</string>
+    <string name="nav_ai">Advice</string>
     <string name="nav_settings">Me</string>
     <string name="nav_quick_log">Quick log</string>
 

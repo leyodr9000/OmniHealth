@@ -52,7 +52,7 @@ data class ApiConfig(
 /** 全局设置快照。 */
 data class AppSettings(
     val themeId: String = "miuix_glass",
-    val layoutId: String = "layout_a",
+    val layoutId: String = "layout_b",
     val languageId: String = "system",
     val frameworkId: String = "material3",
     val reduceMotion: Boolean = false,
@@ -101,7 +101,7 @@ class SettingsPreferences(private val context: Context) {
     val settings: Flow<AppSettings> = context.omniDataStore.data.map { p ->
         AppSettings(
             themeId = p[Keys.theme] ?: "miuix_glass",
-            layoutId = p[Keys.layout] ?: "layout_a",
+            layoutId = p[Keys.layout] ?: "layout_b",
             languageId = p[Keys.language] ?: "system",
             frameworkId = p[Keys.framework] ?: "material3",
             reduceMotion = p[Keys.reduceMotion] ?: false,

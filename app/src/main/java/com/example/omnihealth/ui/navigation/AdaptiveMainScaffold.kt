@@ -72,7 +72,7 @@ enum class OmniDest(
     companion object {
         fun itemsFor(layout: NavLayoutMode): List<OmniDest> = when (layout) {
             NavLayoutMode.A_FAB -> listOf(Home, Diet, Stats, Ai)
-            NavLayoutMode.B_FIVE -> listOf(Home, Diet, Sport, Stats, Ai)
+            NavLayoutMode.B_FIVE -> listOf(Home, Diet, Stats, Ai, Settings)
             NavLayoutMode.C_BENTO -> listOf(Home, Stats, Settings)
         }
 
