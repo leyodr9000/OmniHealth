@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -79,22 +80,66 @@ fun GlassCard(
     onClick: (() -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    // 实心卡片：纯色底 + 1px 描边，不用渐变、不用阴影。
-    val base = modifier
-        .clip(shape)
-        .background(color = palette.cardFill, shape = shape)
-        .border(
-            width = 1.dp,
-            color = palette.cardStroke,
-            shape = shape,
-        )
-
+    // 玻璃主题下：卡片也走背景采样模糊；其他主题保持实心卡以保证可读性。
+    // MIUI X 框架下无论配色如何都启用玻璃，保证「换框架 = 换质感」。
+    val hazeState = LocalLiquidGlass.current
+    val useGlass = hazeState != null &&
+        (palette.glass || LocalUiFramework.current == UiFramework.MIUIX)
+    val base = if (useGlass) {
+        modifier.liquidGlassCard(hazeState!!, palette, shape)
+    } else {
+        modifier
+            .clip(shape)
+            .background(color = palette.cardFill, shape = shape)
+            .border(
+                width = 1.dp,
+                color = palette.cardStroke,
+                shape = shape,
+            )
+    }
     Column(
         modifier = if (onClick != null) base.quietClick(onClick = onClick) else base,
     ) {
         Column(Modifier.padding(contentPadding), content = content)
     }
 }
+
+/**
+ * 卡片级液态玻璃：背景采样模糊 + 高光描边。
+ *
+ * 底色保留较高不透明度（0.72），保证卡片上的数字与正文在模糊背景上依然清晰。
+ */
+@Composable
+fun Modifier.liquidGlassCard(
+    state: HazeState,
+    palette: OmniPalette,
+    shape: Shape,
+): Modifier = this
+    .clip(shape)
+    .hazeEffect(state) {
+        style = HazeStyle(
+            backgroundColor = palette.cardFill.copy(alpha = 0.72f),
+            tints = listOf(
+                HazeTint(palette.cardFill.copy(alpha = 0.45f)),
+                HazeTint(palette.accent.copy(alpha = 0.04f)),
+            ),
+            blurRadius = 16.dp,
+            noiseFactor = 0.015f,
+            fallbackTint = HazeTint(palette.cardFill),
+        )
+        blurEnabled = true
+        alpha = 1f
+    }
+    .border(
+        width = 1.dp,
+        brush = Brush.linearGradient(
+            colors = listOf(
+                Color.White.copy(alpha = 0.72f),
+                palette.cardStroke.copy(alpha = 0.55f),
+            ),
+        ),
+        shape = shape,
+    )
 
 /**
  * 底部 / 顶部毛玻璃栏的背景修饰符（含顶部细描边）。
@@ -152,3 +197,11 @@ fun Modifier.liquidGlass(
 /** 背景采样源：把整块背景 + 内容标记成「可被玻璃采样」。 */
 @Composable
 fun rememberHazeState(): HazeState = remember { HazeState() }
+
+/**
+ * 液态玻璃状态。
+ *
+ * 只有 MIUI X 框架 + 玻璃配色时才非空：其他组合保持实心卡片，
+ * 既符合 Material 3 的规范，也保证可读性。
+ */
+val LocalLiquidGlass = staticCompositionLocalOf<HazeState?> { null }

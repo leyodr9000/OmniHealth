@@ -65,6 +65,7 @@ import com.example.omnihealth.ui.i18n.AppLanguage
 import com.example.omnihealth.ui.navigation.NavLayoutMode
 import com.example.omnihealth.ui.theme.OmniTheme
 import com.example.omnihealth.ui.theme.ThemeMode
+import com.example.omnihealth.ui.theme.UiFramework
 import com.example.omnihealth.ui.theme.bounceClick
 import com.example.omnihealth.ui.theme.quietClick
 import kotlinx.coroutines.launch
@@ -79,9 +80,11 @@ fun SettingsScreen(
     themeMode: ThemeMode,
     layoutMode: NavLayoutMode,
     language: AppLanguage,
+    framework: UiFramework,
     onThemeChange: (ThemeMode) -> Unit,
     onLayoutChange: (NavLayoutMode) -> Unit,
     onLanguageChange: (AppLanguage) -> Unit,
+    onFrameworkChange: (UiFramework) -> Unit,
 ) {
     val palette = OmniTheme.palette
     val repository = LocalHealthRepository.current
@@ -111,9 +114,11 @@ fun SettingsScreen(
             themeMode = themeMode,
             layoutMode = layoutMode,
             language = language,
+            framework = framework,
             onThemeChange = onThemeChange,
             onLayoutChange = onLayoutChange,
             onLanguageChange = onLanguageChange,
+            onFrameworkChange = onFrameworkChange,
             onBack = { page = SettingsPage.ROOT },
         )
         return
@@ -195,9 +200,8 @@ fun SettingsScreen(
                 SettingItem(
                     icon = Icons.Rounded.Palette,
                     title = stringResource(R.string.settings_row_appearance),
-                    value = stringResource(themeMode.labelRes) + " · " +
-                        stringResource(layoutMode.labelRes) + " · " +
-                        stringResource(language.labelRes),
+                    value = stringResource(framework.labelRes) + " · " +
+                        stringResource(themeMode.labelRes),
                     onClick = { page = SettingsPage.APPEARANCE },
                 )
                 SettingDivider()

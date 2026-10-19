@@ -72,6 +72,25 @@ enum class ThemeMode(
 enum class SurfaceStyle { FROSTED, SOFT, NEON }
 
 /**
+ * 界面框架：决定组件语言，而不是配色。
+ *
+ * [MATERIAL3] 默认。实心卡片、标准圆角、Material 列表。
+ * [MIUIX]  HyperOS 风格：更大圆角、液态玻璃卡片与底栏、弹性按压。
+ */
+enum class UiFramework(
+    val id: String,
+    @StringRes val labelRes: Int,
+) {
+    MATERIAL3("material3", R.string.framework_md3),
+    MIUIX("miuix", R.string.framework_miuix),
+    ;
+
+    companion object {
+        fun from(id: String?): UiFramework = entries.firstOrNull { it.id == id } ?: MATERIAL3
+    }
+}
+
+/**
  * 主题调色板：在 Material3 ColorScheme 之外，补充骨架所需的渐变、玻璃、图表色。
  */
 @Immutable
@@ -138,7 +157,7 @@ private val MiuiPalette = OmniPalette(
     ),
     corner = 18.dp,
     elevation = 2.dp,
-    glass = false,
+    glass = true,
 )
 
 private val MorandiPalette = OmniPalette(
@@ -284,6 +303,7 @@ private fun omniShapes(corner: Dp) = Shapes(
 
 val LocalOmniPalette = staticCompositionLocalOf { MiuiPalette }
 val LocalThemeMode = staticCompositionLocalOf { ThemeMode.MIUIX_GLASS }
+val LocalUiFramework = staticCompositionLocalOf { UiFramework.MATERIAL3 }
 
 /** 便捷访问当前调色板。 */
 object OmniTheme {
@@ -292,11 +312,15 @@ object OmniTheme {
 
     val mode: ThemeMode
         @Composable get() = LocalThemeMode.current
+
+    val framework: UiFramework
+        @Composable get() = LocalUiFramework.current
 }
 
 @Composable
 fun OmniHealthTheme(
     mode: ThemeMode = ThemeMode.MIUIX_GLASS,
+    framework: UiFramework = UiFramework.MATERIAL3,
     content: @Composable () -> Unit,
 ) {
     val palette = remember(mode) { paletteFor(mode) }
@@ -318,6 +342,7 @@ fun OmniHealthTheme(
     CompositionLocalProvider(
         LocalOmniPalette provides palette,
         LocalThemeMode provides mode,
+        LocalUiFramework provides framework,
     ) {
         MaterialTheme(
             colorScheme = scheme,

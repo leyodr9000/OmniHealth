@@ -53,7 +53,7 @@ data class AppSettings(
     val themeId: String = "miuix_glass",
     val layoutId: String = "layout_a",
     val languageId: String = "system",
-    val frameworkId: String = "miuix",
+    val frameworkId: String = "material3",
     val profile: UserProfile = UserProfile(),
     val api: ApiConfig = ApiConfig(),
     val stepGoal: Int = 10_000,
@@ -100,7 +100,7 @@ class SettingsPreferences(private val context: Context) {
             themeId = p[Keys.theme] ?: "miuix_glass",
             layoutId = p[Keys.layout] ?: "layout_a",
             languageId = p[Keys.language] ?: "system",
-            frameworkId = p[Keys.framework] ?: "miuix",
+            frameworkId = p[Keys.framework] ?: "material3",
             profile = UserProfile(
                 nickname = p[Keys.nickname] ?: "Kai",
                 gender = p[Keys.gender]?.let { runCatching { Gender.valueOf(it) }.getOrNull() } ?: Gender.MALE,

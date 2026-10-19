@@ -336,6 +336,8 @@ class HealthRepository(
 
     suspend fun setLanguage(id: String) = preferences.setLanguageId(id)
 
+    suspend fun setFramework(id: String) = preferences.setFrameworkId(id)
+
     suspend fun setWaterReminder(enabled: Boolean) = preferences.setWaterReminder(enabled)
 
     suspend fun setSleepReminder(enabled: Boolean) = preferences.setSleepReminder(enabled)

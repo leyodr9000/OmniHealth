@@ -27,24 +27,13 @@ fun AppearOnScreen(
     index: Int = 0,
     content: @Composable () -> Unit,
 ) {
-    var visible by remember { mutableStateOf(false) }
-    LaunchedEffect(Unit) {
-        delay(index * 45L)
-        visible = true
-    }
-    AnimatedVisibility(
-        visible = visible,
-        enter = fadeIn(tween(260, easing = FastOutSlowInEasing)) +
-            slideInVertically(tween(280, easing = FastOutSlowInEasing)) { it / 18 } +
-            expandVertically(tween(280, easing = FastOutSlowInEasing), expandFrom = androidx.compose.ui.Alignment.Top),
-    ) {
-        content()
-    }
+    // 刻意不做逐段入场：与页面切换动画叠加会出现重影，也影响阅读。
+    content()
 }
 
 /** 数字滚动到目标值（健康分、步数这类主指标）。 */
 @Composable
-fun animatedInt(target: Int, durationMillis: Int = 650): Int {
+fun animatedInt(target: Int, durationMillis: Int = 420): Int {
     val value by animateIntAsState(
         targetValue = target,
         animationSpec = tween(durationMillis, easing = FastOutSlowInEasing),
@@ -55,7 +44,7 @@ fun animatedInt(target: Int, durationMillis: Int = 650): Int {
 
 /** 0f..1f 的平滑进度，用于进度条 / 圆环 / 选中态。 */
 @Composable
-fun animatedFraction(target: Float, durationMillis: Int = 600): Float {
+fun animatedFraction(target: Float, durationMillis: Int = 420): Float {
     val value by animateFloatAsState(
         targetValue = target.coerceIn(0f, 1f),
         animationSpec = tween(durationMillis, easing = FastOutSlowInEasing),
@@ -66,7 +55,7 @@ fun animatedFraction(target: Float, durationMillis: Int = 600): Float {
 
 /** 浮点滚动（饮水 L、睡眠 h 这类小数指标）。 */
 @Composable
-fun animatedFloat(target: Float, durationMillis: Int = 600): Float {
+fun animatedFloat(target: Float, durationMillis: Int = 420): Float {
     val value by animateFloatAsState(
         targetValue = target,
         animationSpec = tween(durationMillis, easing = FastOutSlowInEasing),

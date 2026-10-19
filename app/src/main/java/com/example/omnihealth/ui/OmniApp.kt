@@ -4,9 +4,8 @@ import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
@@ -15,6 +14,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import dev.chrisbanes.haze.hazeSource
@@ -42,15 +42,19 @@ import com.example.omnihealth.ui.theme.MeshGradientBackground
 import com.example.omnihealth.ui.theme.rememberHazeState
 import com.example.omnihealth.ui.theme.OmniTheme
 import com.example.omnihealth.ui.theme.ThemeMode
+import com.example.omnihealth.ui.theme.UiFramework
+import com.example.omnihealth.ui.theme.LocalLiquidGlass
 
 @Composable
 fun OmniApp(
     themeMode: ThemeMode,
     layoutMode: NavLayoutMode,
     language: AppLanguage,
+    framework: UiFramework,
     onThemeChange: (ThemeMode) -> Unit,
     onLayoutChange: (NavLayoutMode) -> Unit,
     onLanguageChange: (AppLanguage) -> Unit,
+    onFrameworkChange: (UiFramework) -> Unit,
 ) {
     val navController = rememberNavController()
     val palette = OmniTheme.palette
@@ -58,10 +62,12 @@ fun OmniApp(
     val currentRoute = backStackEntry?.destination?.route
     var quickLogOpen by remember { mutableStateOf(false) }
     val hazeState = rememberHazeState()
+    val liquid = framework == UiFramework.MIUIX
 
+    CompositionLocalProvider(LocalLiquidGlass provides if (liquid) hazeState else null) {
     MeshGradientBackground(
         palette = palette,
-        modifier = Modifier.hazeSource(hazeState),
+        modifier = if (liquid) Modifier.hazeSource(hazeState) else Modifier,
     ) {
         Scaffold(
             containerColor = Color.Transparent,
@@ -72,6 +78,7 @@ fun OmniApp(
                     currentRoute = currentRoute,
                     hazeState = hazeState,
                     onSelect = { dest -> navController.navigateSingleTop(dest) },
+                    liquid = liquid,
                     onQuickLog = { quickLogOpen = true },
                 )
             },
@@ -89,15 +96,17 @@ fun OmniApp(
                 // Tab 切换：淡入 + 轻微上浮，220ms。短时长、单属性位移，
                 // 在 120Hz 上不会与首帧合成抢出明显掉帧。
                 enterTransition = {
-                    fadeIn(tween(220, easing = FastOutSlowInEasing)) +
-                        slideInVertically(tween(220, easing = FastOutSlowInEasing)) { it / 28 }
+                    slideInVertically(tween(180, easing = FastOutSlowInEasing)) { it / 36 }
                 },
-                exitTransition = { fadeOut(tween(150)) },
+                exitTransition = {
+                    slideOutVertically(tween(160, easing = FastOutSlowInEasing)) { -it / 36 }
+                },
                 popEnterTransition = {
-                    fadeIn(tween(220, easing = FastOutSlowInEasing)) +
-                        slideInVertically(tween(220, easing = FastOutSlowInEasing)) { -it / 28 }
+                    slideInVertically(tween(180, easing = FastOutSlowInEasing)) { -it / 36 }
                 },
-                popExitTransition = { fadeOut(tween(150)) },
+                popExitTransition = {
+                    slideOutVertically(tween(160, easing = FastOutSlowInEasing)) { it / 36 }
+                },
                 modifier = Modifier.padding(bottom = innerPadding.calculateBottomPadding() + extraBottom),
             ) {
                 composable(OmniDest.Home.route) {
@@ -130,13 +139,16 @@ fun OmniApp(
                         themeMode = themeMode,
                         layoutMode = layoutMode,
                         language = language,
+                        framework = framework,
                         onThemeChange = onThemeChange,
                         onLayoutChange = onLayoutChange,
                         onLanguageChange = onLanguageChange,
+                        onFrameworkChange = onFrameworkChange,
                     )
                 }
             }
         }
+    }
     }
 
     if (quickLogOpen) {

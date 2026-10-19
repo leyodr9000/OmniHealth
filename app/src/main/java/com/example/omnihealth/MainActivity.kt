@@ -18,6 +18,7 @@ import com.example.omnihealth.ui.i18n.LocalizedApp
 import com.example.omnihealth.ui.navigation.NavLayoutMode
 import com.example.omnihealth.ui.theme.OmniHealthTheme
 import com.example.omnihealth.ui.theme.ThemeMode
+import com.example.omnihealth.ui.theme.UiFramework
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
@@ -34,18 +35,21 @@ class MainActivity : ComponentActivity() {
             val themeMode = remember(settings.themeId) { ThemeMode.from(settings.themeId) }
             val layoutMode = remember(settings.layoutId) { NavLayoutMode.from(settings.layoutId) }
             val language = remember(settings.languageId) { AppLanguage.from(settings.languageId) }
+            val framework = remember(settings.frameworkId) { UiFramework.from(settings.frameworkId) }
             val scope = rememberCoroutineScope()
 
             LocalizedApp(language = language) {
-                OmniHealthTheme(mode = themeMode) {
+                OmniHealthTheme(mode = themeMode, framework = framework) {
                     CompositionLocalProvider(LocalHealthRepository provides repository) {
                         OmniApp(
                             themeMode = themeMode,
                             layoutMode = layoutMode,
                             language = language,
+                            framework = framework,
                             onThemeChange = { scope.launch { repository.setTheme(it.id) } },
                             onLayoutChange = { scope.launch { repository.setLayout(it.id) } },
                             onLanguageChange = { scope.launch { repository.setLanguage(it.id) } },
+                            onFrameworkChange = { scope.launch { repository.setFramework(it.id) } },
                         )
                     }
                 }

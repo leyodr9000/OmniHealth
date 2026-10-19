@@ -2,6 +2,8 @@ package com.example.omnihealth.ui.navigation
 
 import androidx.annotation.StringRes
 import androidx.compose.animation.core.Spring
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
@@ -99,6 +101,7 @@ fun AdaptiveBottomBar(
     layout: NavLayoutMode,
     currentRoute: String?,
     hazeState: HazeState,
+    liquid: Boolean,
     onSelect: (OmniDest) -> Unit,
     onQuickLog: () -> Unit,
     modifier: Modifier = Modifier,
@@ -114,9 +117,9 @@ fun AdaptiveBottomBar(
         contentAlignment = Alignment.Center,
     ) {
         when (layout) {
-            NavLayoutMode.A_FAB -> FabNavBar(items, currentRoute, hazeState, onSelect, onQuickLog, palette)
-            NavLayoutMode.B_FIVE -> WideNavBar(items, currentRoute, hazeState, onSelect, palette)
-            NavLayoutMode.C_BENTO -> PillNavBar(items, currentRoute, hazeState, onSelect, palette)
+            NavLayoutMode.A_FAB -> FabNavBar(items, currentRoute, hazeState, liquid, onSelect, onQuickLog, palette)
+            NavLayoutMode.B_FIVE -> WideNavBar(items, currentRoute, hazeState, liquid, onSelect, palette)
+            NavLayoutMode.C_BENTO -> PillNavBar(items, currentRoute, hazeState, liquid, onSelect, palette)
         }
     }
 }
@@ -130,6 +133,7 @@ private fun FabNavBar(
     items: List<OmniDest>,
     currentRoute: String?,
     hazeState: HazeState,
+    liquid: Boolean,
     onSelect: (OmniDest) -> Unit,
     onQuickLog: () -> Unit,
     palette: OmniPalette,
@@ -139,7 +143,7 @@ private fun FabNavBar(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(70.dp)
-                .liquidGlass(hazeState, palette, RoundedCornerShape(28.dp))
+                .then(if (liquid) Modifier.liquidGlass(hazeState, palette, RoundedCornerShape(28.dp)) else Modifier.frostBar(palette, RoundedCornerShape(28.dp)))
                 .padding(horizontal = 6.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -183,6 +187,7 @@ private fun WideNavBar(
     items: List<OmniDest>,
     currentRoute: String?,
     hazeState: HazeState,
+    liquid: Boolean,
     onSelect: (OmniDest) -> Unit,
     palette: OmniPalette,
 ) {
@@ -190,7 +195,7 @@ private fun WideNavBar(
         modifier = Modifier
             .fillMaxWidth()
             .height(72.dp)
-            .liquidGlass(hazeState, palette, RoundedCornerShape(26.dp))
+            .then(if (liquid) Modifier.liquidGlass(hazeState, palette, RoundedCornerShape(26.dp)) else Modifier.frostBar(palette, RoundedCornerShape(26.dp)))
             .padding(horizontal = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -209,6 +214,7 @@ private fun PillNavBar(
     items: List<OmniDest>,
     currentRoute: String?,
     hazeState: HazeState,
+    liquid: Boolean,
     onSelect: (OmniDest) -> Unit,
     palette: OmniPalette,
 ) {
@@ -216,7 +222,7 @@ private fun PillNavBar(
         modifier = Modifier
             .width(280.dp)
             .height(64.dp)
-            .liquidGlass(hazeState, palette, RoundedCornerShape(32.dp))
+            .then(if (liquid) Modifier.liquidGlass(hazeState, palette, RoundedCornerShape(32.dp)) else Modifier.frostBar(palette, RoundedCornerShape(32.dp)))
             .padding(horizontal = 10.dp, vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceEvenly,
@@ -239,8 +245,17 @@ private fun NavItem(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
 ) {
-    val tint = if (selected) palette.accent else palette.textTertiary
     val pillColor = palette.accent.copy(alpha = if (palette.style == SurfaceStyle.NEON) 0.18f else 0.12f)
+    val tint by animateColorAsState(
+        targetValue = if (selected) palette.accent else palette.textTertiary,
+        animationSpec = tween(220),
+        label = "navTint",
+    )
+    val pillAlpha by animateFloatAsState(
+        targetValue = if (selected) 1f else 0f,
+        animationSpec = tween(240),
+        label = "navPill",
+    )
     val iconScale by animateFloatAsState(
         targetValue = if (selected) 1.08f else 1f,
         animationSpec = spring(stiffness = Spring.StiffnessMediumLow, dampingRatio = 0.5f),
@@ -257,7 +272,7 @@ private fun NavItem(
         Box(
             modifier = Modifier
                 .background(
-                    color = if (selected) pillColor else Color.Transparent,
+                    color = pillColor.copy(alpha = pillColor.alpha * pillAlpha),
                     shape = RoundedCornerShape(14.dp),
                 )
                 .padding(horizontal = 14.dp, vertical = 5.dp),
