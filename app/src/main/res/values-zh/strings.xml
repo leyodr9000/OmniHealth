@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">OmniHealth</string>
+
+    <!-- 导航 -->
+    <string name="nav_home">首页</string>
+    <string name="nav_diet">饮食</string>
+    <string name="nav_sport">运动</string>
+    <string name="nav_stats">统计</string>
+    <string name="nav_ai">AI 顾问</string>
+    <string name="nav_settings">我的</string>
+    <string name="nav_quick_log">快捷记录</string>
+
+    <!-- 通用 -->
+    <string name="save">保存</string>
+    <string name="cancel">取消</string>
+    <string name="done">完成</string>
+    <string name="back">返回</string>
+
+    <!-- 设置 -->
+    <string name="settings_title">外观实验室</string>
+    <string name="settings_subtitle">主题、布局、语言实时切换，无需重启</string>
+    <string name="settings_section_theme">主题引擎</string>
+    <string name="settings_section_theme_sub">3 套视觉语言</string>
+    <string name="settings_section_layout">导航骨架</string>
+    <string name="settings_section_layout_sub">3 套布局结构</string>
+    <string name="settings_section_language">语言</string>
+    <string name="settings_section_language_sub">切换后立即全局生效</string>
+    <string name="settings_section_profile">个人资料</string>
+    <string name="settings_section_profile_sub">用于 BMR / TDEE 计算</string>
+    <string name="settings_section_api">AI 接口</string>
+    <string name="settings_section_api_sub">OpenAI 兼容 · 留空走离线引擎</string>
+    <string name="settings_footer">OmniHealth 1.0.0 · 所有健康数据保存在本机 Room 数据库，不上传云端。</string>
+
+    <string name="language_system">跟随系统</string>
+    <string name="language_zh">中文</string>
+    <string name="language_en">English</string>
+
+    <string name="profile_nickname">昵称</string>
+    <string name="profile_gender_age">性别 / 年龄</string>
+    <string name="profile_body">身高 / 体重</string>
+    <string name="profile_activity">活动水平</string>
+    <string name="profile_goal">目标</string>
+
+    <!-- 快捷记录 -->
+    <string name="quick_log_title">快捷记录</string>
+    <string name="quick_log_subtitle">一秒入账，健康数据不求人</string>
+    <string name="quick_log_save">保存记录</string>
+    <string name="quick_log_weight">体重</string>
+    <string name="quick_log_water">饮水</string>
+    <string name="quick_log_sleep">睡眠</string>
+    <string name="quick_log_steps">步数</string>
+    <string name="quick_log_mood">心情</string>
+
+    <!-- 主题 -->
+    <string name="theme_miui_label">MIUIX 玻璃</string>
+    <string name="theme_miui_tagline">HyperOS · 毛玻璃</string>
+    <string name="theme_miui_blurb">柔光渐变 / 24dp 超椭圆 / 物理弹性按压</string>
+    <string name="theme_morandi_label">莫兰迪 MD3</string>
+    <string name="theme_morandi_tagline">Material You · 低饱和</string>
+    <string name="theme_morandi_blurb">几何卡片 / 柔和阴影 / 极高可读性</string>
+    <string name="theme_cyber_label">赛博暗黑</string>
+    <string name="theme_cyber_tagline">Neon · 深空黑</string>
+    <string name="theme_cyber_blurb">霓虹描边 / 冷光渐变 / 未来感数据流</string>
+
+    <!-- 布局 -->
+    <string name="layout_a_label">布局 A</string>
+    <string name="layout_a_desc">4 Tab + 中央悬浮记录键</string>
+    <string name="layout_b_label">布局 B</string>
+    <string name="layout_b_desc">5 Tab 经典玻璃底栏</string>
+    <string name="layout_c_label">布局 C</string>
+    <string name="layout_c_desc">3 Tab 胶囊 + Bento 概览</string>
+</resources>

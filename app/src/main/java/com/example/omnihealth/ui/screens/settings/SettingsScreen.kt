@@ -1,0 +1,426 @@
+package com.example.omnihealth.ui.screens.settings
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.example.omnihealth.R
+import com.example.omnihealth.ui.components.SectionHeader
+import com.example.omnihealth.ui.i18n.AppLanguage
+import com.example.omnihealth.ui.navigation.NavLayoutMode
+import com.example.omnihealth.ui.theme.GlassCard
+import com.example.omnihealth.ui.theme.OmniTheme
+import com.example.omnihealth.ui.theme.ThemeMode
+import com.example.omnihealth.ui.theme.bounceClick
+import com.example.omnihealth.ui.theme.paletteFor
+
+@Composable
+fun SettingsScreen(
+    themeMode: ThemeMode,
+    layoutMode: NavLayoutMode,
+    language: AppLanguage,
+    onThemeChange: (ThemeMode) -> Unit,
+    onLayoutChange: (NavLayoutMode) -> Unit,
+    onLanguageChange: (AppLanguage) -> Unit,
+) {
+    val palette = OmniTheme.palette
+
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxWidth()
+            .statusBarsPadding(),
+        contentPadding = PaddingValues(start = 18.dp, end = 18.dp, top = 8.dp, bottom = 28.dp),
+        verticalArrangement = Arrangement.spacedBy(14.dp),
+    ) {
+        item {
+            Text(
+                text = stringResource(R.string.settings_title),
+                color = palette.textPrimary,
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+            )
+            Text(
+                text = stringResource(R.string.settings_subtitle),
+                color = palette.textTertiary,
+                fontSize = 12.sp,
+                modifier = Modifier.padding(top = 3.dp),
+            )
+        }
+
+        item {
+            SectionHeader(
+                title = stringResource(R.string.settings_section_language),
+                subtitle = stringResource(R.string.settings_section_language_sub),
+            )
+        }
+
+        item {
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                AppLanguage.entries.forEach { item ->
+                    LanguageChip(
+                        label = stringResource(item.labelRes),
+                        selected = item == language,
+                        modifier = Modifier.weight(1f),
+                        onClick = { onLanguageChange(item) },
+                    )
+                }
+            }
+        }
+
+        item {
+            SectionHeader(
+                title = stringResource(R.string.settings_section_theme),
+                subtitle = stringResource(R.string.settings_section_theme_sub),
+            )
+        }
+
+        item {
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                ThemeMode.entries.forEach { mode ->
+                    ThemeOption(
+                        mode = mode,
+                        selected = mode == themeMode,
+                        onClick = { onThemeChange(mode) },
+                    )
+                }
+            }
+        }
+
+        item {
+            SectionHeader(
+                title = stringResource(R.string.settings_section_layout),
+                subtitle = stringResource(R.string.settings_section_layout_sub),
+            )
+        }
+
+        item {
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                NavLayoutMode.entries.forEach { mode ->
+                    LayoutOption(
+                        mode = mode,
+                        selected = mode == layoutMode,
+                        onClick = { onLayoutChange(mode) },
+                    )
+                }
+            }
+        }
+
+        item {
+            SectionHeader(
+                title = stringResource(R.string.settings_section_profile),
+                subtitle = stringResource(R.string.settings_section_profile_sub),
+            )
+        }
+
+        item {
+            GlassCard(Modifier.fillMaxWidth()) {
+                ProfileRow(stringResource(R.string.profile_nickname), "Kai")
+                ProfileRow(stringResource(R.string.profile_gender_age), "M · 26")
+                ProfileRow(stringResource(R.string.profile_body), "178 cm · 62.4 kg")
+                ProfileRow(stringResource(R.string.profile_activity), "Moderate · 4x / week")
+                ProfileRow(stringResource(R.string.profile_goal), "Lean bulk · maintain")
+            }
+        }
+
+        item {
+            SectionHeader(
+                title = stringResource(R.string.settings_section_api),
+                subtitle = stringResource(R.string.settings_section_api_sub),
+            )
+        }
+
+        item {
+            GlassCard(Modifier.fillMaxWidth()) {
+                ProfileRow("Provider", "DeepSeek")
+                ProfileRow("Base URL", "https://api.deepseek.com")
+                ProfileRow("Model", "deepseek-chat")
+                ProfileRow("API Key", "Not set · offline engine")
+            }
+        }
+
+        item {
+            Box(
+                Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(18.dp))
+                    .background(palette.textPrimary.copy(alpha = 0.05f))
+                    .padding(14.dp),
+            ) {
+                Text(
+                    text = stringResource(R.string.settings_footer),
+                    color = palette.textTertiary,
+                    fontSize = 10.sp,
+                    lineHeight = 15.sp,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun LanguageChip(
+    label: String,
+    selected: Boolean,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit,
+) {
+    val palette = OmniTheme.palette
+    Box(
+        modifier
+            .clip(RoundedCornerShape(14.dp))
+            .then(
+                if (selected) {
+                    Modifier.background(Brush.horizontalGradient(listOf(palette.accent, palette.accentAlt)))
+                } else {
+                    Modifier.background(palette.textPrimary.copy(alpha = 0.06f))
+                },
+            )
+            .bounceClick(pressScale = 0.94f, haptics = false, onClick = onClick)
+            .padding(vertical = 10.dp),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(
+            text = label,
+            color = if (selected) Color.White else palette.textSecondary,
+            fontSize = 12.sp,
+            fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium,
+        )
+    }
+}
+
+@Composable
+private fun ThemeOption(
+    mode: ThemeMode,
+    selected: Boolean,
+    onClick: () -> Unit,
+) {
+    val preview = paletteFor(mode)
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(preview.corner))
+            .background(
+                Brush.verticalGradient(
+                    listOf(preview.cardHighlight.copy(alpha = 0.9f), preview.cardFill),
+                ),
+            )
+            .bounceClick(pressScale = 0.97f, onClick = onClick)
+            .padding(14.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Box(
+            Modifier
+                .size(46.dp)
+                .clip(CircleShape)
+                .background(Brush.linearGradient(listOf(preview.accent, preview.accentAlt))),
+            contentAlignment = Alignment.Center,
+        ) {
+            Text(mode.emoji, fontSize = 18.sp)
+        }
+        Spacer(Modifier.width(12.dp))
+        Column(Modifier.weight(1f)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = stringResource(mode.labelRes),
+                    color = preview.textPrimary,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold,
+                )
+                Spacer(Modifier.width(6.dp))
+                Text(
+                    text = stringResource(mode.taglineRes),
+                    color = preview.textTertiary,
+                    fontSize = 9.sp,
+                )
+            }
+            Text(
+                text = stringResource(mode.blurbRes),
+                color = preview.textSecondary,
+                fontSize = 10.sp,
+                modifier = Modifier.padding(top = 3.dp),
+            )
+        }
+        Box(
+            Modifier
+                .size(20.dp)
+                .clip(CircleShape)
+                .background(if (selected) preview.accent else preview.textTertiary.copy(alpha = 0.18f)),
+            contentAlignment = Alignment.Center,
+        ) {
+            if (selected) Text("✓", color = preview.bgTop, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+        }
+    }
+}
+
+@Composable
+private fun LayoutOption(
+    mode: NavLayoutMode,
+    selected: Boolean,
+    onClick: () -> Unit,
+) {
+    val palette = OmniTheme.palette
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(palette.corner))
+            .background(palette.cardFill)
+            .bounceClick(pressScale = 0.97f, onClick = onClick)
+            .padding(14.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        LayoutDiagram(mode)
+        Spacer(Modifier.width(14.dp))
+        Column(Modifier.weight(1f)) {
+            Text(
+                text = stringResource(mode.labelRes),
+                color = palette.textPrimary,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Bold,
+            )
+            Text(
+                text = stringResource(mode.descRes),
+                color = palette.textSecondary,
+                fontSize = 10.sp,
+                modifier = Modifier.padding(top = 3.dp),
+            )
+        }
+        Box(
+            Modifier
+                .size(20.dp)
+                .clip(CircleShape)
+                .background(if (selected) palette.accent else palette.textTertiary.copy(alpha = 0.18f)),
+            contentAlignment = Alignment.Center,
+        ) {
+            if (selected) Text("✓", color = Color.White, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+        }
+    }
+}
+
+@Composable
+private fun LayoutDiagram(mode: NavLayoutMode) {
+    val palette = OmniTheme.palette
+    Box(
+        Modifier
+            .size(width = 46.dp, height = 46.dp)
+            .clip(RoundedCornerShape(12.dp))
+            .background(palette.textPrimary.copy(alpha = 0.06f))
+            .padding(6.dp),
+    ) {
+        when (mode) {
+            NavLayoutMode.A_FAB -> {
+                Row(
+                    Modifier
+                        .align(Alignment.BottomCenter)
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                ) {
+                    repeat(4) {
+                        Box(
+                            Modifier
+                                .size(5.dp)
+                                .clip(CircleShape)
+                                .background(palette.accent.copy(alpha = 0.7f)),
+                        )
+                    }
+                }
+                Box(
+                    Modifier
+                        .align(Alignment.BottomCenter)
+                        .size(13.dp)
+                        .clip(CircleShape)
+                        .background(palette.accentAlt),
+                )
+            }
+
+            NavLayoutMode.B_FIVE -> Row(
+                Modifier
+                    .align(Alignment.BottomCenter)
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+            ) {
+                repeat(5) {
+                    Box(
+                        Modifier
+                            .size(5.dp)
+                            .clip(CircleShape)
+                            .background(palette.accent.copy(alpha = 0.7f)),
+                    )
+                }
+            }
+
+            NavLayoutMode.C_BENTO -> {
+                Row(
+                    Modifier
+                        .align(Alignment.TopCenter)
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(3.dp),
+                ) {
+                    Box(
+                        Modifier
+                            .size(width = 18.dp, height = 12.dp)
+                            .clip(RoundedCornerShape(3.dp))
+                            .background(palette.accent.copy(alpha = 0.35f)),
+                    )
+                    Box(
+                        Modifier
+                            .size(width = 12.dp, height = 12.dp)
+                            .clip(RoundedCornerShape(3.dp))
+                            .background(palette.accentAlt.copy(alpha = 0.35f)),
+                    )
+                }
+                Row(
+                    Modifier
+                        .align(Alignment.BottomCenter)
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                ) {
+                    repeat(3) {
+                        Box(
+                            Modifier
+                                .size(5.dp)
+                                .clip(CircleShape)
+                                .background(palette.accent.copy(alpha = 0.7f)),
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ProfileRow(label: String, value: String) {
+    val palette = OmniTheme.palette
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .padding(vertical = 7.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(label, color = palette.textSecondary, fontSize = 12.sp, modifier = Modifier.weight(1f))
+        Text(value, color = palette.textPrimary, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+    }
+}

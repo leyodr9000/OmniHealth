@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">OmniHealth</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_diet">Diet</string>
+    <string name="nav_sport">Sport</string>
+    <string name="nav_stats">Stats</string>
+    <string name="nav_ai">AI</string>
+    <string name="nav_settings">Me</string>
+    <string name="nav_quick_log">Quick log</string>
+
+    <!-- Generic -->
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+    <string name="done">Done</string>
+    <string name="back">Back</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Appearance Lab</string>
+    <string name="settings_subtitle">Switch theme, layout and language instantly — no restart</string>
+    <string name="settings_section_theme">Theme engine</string>
+    <string name="settings_section_theme_sub">3 visual languages</string>
+    <string name="settings_section_layout">Navigation skeleton</string>
+    <string name="settings_section_layout_sub">3 structural layouts</string>
+    <string name="settings_section_language">Language</string>
+    <string name="settings_section_language_sub">Applies immediately across the UI</string>
+    <string name="settings_section_profile">Profile</string>
+    <string name="settings_section_profile_sub">Used for BMR / TDEE</string>
+    <string name="settings_section_api">AI endpoint</string>
+    <string name="settings_section_api_sub">OpenAI compatible · blank = offline engine</string>
+    <string name="settings_footer">OmniHealth 1.0.0 · All health data stays on this device in a local Room database. Nothing is uploaded.</string>
+
+    <string name="language_system">System</string>
+    <string name="language_zh">中文</string>
+    <string name="language_en">English</string>
+
+    <string name="profile_nickname">Nickname</string>
+    <string name="profile_gender_age">Gender / Age</string>
+    <string name="profile_body">Height / Weight</string>
+    <string name="profile_activity">Activity level</string>
+    <string name="profile_goal">Goal</string>
+
+    <!-- Quick log -->
+    <string name="quick_log_title">Quick log</string>
+    <string name="quick_log_subtitle">One tap, logged</string>
+    <string name="quick_log_save">Save record</string>
+    <string name="quick_log_weight">Weight</string>
+    <string name="quick_log_water">Water</string>
+    <string name="quick_log_sleep">Sleep</string>
+    <string name="quick_log_steps">Steps</string>
+    <string name="quick_log_mood">Mood</string>
+
+    <!-- Themes -->
+    <string name="theme_miui_label">MIUIX Glass</string>
+    <string name="theme_miui_tagline">HyperOS · frosted</string>
+    <string name="theme_miui_blurb">Soft mesh gradient / 24dp squircle / physical spring press</string>
+    <string name="theme_morandi_label">Morandi MD3</string>
+    <string name="theme_morandi_tagline">Material You · muted</string>
+    <string name="theme_morandi_blurb">Geometric cards / soft shadows / high legibility</string>
+    <string name="theme_cyber_label">Cyber Dark</string>
+    <string name="theme_cyber_tagline">Neon · deep space</string>
+    <string name="theme_cyber_blurb">Neon strokes / cool gradients / data-centric</string>
+
+    <!-- Layouts -->
+    <string name="layout_a_label">Layout A</string>
+    <string name="layout_a_desc">4 tabs + center FAB</string>
+    <string name="layout_b_label">Layout B</string>
+    <string name="layout_b_desc">5 tabs classic glass bar</string>
+    <string name="layout_c_label">Layout C</string>
+    <string name="layout_c_desc">3 tabs pill + Bento overview</string>
+</resources>
