@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.view.WindowCompat
 import com.example.omnihealth.R
+import top.yukonga.miuix.kmp.theme.MiuixTheme
 
 /**
  * 三套可实时切换的主题。
@@ -69,6 +70,25 @@ enum class ThemeMode(
 
 /** 表面材质风格，供组件决定描边、阴影、光泽的绘制方式。 */
 enum class SurfaceStyle { FROSTED, SOFT, NEON }
+
+/**
+ * 界面框架（组件体系），与配色解耦。
+ *
+ * [MIUIX] 走 `top.yukonga.miuix.kmp`（HyperOS / KernelSU 管理器同款组件库）；
+ * [MATERIAL3] 走 androidx.compose.material3。
+ */
+enum class UiFramework(
+    val id: String,
+    @StringRes val labelRes: Int,
+) {
+    MIUIX("miuix", R.string.framework_miuix),
+    MATERIAL3("material3", R.string.framework_md3),
+    ;
+
+    companion object {
+        fun from(id: String?): UiFramework = entries.firstOrNull { it.id == id } ?: MIUIX
+    }
+}
 
 /**
  * 主题调色板：在 Material3 ColorScheme 之外，补充骨架所需的渐变、玻璃、图表色。
@@ -283,6 +303,7 @@ private fun omniShapes(corner: Dp) = Shapes(
 
 val LocalOmniPalette = staticCompositionLocalOf { MiuiPalette }
 val LocalThemeMode = staticCompositionLocalOf { ThemeMode.MIUIX_GLASS }
+val LocalUiFramework = staticCompositionLocalOf { UiFramework.MIUIX }
 
 /** 便捷访问当前调色板。 */
 object OmniTheme {
@@ -291,11 +312,15 @@ object OmniTheme {
 
     val mode: ThemeMode
         @Composable get() = LocalThemeMode.current
+
+    val framework: UiFramework
+        @Composable get() = LocalUiFramework.current
 }
 
 @Composable
 fun OmniHealthTheme(
     mode: ThemeMode = ThemeMode.MIUIX_GLASS,
+    framework: UiFramework = UiFramework.MIUIX,
     content: @Composable () -> Unit,
 ) {
     val palette = remember(mode) { paletteFor(mode) }
@@ -317,12 +342,23 @@ fun OmniHealthTheme(
     CompositionLocalProvider(
         LocalOmniPalette provides palette,
         LocalThemeMode provides mode,
+        LocalUiFramework provides framework,
     ) {
         MaterialTheme(
             colorScheme = scheme,
             typography = typography,
             shapes = shapes,
-            content = content,
-        )
+        ) {
+            // 始终包一层 MiuixTheme：它只提供 CompositionLocal，不改变布局。
+            // 这样在 MIUIX / Material3 之间切换时组件树结构不变，导航栈不会丢。
+            MiuixTheme(
+                colors = if (palette.dark) {
+                    top.yukonga.miuix.kmp.theme.darkColorScheme()
+                } else {
+                    top.yukonga.miuix.kmp.theme.lightColorScheme()
+                },
+                content = content,
+            )
+        }
     }
 }

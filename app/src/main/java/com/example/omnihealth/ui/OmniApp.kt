@@ -33,15 +33,18 @@ import com.example.omnihealth.ui.screens.stats.ChartAnalyticsScreen
 import com.example.omnihealth.ui.theme.MeshGradientBackground
 import com.example.omnihealth.ui.theme.OmniTheme
 import com.example.omnihealth.ui.theme.ThemeMode
+import com.example.omnihealth.ui.theme.UiFramework
 
 @Composable
 fun OmniApp(
     themeMode: ThemeMode,
     layoutMode: NavLayoutMode,
     language: AppLanguage,
+    framework: UiFramework,
     onThemeChange: (ThemeMode) -> Unit,
     onLayoutChange: (NavLayoutMode) -> Unit,
     onLanguageChange: (AppLanguage) -> Unit,
+    onFrameworkChange: (UiFramework) -> Unit,
 ) {
     val navController = rememberNavController()
     val palette = OmniTheme.palette
@@ -104,9 +107,11 @@ fun OmniApp(
                         themeMode = themeMode,
                         layoutMode = layoutMode,
                         language = language,
+                        framework = framework,
                         onThemeChange = onThemeChange,
                         onLayoutChange = onLayoutChange,
                         onLanguageChange = onLanguageChange,
+                        onFrameworkChange = onFrameworkChange,
                     )
                 }
             }

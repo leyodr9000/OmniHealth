@@ -53,6 +53,7 @@ data class AppSettings(
     val themeId: String = "miuix_glass",
     val layoutId: String = "layout_a",
     val languageId: String = "system",
+    val frameworkId: String = "miuix",
     val profile: UserProfile = UserProfile(),
     val api: ApiConfig = ApiConfig(),
     val stepGoal: Int = 10_000,
@@ -68,6 +69,7 @@ class SettingsPreferences(private val context: Context) {
         val theme = stringPreferencesKey("theme_id")
         val layout = stringPreferencesKey("layout_id")
         val language = stringPreferencesKey("language_id")
+        val framework = stringPreferencesKey("framework_id")
 
         val nickname = stringPreferencesKey("profile_nickname")
         val gender = stringPreferencesKey("profile_gender")
@@ -94,6 +96,7 @@ class SettingsPreferences(private val context: Context) {
             themeId = p[Keys.theme] ?: "miuix_glass",
             layoutId = p[Keys.layout] ?: "layout_a",
             languageId = p[Keys.language] ?: "system",
+            frameworkId = p[Keys.framework] ?: "miuix",
             profile = UserProfile(
                 nickname = p[Keys.nickname] ?: "Kai",
                 gender = p[Keys.gender]?.let { runCatching { Gender.valueOf(it) }.getOrNull() } ?: Gender.MALE,
@@ -123,6 +126,8 @@ class SettingsPreferences(private val context: Context) {
     suspend fun setLayoutId(id: String) = context.omniDataStore.edit { it[Keys.layout] = id }
 
     suspend fun setLanguageId(id: String) = context.omniDataStore.edit { it[Keys.language] = id }
+
+    suspend fun setFrameworkId(id: String) = context.omniDataStore.edit { it[Keys.framework] = id }
 
     suspend fun updateProfile(profile: UserProfile) = context.omniDataStore.edit { p ->
         p[Keys.nickname] = profile.nickname

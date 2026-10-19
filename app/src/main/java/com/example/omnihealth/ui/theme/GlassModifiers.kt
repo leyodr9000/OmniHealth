@@ -29,6 +29,7 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import top.yukonga.miuix.kmp.basic.Card as MiuixCard
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -106,6 +107,20 @@ fun GlassCard(
     onClick: (() -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit,
 ) {
+    // MIUIX 框架：卡片交给 miuix 官方组件渲染（HyperOS 的圆角、内边距与配色语言）。
+    if (LocalUiFramework.current == UiFramework.MIUIX) {
+        val clickable = if (onClick != null) modifier.bounceClick(onClick = onClick) else modifier
+        MiuixCard(
+            clickable,
+            palette.corner,
+            contentPadding,
+            palette.cardFill,
+        ) {
+            content()
+        }
+        return
+    }
+
     // 实心卡片：纯色底 + 1px 描边，不用渐变、不用阴影。
     val base = modifier
         .clip(shape)

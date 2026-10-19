@@ -35,6 +35,7 @@ import com.example.omnihealth.ui.i18n.AppLanguage
 import com.example.omnihealth.ui.navigation.NavLayoutMode
 import com.example.omnihealth.ui.theme.OmniTheme
 import com.example.omnihealth.ui.theme.ThemeMode
+import com.example.omnihealth.ui.theme.UiFramework
 import com.example.omnihealth.ui.theme.bounceClick
 import com.example.omnihealth.ui.theme.paletteFor
 
@@ -43,9 +44,11 @@ fun AppearanceScreen(
     themeMode: ThemeMode,
     layoutMode: NavLayoutMode,
     language: AppLanguage,
+    framework: UiFramework,
     onThemeChange: (ThemeMode) -> Unit,
     onLayoutChange: (NavLayoutMode) -> Unit,
     onLanguageChange: (AppLanguage) -> Unit,
+    onFrameworkChange: (UiFramework) -> Unit,
     onBack: () -> Unit,
 ) {
     val palette = OmniTheme.palette
@@ -89,6 +92,37 @@ fun AppearanceScreen(
                     )
                 }
             }
+        }
+
+        item {
+            Text(
+                text = stringResource(R.string.settings_section_framework),
+                color = palette.textTertiary,
+                fontSize = 11.sp,
+                modifier = Modifier.padding(start = 4.dp),
+            )
+        }
+
+        item {
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                UiFramework.entries.forEach { item ->
+                    FrameworkCard(
+                        label = stringResource(item.labelRes),
+                        selected = item == framework,
+                        modifier = Modifier.weight(1f),
+                        onClick = { onFrameworkChange(item) },
+                    )
+                }
+            }
+        }
+
+        item {
+            Text(
+                text = stringResource(R.string.settings_section_framework_sub),
+                color = palette.textTertiary,
+                fontSize = 10.sp,
+                modifier = Modifier.padding(start = 4.dp),
+            )
         }
 
         item {
@@ -154,6 +188,36 @@ fun AppearanceScreen(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun FrameworkCard(
+    label: String,
+    selected: Boolean,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit,
+) {
+    val palette = OmniTheme.palette
+    Box(
+        modifier
+            .clip(RoundedCornerShape(12.dp))
+            .background(if (selected) palette.accent else palette.cardFill)
+            .border(
+                1.dp,
+                if (selected) palette.accent else palette.cardStroke,
+                RoundedCornerShape(12.dp),
+            )
+            .bounceClick(pressScale = 0.96f, haptics = false, onClick = onClick)
+            .padding(vertical = 14.dp),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(
+            text = label,
+            color = if (selected) Color.White else palette.textSecondary,
+            fontSize = 12.sp,
+            fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal,
+        )
     }
 }
 

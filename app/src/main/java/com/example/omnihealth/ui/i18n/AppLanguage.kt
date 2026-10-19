@@ -47,28 +47,25 @@ fun LocalizedApp(
     content: @Composable () -> Unit,
 ) {
     CompositionLocalProvider(LocalAppLanguage provides language) {
-        val locale = language.locale
-        if (locale == null) {
-            content()
-            return@CompositionLocalProvider
-        }
-
         val context = LocalContext.current
         val configuration = LocalConfiguration.current
+        // 跟随系统时也走同一套包装，避免切换语言时组件树结构变化导致导航栈重置。
+        val targetLocale = language.locale ?: configuration.locales[0]
+
         // 覆盖 LocalContext 会切断 Compose 从 Context 推导出的宿主对象，
         // 这里把它们原样转发，避免 ActivityResult / 返回键失效。
         val resultRegistryOwner = LocalActivityResultRegistryOwner.current
         val backDispatcherOwner = LocalOnBackPressedDispatcherOwner.current
 
-        val localizedContext = remember(locale, configuration) {
-            val config = Configuration(configuration).apply { setLocale(locale) }
+        val localizedContext = remember(targetLocale, configuration) {
+            val config = Configuration(configuration).apply { setLocale(targetLocale) }
             context.createConfigurationContext(config)
         }
-        val localizedConfiguration = remember(locale, configuration) {
-            Configuration(configuration).apply { setLocale(locale) }
+        val localizedConfiguration = remember(targetLocale, configuration) {
+            Configuration(configuration).apply { setLocale(targetLocale) }
         }
 
-        SideEffect { Locale.setDefault(locale) }
+        SideEffect { Locale.setDefault(targetLocale) }
 
         CompositionLocalProvider(
             LocalContext provides localizedContext,

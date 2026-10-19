@@ -225,4 +225,8 @@
     <string name="settings_back">Back</string>
     <string name="settings_appearance_title">Appearance</string>
     <string name="settings_appearance_sub">Theme framework, palette and language</string>
+    <string name="framework_miuix">MIUIX</string>
+    <string name="framework_md3">Material 3</string>
+    <string name="settings_section_framework">UI framework</string>
+    <string name="settings_section_framework_sub">Component system, not just colors</string>
 </resources>

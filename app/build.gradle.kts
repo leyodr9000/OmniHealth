@@ -93,6 +93,7 @@ dependencies {
     implementation(libs.kotlinx.coroutines.android)
 
     implementation(libs.haze)
+    implementation(libs.miuix)
     implementation(libs.mpandroidchart)
 
     testImplementation(libs.junit)
