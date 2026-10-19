@@ -76,6 +76,13 @@ android {
     }
 }
 
+// 生成 Compose 编译器报告：找出 unstable 类与不可跳过（non-skippable）的 Composable，
+// 用来定位重组开销。报告输出到 app/build/compose_compiler/。
+composeCompiler {
+    reportsDestination = layout.buildDirectory.dir("compose_compiler")
+    metricsDestination = layout.buildDirectory.dir("compose_compiler")
+}
+
 kotlin {
     compilerOptions {
         jvmTarget.set(JvmTarget.JVM_17)
