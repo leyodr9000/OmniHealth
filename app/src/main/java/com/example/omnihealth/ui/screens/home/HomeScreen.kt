@@ -265,6 +265,12 @@ fun HomeScreen(
                     modifier = Modifier.weight(1f),
                 )
             }
+            Text(
+                text = stringResource(R.string.estimate_note),
+                color = palette.textTertiary,
+                fontSize = 9.sp,
+                modifier = Modifier.padding(top = 6.dp, start = 2.dp),
+            )
         }
 
         item {
@@ -499,6 +505,22 @@ private fun HealthScoreCard(state: HomeUiState) {
                 ScoreBar(stringResource(R.string.dim_hydration), state.score.hydration / 100f, Color(0xFF4FB3FF))
             }
         }
+        Spacer(Modifier.height(10.dp))
+        Text(
+            text = stringResource(
+                R.string.score_basis,
+                listOf(state.hasCalories, state.hasSteps, state.hasSleep, state.hasWater, state.hasHabits)
+                    .count { it },
+            ),
+            color = palette.textTertiary,
+            fontSize = 10.sp,
+        )
+        Text(
+            text = stringResource(R.string.score_basis_hint),
+            color = palette.textTertiary.copy(alpha = 0.8f),
+            fontSize = 9.sp,
+            modifier = Modifier.padding(top = 2.dp),
+        )
     }
 }
 

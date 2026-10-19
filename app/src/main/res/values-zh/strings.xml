@@ -74,8 +74,8 @@
     <!-- 首页 -->
     <string name="home_greeting">你好，%1$s</string>
     <string name="home_status">%1$s</string>
-    <string name="home_health_index">综合健康指数</string>
-    <string name="home_score_label">健康分</string>
+    <string name="home_health_index">生活方式参考分</string>
+    <string name="home_score_label">生活方式参考分</string>
     <string name="home_score_delta">比上周 +%1$d 分</string>
     <string name="home_section_today">今日概览</string>
     <string name="home_section_today_sub">目标完成度</string>
@@ -267,4 +267,7 @@
     <string name="restore_failed">恢复失败：%1$s</string>
     <string name="restore_read_failed">无法读取该文件</string>
     <string name="home_not_recorded">未记录</string>
+    <string name="score_basis">基于 %1$d/5 项数据</string>
+    <string name="score_basis_hint">缺失维度不计入，不按 0 分处理</string>
+    <string name="estimate_note">BMI · BMR · TDEE 为估算值</string>
 </resources>

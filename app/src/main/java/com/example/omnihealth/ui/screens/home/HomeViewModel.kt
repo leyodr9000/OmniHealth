@@ -36,6 +36,7 @@ data class HomeUiState(
     val hasWater: Boolean = false,
     val hasSleep: Boolean = false,
     val hasCalories: Boolean = false,
+    val hasHabits: Boolean = false,
     val workouts: List<WorkoutEntity> = emptyList(),
     val score: HealthCalculator.ScoreBreakdown = HealthCalculator.ScoreBreakdown(0, 0, 0, 0, 0),
 ) {
@@ -101,6 +102,7 @@ class HomeViewModel(private val repository: HealthRepository) : ViewModel() {
             hasWater = snapshot.waterMl > 0f,
             hasSleep = snapshot.sleepHours > 0f,
             hasCalories = snapshot.caloriesIn > 0f,
+            hasHabits = habits.isNotEmpty(),
             workouts = workouts,
             score = score,
         )

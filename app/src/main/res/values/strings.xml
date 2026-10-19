@@ -74,8 +74,8 @@
     <!-- Home -->
     <string name="home_greeting">Hi, %1$s</string>
     <string name="home_status">%1$s</string>
-    <string name="home_health_index">Health index</string>
-    <string name="home_score_label">Score</string>
+    <string name="home_health_index">Lifestyle score</string>
+    <string name="home_score_label">Lifestyle score</string>
     <string name="home_score_delta">+%1$d vs last week</string>
     <string name="home_section_today">Today</string>
     <string name="home_section_today_sub">Goal completion</string>
@@ -267,4 +267,7 @@
     <string name="restore_failed">Restore failed: %1$s</string>
     <string name="restore_read_failed">Cannot read this file</string>
     <string name="home_not_recorded">Not recorded</string>
+    <string name="score_basis">Based on %1$d/5 metrics</string>
+    <string name="score_basis_hint">Missing metrics are excluded, not scored zero</string>
+    <string name="estimate_note">BMI · BMR · TDEE are estimates</string>
 </resources>
