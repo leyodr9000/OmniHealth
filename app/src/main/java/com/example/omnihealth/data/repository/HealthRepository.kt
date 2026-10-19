@@ -336,7 +336,6 @@ class HealthRepository(
 
     suspend fun setLanguage(id: String) = preferences.setLanguageId(id)
 
-    suspend fun setFramework(id: String) = preferences.setFrameworkId(id)
 
     suspend fun updateProfile(profile: UserProfile) = preferences.updateProfile(profile)
 

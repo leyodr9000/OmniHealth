@@ -15,9 +15,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.omnihealth.ui.theme.OmniTheme
-import com.example.omnihealth.ui.theme.UiFramework
 import com.example.omnihealth.ui.theme.bounceClick
-import top.yukonga.miuix.kmp.basic.Button as MiuixButton
 
 /**
  * 主行动按钮。
@@ -32,17 +30,6 @@ fun AppPrimaryButton(
     enabled: Boolean = true,
     onClick: () -> Unit,
 ) {
-    if (OmniTheme.framework == UiFramework.MIUIX) {
-        MiuixButton(
-            onClick,
-            modifier.fillMaxWidth(),
-            enabled,
-        ) {
-            Text(text)
-        }
-        return
-    }
-
     val palette = OmniTheme.palette
     Box(
         modifier = modifier

@@ -47,9 +47,6 @@ import com.example.omnihealth.R
 import com.example.omnihealth.ui.theme.OmniPalette
 import com.example.omnihealth.ui.theme.OmniTheme
 import com.example.omnihealth.ui.theme.SurfaceStyle
-import com.example.omnihealth.ui.theme.UiFramework
-import top.yukonga.miuix.kmp.basic.NavigationBar
-import top.yukonga.miuix.kmp.basic.NavigationItem
 import com.example.omnihealth.ui.theme.bounceClick
 import com.example.omnihealth.ui.theme.frostBar
 import com.example.omnihealth.ui.theme.paletteFor
@@ -105,42 +102,6 @@ fun AdaptiveBottomBar(
 ) {
     val palette = OmniTheme.palette
     val items = remember(layout) { OmniDest.itemsFor(layout) }
-
-    // MIUIX 框架：底栏交给 miuix 的 NavigationBar（HyperOS 的指示器、间距与按压反馈）。
-    if (OmniTheme.framework == UiFramework.MIUIX) {
-        Box(
-            modifier = modifier
-                .fillMaxWidth()
-                .navigationBarsPadding(),
-        ) {
-            val selectedIndex = items.indexOfFirst { it.route == currentRoute }.coerceAtLeast(0)
-            NavigationBar(
-                items.map { NavigationItem(stringResource(it.labelRes), it.icon) },
-                selectedIndex,
-                { index -> items.getOrNull(index)?.let(onSelect) },
-                Modifier.fillMaxWidth(),
-            )
-            if (layout == NavLayoutMode.A_FAB) {
-                Box(
-                    modifier = Modifier
-                        .align(Alignment.TopCenter)
-                        .offset(y = (-24).dp)
-                        .size(56.dp)
-                        .background(color = palette.accent, shape = CircleShape)
-                        .bounceClick(pressScale = 0.88f, onClick = onQuickLog),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Icon(
-                        imageVector = Icons.Rounded.Add,
-                        contentDescription = stringResource(R.string.nav_quick_log),
-                        tint = Color.White,
-                        modifier = Modifier.size(26.dp),
-                    )
-                }
-            }
-        }
-        return
-    }
 
     Box(
         modifier = modifier

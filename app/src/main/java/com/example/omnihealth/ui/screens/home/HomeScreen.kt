@@ -280,12 +280,6 @@ private fun HealthScoreCard(state: HomeUiState) {
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Bold,
                 )
-                Text(
-                    text = stringResource(R.string.home_score_delta, 4),
-                    color = palette.success,
-                    fontSize = 11.sp,
-                    modifier = Modifier.padding(top = 3.dp),
-                )
                 Spacer(Modifier.height(8.dp))
                 ScoreBar(stringResource(R.string.dim_nutrition), state.score.nutrition / 100f, palette.accent)
                 ScoreBar(stringResource(R.string.dim_activity), state.score.activity / 100f, palette.accentAlt)

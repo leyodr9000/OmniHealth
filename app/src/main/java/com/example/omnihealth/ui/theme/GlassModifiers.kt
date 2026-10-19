@@ -29,7 +29,6 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import top.yukonga.miuix.kmp.basic.Card as MiuixCard
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -107,21 +106,6 @@ fun GlassCard(
     onClick: (() -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    // MIUIX 框架：卡片完全交给 miuix 组件渲染，用自己的圆角、内边距与按压反馈，
-    // 不再套我们的调色板，否则两套框架看起来会几乎一样。
-    if (LocalUiFramework.current == UiFramework.MIUIX) {
-        val clickable = if (onClick != null) modifier.bounceClick(onClick = onClick) else modifier
-        MiuixCard(
-            clickable,
-            top.yukonga.miuix.kmp.basic.CardDefaults.ConorRadius,
-            top.yukonga.miuix.kmp.basic.CardDefaults.InsideMargin,
-            top.yukonga.miuix.kmp.basic.CardDefaults.DefaultColor(),
-        ) {
-            content()
-        }
-        return
-    }
-
     // 实心卡片：纯色底 + 1px 描边，不用渐变、不用阴影。
     val base = modifier
         .clip(shape)
