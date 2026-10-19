@@ -60,6 +60,8 @@ data class AppSettings(
     val waterGoalMl: Int = 2_500,
     val sleepGoalMin: Int = 480,
     val calorieGoal: Int = 2_000,
+    val waterReminder: Boolean = false,
+    val sleepReminder: Boolean = false,
     val onboarded: Boolean = false,
 )
 
@@ -89,6 +91,8 @@ class SettingsPreferences(private val context: Context) {
         val sleepGoal = intPreferencesKey("goal_sleep")
         val calorieGoal = intPreferencesKey("goal_calories")
         val onboarded = booleanPreferencesKey("onboarded")
+        val waterReminder = booleanPreferencesKey("reminder_water")
+        val sleepReminder = booleanPreferencesKey("reminder_sleep")
     }
 
     val settings: Flow<AppSettings> = context.omniDataStore.data.map { p ->
@@ -117,6 +121,8 @@ class SettingsPreferences(private val context: Context) {
             waterGoalMl = p[Keys.waterGoal] ?: 2_500,
             sleepGoalMin = p[Keys.sleepGoal] ?: 480,
             calorieGoal = p[Keys.calorieGoal] ?: 2_000,
+            waterReminder = p[Keys.waterReminder] ?: false,
+            sleepReminder = p[Keys.sleepReminder] ?: false,
             onboarded = p[Keys.onboarded] ?: false,
         )
     }
@@ -155,4 +161,10 @@ class SettingsPreferences(private val context: Context) {
         }
 
     suspend fun setOnboarded(value: Boolean) = context.omniDataStore.edit { it[Keys.onboarded] = value }
+
+    suspend fun setWaterReminder(enabled: Boolean) =
+        context.omniDataStore.edit { it[Keys.waterReminder] = enabled }
+
+    suspend fun setSleepReminder(enabled: Boolean) =
+        context.omniDataStore.edit { it[Keys.sleepReminder] = enabled }
 }

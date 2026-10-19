@@ -1,6 +1,14 @@
 package com.example.omnihealth.ui.screens.settings
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.ContextCompat
+import com.example.omnihealth.data.work.ReminderScheduler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -61,7 +69,7 @@ import java.util.Locale
 
 private enum class SettingsPage { ROOT, APPEARANCE }
 
-private enum class SettingsSheet { NONE, PROFILE, API, GOALS }
+private enum class SettingsSheet { NONE, PROFILE, API, GOALS, REMINDERS }
 
 @Composable
 fun SettingsScreen(
@@ -76,6 +84,19 @@ fun SettingsScreen(
     val repository = LocalHealthRepository.current
     val settings by repository.settings.collectAsStateWithLifecycle(initialValue = AppSettings())
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
+    val permissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission(),
+    ) { }
+
+    fun ensureNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+            ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) !=
+            PackageManager.PERMISSION_GRANTED
+        ) {
+            permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        }
+    }
 
     var page by remember { mutableStateOf(SettingsPage.ROOT) }
     var sheet by remember { mutableStateOf(SettingsSheet.NONE) }
@@ -195,8 +216,12 @@ fun SettingsScreen(
                 SettingItem(
                     icon = Icons.Rounded.Notifications,
                     title = stringResource(R.string.settings_row_reminders),
-                    value = stringResource(R.string.settings_reminders_off),
-                    onClick = {},
+                    value = if (settings.waterReminder || settings.sleepReminder) {
+                        stringResource(R.string.reminder_on)
+                    } else {
+                        stringResource(R.string.reminder_off)
+                    },
+                    onClick = { sheet = SettingsSheet.REMINDERS },
                 )
                 SettingDivider()
                 SettingItem(
@@ -247,6 +272,22 @@ fun SettingsScreen(
             onSave = { steps, water, sleepMin, calories ->
                 scope.launch { repository.updateGoals(steps, water, sleepMin, calories) }
                 sheet = SettingsSheet.NONE
+            },
+        )
+
+        SettingsSheet.REMINDERS -> RemindersSheet(
+            water = settings.waterReminder,
+            sleep = settings.sleepReminder,
+            onDismiss = { sheet = SettingsSheet.NONE },
+            onWaterChange = { enabled ->
+                ensureNotificationPermission()
+                scope.launch { repository.setWaterReminder(enabled) }
+                ReminderScheduler.setWaterReminder(context, enabled)
+            },
+            onSleepChange = { enabled ->
+                ensureNotificationPermission()
+                scope.launch { repository.setSleepReminder(enabled) }
+                ReminderScheduler.setSleepReminder(context, enabled)
             },
         )
 

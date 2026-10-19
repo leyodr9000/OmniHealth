@@ -233,4 +233,13 @@
     <string name="insight_water_left">再喝 %1$s 就达饮水目标</string>
     <string name="insight_calories_left">今日还可摄入 %1$s kcal</string>
     <string name="insight_all_good">各项目标都在轨道上，保持即可</string>
+    <string name="reminders_title">提醒</string>
+    <string name="reminders_sub">本地通知，不经过服务器</string>
+    <string name="reminder_water">饮水提醒</string>
+    <string name="reminder_water_desc">每 2 小时一次</string>
+    <string name="reminder_sleep">睡前提醒</string>
+    <string name="reminder_sleep_desc">每天 22:30</string>
+    <string name="reminder_on">已开启</string>
+    <string name="reminder_off">未开启</string>
+    <string name="reminder_permission_hint">需要通知权限才能收到提醒</string>
 </resources>

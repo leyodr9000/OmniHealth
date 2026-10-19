@@ -15,6 +15,7 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -431,4 +432,89 @@ private fun <T> ChipGroup(
 @Composable
 private fun PrimaryButton(label: String, onClick: () -> Unit) {
     AppPrimaryButton(text = label, onClick = onClick)
+}
+
+/* ------------------------------------------------------------------ */
+/* 提醒                                                                */
+/* ------------------------------------------------------------------ */
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun RemindersSheet(
+    water: Boolean,
+    sleep: Boolean,
+    onDismiss: () -> Unit,
+    onWaterChange: (Boolean) -> Unit,
+    onSleepChange: (Boolean) -> Unit,
+) {
+    val palette = OmniTheme.palette
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        sheetState = sheetState,
+        shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
+        containerColor = palette.barFill,
+        tonalElevation = 0.dp,
+        scrimColor = palette.textPrimary.copy(alpha = 0.28f),
+    ) {
+        LocalizedApp(LocalAppLanguage.current) {
+            Column(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 22.dp)
+                    .padding(bottom = 30.dp),
+            ) {
+                SheetHeader(
+                    title = stringResource(R.string.reminders_title),
+                    subtitle = stringResource(R.string.reminders_sub),
+                )
+
+                ReminderRow(
+                    title = stringResource(R.string.reminder_water),
+                    desc = stringResource(R.string.reminder_water_desc),
+                    checked = water,
+                    onCheckedChange = onWaterChange,
+                )
+                ReminderRow(
+                    title = stringResource(R.string.reminder_sleep),
+                    desc = stringResource(R.string.reminder_sleep_desc),
+                    checked = sleep,
+                    onCheckedChange = onSleepChange,
+                )
+
+                Spacer(Modifier.height(12.dp))
+                Text(
+                    text = stringResource(R.string.reminder_permission_hint),
+                    color = palette.textTertiary,
+                    fontSize = 10.sp,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun ReminderRow(
+    title: String,
+    desc: String,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+) {
+    val palette = OmniTheme.palette
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .padding(vertical = 10.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Column(Modifier.weight(1f)) {
+            Text(title, color = palette.textPrimary, fontSize = 13.sp, fontWeight = FontWeight.Medium)
+            Text(desc, color = palette.textTertiary, fontSize = 10.sp, modifier = Modifier.padding(top = 2.dp))
+        }
+        Switch(
+            checked = checked,
+            onCheckedChange = onCheckedChange,
+        )
+    }
 }

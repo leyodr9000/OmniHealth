@@ -233,4 +233,13 @@
     <string name="insight_water_left">Drink %1$s more to reach your water goal</string>
     <string name="insight_calories_left">%1$s kcal left today</string>
     <string name="insight_all_good">All targets on track — keep the pace</string>
+    <string name="reminders_title">Reminders</string>
+    <string name="reminders_sub">Local notifications, no server involved</string>
+    <string name="reminder_water">Hydration</string>
+    <string name="reminder_water_desc">Every 2 hours</string>
+    <string name="reminder_sleep">Bedtime</string>
+    <string name="reminder_sleep_desc">Daily at 22:30</string>
+    <string name="reminder_on">On</string>
+    <string name="reminder_off">Off</string>
+    <string name="reminder_permission_hint">Allow notifications to receive reminders</string>
 </resources>
