@@ -153,4 +153,20 @@
     <string name="stats_radar_title">Health radar</string>
     <string name="stats_radar_sub">five dimensions of today</string>
     <string name="stats_no_data">Not enough data yet — log a few days first.</string>
+
+    <!-- AI advisor -->
+    <string name="ai_title">AI health advisor</string>
+    <string name="ai_subtitle">Built on your last 7 days · works offline</string>
+    <string name="ai_provider_cloud">%1$s</string>
+    <string name="ai_provider_offline">Offline engine</string>
+    <string name="ai_generate">Generate 7-day report</string>
+    <string name="ai_generating">Analyzing your week…</string>
+    <string name="ai_report_title">Weekly report</string>
+    <string name="ai_chat_title">Chat</string>
+    <string name="ai_input_hint">Ask anything about your health…</string>
+    <string name="ai_send">Send</string>
+    <string name="ai_empty_chat">Try: “How do I sleep better?” or “Is my protein enough?”</string>
+    <string name="ai_error">Something went wrong. Offline answer shown instead.</string>
+    <string name="ai_clear">Clear</string>
+    <string name="ai_score">Score %1$d / 100</string>
 </resources>

@@ -153,4 +153,20 @@
     <string name="stats_radar_title">健康五维雷达</string>
     <string name="stats_radar_sub">今日五项得分</string>
     <string name="stats_no_data">数据还不够，先记录几天吧。</string>
+
+    <!-- AI 顾问 -->
+    <string name="ai_title">AI 健康顾问</string>
+    <string name="ai_subtitle">基于最近 7 天数据 · 离线可用</string>
+    <string name="ai_provider_cloud">%1$s</string>
+    <string name="ai_provider_offline">离线引擎</string>
+    <string name="ai_generate">生成 7 日健康报告</string>
+    <string name="ai_generating">正在分析这一周…</string>
+    <string name="ai_report_title">本周报告</string>
+    <string name="ai_chat_title">对话</string>
+    <string name="ai_input_hint">问问你的健康状况…</string>
+    <string name="ai_send">发送</string>
+    <string name="ai_empty_chat">试试：「怎么改善睡眠？」「我的蛋白质够吗？」</string>
+    <string name="ai_error">出了点问题，已切换为离线回答。</string>
+    <string name="ai_clear">清空</string>
+    <string name="ai_score">健康分 %1$d / 100</string>
 </resources>

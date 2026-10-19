@@ -2,10 +2,12 @@ package com.example.omnihealth.data.repository
 
 import com.example.omnihealth.data.datastore.ApiConfig
 import com.example.omnihealth.data.datastore.AppSettings
+import com.example.omnihealth.data.datastore.Gender
 import com.example.omnihealth.data.datastore.SettingsPreferences
 import com.example.omnihealth.data.datastore.UserProfile
 import com.example.omnihealth.data.local.AppDatabase
 import com.example.omnihealth.data.local.entity.AiReportEntity
+import com.example.omnihealth.data.local.entity.AiReportKind
 import com.example.omnihealth.data.local.entity.DietLogEntity
 import com.example.omnihealth.data.local.entity.FoodEntity
 import com.example.omnihealth.data.local.entity.HabitEntity
@@ -15,9 +17,15 @@ import com.example.omnihealth.data.local.entity.StepEntity
 import com.example.omnihealth.data.local.entity.VitalEntity
 import com.example.omnihealth.data.local.entity.VitalType
 import com.example.omnihealth.data.local.entity.WorkoutEntity
+import com.example.omnihealth.data.remote.AiAdvisor
+import com.example.omnihealth.data.remote.AiAnswer
+import com.example.omnihealth.data.remote.ChatMessage
+import com.example.omnihealth.domain.model.HealthContext
+import com.example.omnihealth.domain.util.HealthCalculator
 import com.example.omnihealth.domain.util.TimeUtils
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 
@@ -166,13 +174,113 @@ class HealthRepository(
         }
     }
 
-    /* ---------------- AI 报告 ---------------- */
+    /* ---------------- AI 顾问 ---------------- */
+
+    private val advisor = AiAdvisor()
 
     fun aiReports(): Flow<List<AiReportEntity>> = db.aiReportDao().observeRecent()
 
     suspend fun saveAiReport(report: AiReportEntity) = db.aiReportDao().insert(report)
 
     suspend fun latestWeeklyReport(): AiReportEntity? = db.aiReportDao().latest("WEEKLY")
+
+    /** 聚合近 7 天数据，供 AI 报告与提示使用。 */
+    suspend fun healthContext(useChinese: Boolean): HealthContext {
+        val settings = preferences.settings.first()
+        val profile = settings.profile
+        val end = TimeUtils.epochDayNow()
+        val from = end - 6
+        val dayCount = 7f
+
+        val stepRows = db.stepDao().range(from, end)
+        val dietRows = db.dietDao().logsBetween(from, end)
+        val sleepRows = db.vitalDao().between(
+            VitalType.SLEEP,
+            TimeUtils.startOfDayMillis(from),
+            TimeUtils.endOfDayMillis(end),
+        )
+        val weight = db.vitalDao().latest(VitalType.WEIGHT)?.value ?: profile.weightKg
+        val water = db.vitalDao().sumBetween(
+            VitalType.WATER,
+            TimeUtils.startOfDayMillis(end),
+            TimeUtils.endOfDayMillis(end),
+        ) ?: 0f
+
+        val habits = db.habitDao().allHabits()
+        val habitLogs = db.habitDao().logsBetween(from, end)
+
+        val avgSteps = (stepRows.sumOf { it.steps } / dayCount).toInt()
+        val avgCalories = (dietRows.sumOf { it.calories.toDouble() } / dayCount).toInt()
+        val avgProtein = (dietRows.sumOf { it.protein.toDouble() } / dayCount).toInt()
+        val avgCarbs = (dietRows.sumOf { it.carbs.toDouble() } / dayCount).toInt()
+        val avgFat = (dietRows.sumOf { it.fat.toDouble() } / dayCount).toInt()
+        val avgSleep = (sleepRows.sumOf { it.value.toDouble() } / dayCount).toFloat()
+
+        val isMale = profile.gender != Gender.FEMALE
+        val bmr = HealthCalculator.bmr(weight, profile.heightCm, profile.age, isMale)
+        val tdee = HealthCalculator.tdee(bmr, profile.activityLevel.factor)
+        val calorieGoal = HealthCalculator.calorieTarget(tdee, profile.goal.calorieDelta)
+        val bmi = HealthCalculator.bmi(weight, profile.heightCm)
+
+        val score = HealthCalculator.fiveDimensionScore(
+            caloriesIn = avgCalories.toFloat(),
+            calorieTarget = calorieGoal,
+            steps = avgSteps,
+            stepGoal = settings.stepGoal,
+            sleepHours = avgSleep,
+            sleepGoalHours = settings.sleepGoalMin / 60f,
+            waterMl = water,
+            waterGoalMl = settings.waterGoalMl.toFloat(),
+            habitChecks = habitLogs.map { it.habitId }.distinct().size,
+            habitTarget = habits.size.coerceAtLeast(1),
+        )
+
+        return HealthContext(
+            nickname = profile.nickname,
+            useChinese = useChinese,
+            days = 7,
+            avgSteps = avgSteps,
+            stepGoal = settings.stepGoal,
+            avgSleepHours = avgSleep,
+            sleepGoalHours = settings.sleepGoalMin / 60f,
+            avgCalories = avgCalories,
+            calorieGoal = calorieGoal,
+            proteinG = avgProtein,
+            carbsG = avgCarbs,
+            fatG = avgFat,
+            waterMl = water,
+            waterGoalMl = settings.waterGoalMl,
+            weightKg = weight,
+            bmi = bmi,
+            score = score.overall,
+            habitsDone = habitLogs.size,
+            habitsTotal = habits.size,
+        )
+    }
+
+    suspend fun generateWeeklyReport(useChinese: Boolean): AiAnswer {
+        val settings = preferences.settings.first()
+        val context = healthContext(useChinese)
+        val answer = advisor.report(context, settings.api)
+        db.aiReportDao().insert(
+            AiReportEntity(
+                kind = AiReportKind.WEEKLY,
+                prompt = context.promptBlock(),
+                content = answer.text,
+                score = context.score,
+            ),
+        )
+        return answer
+    }
+
+    suspend fun askAdvisor(
+        question: String,
+        useChinese: Boolean,
+        history: List<ChatMessage> = emptyList(),
+    ): AiAnswer {
+        val settings = preferences.settings.first()
+        return advisor.chat(question, healthContext(useChinese), settings.api, history)
+    }
 
     /* ---------------- 首页聚合 ---------------- */
 
