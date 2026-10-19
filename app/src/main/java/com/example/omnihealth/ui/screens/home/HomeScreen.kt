@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -32,6 +33,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.AutoAwesome
+import androidx.compose.material.icons.rounded.Bedtime
+import androidx.compose.material.icons.rounded.DirectionsWalk
+import androidx.compose.material.icons.rounded.LocalFireDepartment
+import androidx.compose.material.icons.rounded.WaterDrop
 import com.example.omnihealth.R
 import com.example.omnihealth.ui.components.MetricTile
 import com.example.omnihealth.ui.components.ProgressRing
@@ -95,7 +102,7 @@ fun HomeScreen(
                     Modifier
                         .size(44.dp)
                         .clip(CircleShape)
-                        .background(Brush.linearGradient(listOf(palette.accent, palette.accentAlt)))
+                        .background(palette.accent)
                         .bounceClick(pressScale = 0.9f, onClick = onOpenSettings),
                     contentAlignment = Alignment.Center,
                 ) {
@@ -130,7 +137,7 @@ fun HomeScreen(
         item {
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 MetricTile(
-                    emoji = "👟",
+                    icon = Icons.Rounded.DirectionsWalk,
                     title = stringResource(R.string.home_steps),
                     value = formatInt(state.steps),
                     unit = "",
@@ -141,7 +148,7 @@ fun HomeScreen(
                     onClick = onQuickLog,
                 )
                 MetricTile(
-                    emoji = "💧",
+                    icon = Icons.Rounded.WaterDrop,
                     title = stringResource(R.string.home_water),
                     value = String.format(Locale.US, "%.2f", state.waterMl / 1000f),
                     unit = "L",
@@ -160,7 +167,7 @@ fun HomeScreen(
         item {
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 MetricTile(
-                    emoji = "🌙",
+                    icon = Icons.Rounded.Bedtime,
                     title = stringResource(R.string.home_sleep),
                     value = String.format(Locale.US, "%.1f", state.sleepHours),
                     unit = "h",
@@ -174,7 +181,7 @@ fun HomeScreen(
                     onClick = onQuickLog,
                 )
                 MetricTile(
-                    emoji = "🔥",
+                    icon = Icons.Rounded.LocalFireDepartment,
                     title = stringResource(R.string.home_calories),
                     value = formatInt(state.caloriesIn),
                     unit = "kcal",
@@ -307,17 +314,13 @@ private fun AiTipCard(onClick: () -> Unit) {
         Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(palette.corner))
-            .background(
-                Brush.linearGradient(
-                    listOf(palette.accent.copy(alpha = 0.92f), palette.accentAlt.copy(alpha = 0.92f)),
-                ),
-            )
+            .background(palette.accent)
             .bounceClick(pressScale = 0.97f, onClick = onClick)
             .padding(18.dp),
     ) {
         Column {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("✨", fontSize = 14.sp)
+                Icon(Icons.Rounded.AutoAwesome, contentDescription = null, tint = Color.White, modifier = Modifier.size(14.dp))
                 Spacer(Modifier.width(6.dp))
                 Text(
                     text = stringResource(R.string.home_ai_title),

@@ -299,7 +299,7 @@ private fun LanguageChip(
             .clip(RoundedCornerShape(14.dp))
             .then(
                 if (selected) {
-                    Modifier.background(Brush.horizontalGradient(listOf(palette.accent, palette.accentAlt)))
+                    Modifier.background(palette.accent)
                 } else {
                     Modifier.background(palette.textPrimary.copy(alpha = 0.06f))
                 },
@@ -328,23 +328,24 @@ private fun ThemeOption(
         Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(preview.corner))
-            .background(
-                Brush.verticalGradient(
-                    listOf(preview.cardHighlight.copy(alpha = 0.9f), preview.cardFill),
-                ),
-            )
+            .background(preview.cardFill)
             .bounceClick(pressScale = 0.97f, onClick = onClick)
             .padding(14.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Box(
             Modifier
-                .size(46.dp)
+                .size(40.dp)
                 .clip(CircleShape)
-                .background(Brush.linearGradient(listOf(preview.accent, preview.accentAlt))),
+                .background(preview.accent),
             contentAlignment = Alignment.Center,
         ) {
-            Text(mode.emoji, fontSize = 18.sp)
+            Text(
+                text = stringResource(preview.mode.labelRes).take(1),
+                color = Color.White,
+                fontSize = 15.sp,
+                fontWeight = FontWeight.Bold,
+            )
         }
         Spacer(Modifier.width(12.dp))
         Column(Modifier.weight(1f)) {

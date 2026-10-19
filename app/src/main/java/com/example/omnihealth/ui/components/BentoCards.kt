@@ -26,6 +26,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -38,6 +39,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -129,11 +131,11 @@ fun ProgressRing(
 }
 
 /**
- * Bento 指标卡：emoji + 标题 + 大数字 + 进度条 + 可点击。
+ * Bento 指标卡：图标 + 标题 + 大数字 + 进度条 + 可点击。
  */
 @Composable
 fun MetricTile(
-    emoji: String,
+    icon: ImageVector,
     title: String,
     value: String,
     unit: String,
@@ -154,11 +156,16 @@ fun MetricTile(
             Box(
                 modifier = Modifier
                     .size(28.dp)
-                    .clip(RoundedCornerShape(10.dp))
-                    .background(accent.copy(alpha = 0.16f)),
+                    .clip(RoundedCornerShape(9.dp))
+                    .background(accent.copy(alpha = 0.12f)),
                 contentAlignment = Alignment.Center,
             ) {
-                Text(emoji, fontSize = 14.sp)
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = accent,
+                    modifier = Modifier.size(16.dp),
+                )
             }
             Spacer(Modifier.width(8.dp))
             Text(
@@ -203,7 +210,7 @@ fun MetricTile(
                         .fillMaxWidth(fraction)
                         .height(5.dp)
                         .clip(RoundedCornerShape(3.dp))
-                        .background(Brush.horizontalGradient(listOf(accent, accent.copy(alpha = 0.55f)))),
+                        .background(accent),
                 )
             }
         }

@@ -44,7 +44,7 @@
 
     <!-- 快捷记录 -->
     <string name="quick_log_title">快捷记录</string>
-    <string name="quick_log_subtitle">一秒入账，健康数据不求人</string>
+    <string name="quick_log_subtitle">记录体重、饮水、睡眠与步数</string>
     <string name="quick_log_save">保存记录</string>
     <string name="quick_log_weight">体重</string>
     <string name="quick_log_water">饮水</string>
@@ -54,8 +54,8 @@
 
     <!-- 主题 -->
     <string name="theme_miui_label">MIUIX 玻璃</string>
-    <string name="theme_miui_tagline">HyperOS · 毛玻璃</string>
-    <string name="theme_miui_blurb">柔光渐变 / 24dp 超椭圆 / 物理弹性按压</string>
+    <string name="theme_miui_tagline">HyperOS · 简洁</string>
+    <string name="theme_miui_blurb">实心卡片 / 18dp 圆角 / 物理弹性按压</string>
     <string name="theme_morandi_label">莫兰迪 MD3</string>
     <string name="theme_morandi_tagline">Material You · 低饱和</string>
     <string name="theme_morandi_blurb">几何卡片 / 柔和阴影 / 极高可读性</string>
@@ -73,7 +73,7 @@
 
     <!-- 首页 -->
     <string name="home_greeting">你好，%1$s</string>
-    <string name="home_status">%1$s · 保持节奏</string>
+    <string name="home_status">%1$s</string>
     <string name="home_health_index">综合健康指数</string>
     <string name="home_score_label">健康分</string>
     <string name="home_score_delta">比上周 +%1$d 分</string>
@@ -90,8 +90,8 @@
     <string name="home_remaining">剩余 %1$d kcal</string>
     <string name="home_section_quick">快捷操作</string>
     <string name="home_quick_hint">点一下就能记</string>
-    <string name="home_ai_title">AI 健康顾问</string>
-    <string name="home_ai_cta">生成 7 日报告 →</string>
+    <string name="home_ai_title">本周建议</string>
+    <string name="home_ai_cta">查看</string>
     <string name="home_bmi">BMI %1$s</string>
     <string name="home_tdee">TDEE %1$d</string>
     <string name="home_habits">习惯 %1$d/%2$d</string>
@@ -103,8 +103,8 @@
     <string name="dim_consistency">习惯</string>
 
     <!-- 饮食与运动 -->
-    <string name="diet_tab">🍽 饮食</string>
-    <string name="sport_tab">🏃 运动</string>
+    <string name="diet_tab">饮食</string>
+    <string name="sport_tab">运动</string>
     <string name="diet_today_title">今日摄入</string>
     <string name="diet_left">剩余 %1$d kcal</string>
     <string name="diet_search_hint">搜索食物，如「鸡胸肉」</string>
@@ -156,7 +156,7 @@
 
     <!-- AI 顾问 -->
     <string name="ai_title">AI 健康顾问</string>
-    <string name="ai_subtitle">基于最近 7 天数据 · 离线可用</string>
+    <string name="ai_subtitle">基于最近 7 天记录</string>
     <string name="ai_provider_cloud">%1$s</string>
     <string name="ai_provider_offline">离线引擎</string>
     <string name="ai_generate">生成 7 日健康报告</string>

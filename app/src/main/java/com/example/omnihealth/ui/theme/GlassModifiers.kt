@@ -106,24 +106,13 @@ fun GlassCard(
     onClick: (() -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    // 刻意不用 Modifier.shadow：在部分真机上 elevation 阴影视图形不被裁切，
-    // 会在卡片/底栏后透出一个方形硬边框，破坏玻璃质感。这里只用描边 + 高光表达层次。
+    // 实心卡片：纯色底 + 1px 描边，不用渐变、不用阴影。
     val base = modifier
         .clip(shape)
-        .background(
-            brush = Brush.verticalGradient(
-                colors = listOf(
-                    palette.cardHighlight.copy(alpha = palette.cardFill.alpha * 0.9f),
-                    palette.cardFill,
-                ),
-            ),
-            shape = shape,
-        )
+        .background(color = palette.cardFill, shape = shape)
         .border(
-            width = if (palette.style == SurfaceStyle.NEON) 1.dp else 0.8.dp,
-            brush = Brush.linearGradient(
-                colors = listOf(palette.cardStroke, palette.cardStroke.copy(alpha = 0.25f)),
-            ),
+            width = 1.dp,
+            color = palette.cardStroke,
             shape = shape,
         )
 
@@ -140,10 +129,5 @@ fun GlassCard(
 fun Modifier.frostBar(palette: OmniPalette, shape: Shape = RoundedCornerShape(palette.corner)): Modifier =
     this
         .clip(shape)
-        .background(
-            brush = Brush.verticalGradient(
-                listOf(palette.barFill, palette.barFill.copy(alpha = palette.barFill.alpha * 0.86f)),
-            ),
-            shape = shape,
-        )
-        .border(0.8.dp, palette.barStroke.copy(alpha = 0.55f), shape)
+        .background(color = palette.barFill, shape = shape)
+        .border(1.dp, palette.barStroke, shape)

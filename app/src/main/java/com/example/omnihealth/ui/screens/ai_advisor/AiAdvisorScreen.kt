@@ -102,14 +102,9 @@ fun AiAdvisorScreen() {
                             .clip(RoundedCornerShape(14.dp))
                             .background(
                                 if (state.hasApiKey) {
-                                    Brush.horizontalGradient(listOf(palette.accent, palette.accentAlt))
+                                    palette.accent
                                 } else {
-                                    Brush.horizontalGradient(
-                                        listOf(
-                                            palette.textTertiary.copy(alpha = 0.25f),
-                                            palette.textTertiary.copy(alpha = 0.15f),
-                                        ),
-                                    )
+                                    palette.textTertiary.copy(alpha = 0.14f)
                                 },
                             )
                             .padding(horizontal = 12.dp, vertical = 7.dp),
@@ -133,7 +128,7 @@ fun AiAdvisorScreen() {
                     Modifier
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(palette.corner))
-                        .background(Brush.linearGradient(listOf(palette.accent, palette.accentAlt)))
+                        .background(palette.accent)
                         .bounceClick(pressScale = 0.97f) { viewModel.generateReport(useChinese) }
                         .padding(18.dp),
                 ) {
@@ -273,14 +268,9 @@ private fun ChatBubble(item: ChatItem) {
                     )
                     .background(
                         if (item.fromUser) {
-                            Brush.horizontalGradient(listOf(palette.accent, palette.accentAlt))
+                            palette.accent
                         } else {
-                            Brush.verticalGradient(
-                                listOf(
-                                    palette.cardFill,
-                                    palette.cardFill.copy(alpha = palette.cardFill.alpha * 0.75f),
-                                ),
-                            )
+                            palette.bgMid
                         },
                     )
                     .padding(horizontal = 14.dp, vertical = 10.dp),
@@ -339,7 +329,7 @@ private fun InputBar(
         Box(
             Modifier
                 .clip(RoundedCornerShape(12.dp))
-                .background(Brush.horizontalGradient(listOf(palette.accent, palette.accentAlt)))
+                .background(palette.accent)
                 .bounceClick(pressScale = 0.94f, onClick = onSend)
                 .padding(horizontal = 14.dp, vertical = 8.dp),
         ) {

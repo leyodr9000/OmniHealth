@@ -221,16 +221,7 @@ fun ApiConfigSheet(
                                 .weight(1f)
                                 .clip(RoundedCornerShape(12.dp))
                                 .background(
-                                    if (active) {
-                                        Brush.horizontalGradient(listOf(palette.accent, palette.accentAlt))
-                                    } else {
-                                        Brush.horizontalGradient(
-                                            listOf(
-                                                palette.textPrimary.copy(alpha = 0.06f),
-                                                palette.textPrimary.copy(alpha = 0.06f),
-                                            ),
-                                        )
-                                    },
+                                    if (active) palette.accent else palette.textPrimary.copy(alpha = 0.06f),
                                 )
                                 .bounceClick(pressScale = 0.94f, haptics = false) { temperature = value }
                                 .padding(vertical = 9.dp),
@@ -417,16 +408,7 @@ private fun <T> ChipGroup(
                         .weight(1f)
                         .clip(RoundedCornerShape(12.dp))
                         .background(
-                            if (active) {
-                                Brush.horizontalGradient(listOf(palette.accent, palette.accentAlt))
-                            } else {
-                                Brush.horizontalGradient(
-                                    listOf(
-                                        palette.textPrimary.copy(alpha = 0.06f),
-                                        palette.textPrimary.copy(alpha = 0.06f),
-                                    ),
-                                )
-                            },
+                            if (active) palette.accent else palette.textPrimary.copy(alpha = 0.06f),
                         )
                         .bounceClick(pressScale = 0.94f, haptics = false) { onSelect(value) }
                         .padding(vertical = 9.dp, horizontal = 2.dp),
@@ -453,7 +435,7 @@ private fun PrimaryButton(label: String, onClick: () -> Unit) {
             .fillMaxWidth()
             .height(50.dp)
             .clip(RoundedCornerShape(18.dp))
-            .background(Brush.horizontalGradient(listOf(palette.accent, palette.accentAlt)))
+            .background(palette.accent)
             .bounceClick(pressScale = 0.97f, onClick = onClick),
         contentAlignment = Alignment.Center,
     ) {

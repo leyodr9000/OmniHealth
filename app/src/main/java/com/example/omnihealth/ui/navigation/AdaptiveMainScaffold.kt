@@ -154,7 +154,7 @@ private fun FabNavBar(
                 .offset(y = (-22).dp)
                 .size(58.dp)
                 .background(
-                    brush = Brush.linearGradient(listOf(palette.accent, palette.accentAlt)),
+                    color = palette.accent,
                     shape = CircleShape,
                 )
                 .bounceClick(pressScale = 0.88f, onClick = onQuickLog),

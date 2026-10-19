@@ -137,15 +137,8 @@ fun QuickLogBottomSheet(
                 Column(
                     Modifier
                         .fillMaxWidth()
-                        .clip(RoundedCornerShape(26.dp))
-                        .background(
-                            Brush.verticalGradient(
-                                listOf(
-                                    palette.accent.copy(alpha = 0.10f),
-                                    palette.accentAlt.copy(alpha = 0.06f),
-                                ),
-                            ),
-                        )
+                        .clip(RoundedCornerShape(20.dp))
+                        .background(palette.textPrimary.copy(alpha = 0.03f))
                         .padding(vertical = 22.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
@@ -202,7 +195,7 @@ fun QuickLogBottomSheet(
                         .fillMaxWidth()
                         .height(52.dp)
                         .clip(RoundedCornerShape(18.dp))
-                        .background(Brush.horizontalGradient(listOf(palette.accent, palette.accentAlt)))
+                        .background(palette.accent)
                         .bounceClick(pressScale = 0.97f) { onSave(type, value) },
                     contentAlignment = Alignment.Center,
                 ) {
@@ -231,7 +224,7 @@ private fun TypeChip(
             .clip(RoundedCornerShape(16.dp))
             .then(
                 if (selected) {
-                    Modifier.background(Brush.horizontalGradient(listOf(palette.accent, palette.accentAlt)))
+                    Modifier.background(palette.accent)
                 } else {
                     Modifier.frostBar(palette, RoundedCornerShape(16.dp))
                 },

@@ -24,6 +24,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -49,6 +50,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.FitnessCenter
+import androidx.compose.material.icons.rounded.Restaurant
+import androidx.compose.material.icons.rounded.Search
+import androidx.compose.material.icons.rounded.DirectionsWalk
+import androidx.compose.material.icons.rounded.LocalFireDepartment
 import com.example.omnihealth.R
 import com.example.omnihealth.data.local.entity.DietLogEntity
 import com.example.omnihealth.data.local.entity.FoodEntity
@@ -175,7 +182,7 @@ fun DietSportScreen(
             item {
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     MetricTile(
-                        emoji = "👟",
+                        icon = Icons.Rounded.DirectionsWalk,
                         title = stringResource(R.string.sport_steps),
                         value = String.format(Locale.US, "%,d", sport.steps),
                         unit = "",
@@ -189,7 +196,7 @@ fun DietSportScreen(
                         modifier = Modifier.weight(1f),
                     )
                     MetricTile(
-                        emoji = "🔥",
+                        icon = Icons.Rounded.LocalFireDepartment,
                         title = stringResource(R.string.sport_today_workouts),
                         value = "${sport.burned}",
                         unit = "kcal",
@@ -314,7 +321,7 @@ private fun FoodAmountSheet(
                                 .clip(RoundedCornerShape(14.dp))
                                 .then(
                                     if (active) {
-                                        Modifier.background(Brush.horizontalGradient(listOf(palette.accent, palette.accentAlt)))
+                                        Modifier.background(palette.accent)
                                     } else {
                                         Modifier.background(palette.textPrimary.copy(alpha = 0.06f))
                                     },
@@ -390,7 +397,7 @@ private fun FoodAmountSheet(
                         .fillMaxWidth()
                         .height(50.dp)
                         .clip(RoundedCornerShape(18.dp))
-                        .background(Brush.horizontalGradient(listOf(palette.accent, palette.accentAlt)))
+                        .background(palette.accent)
                         .bounceClick(pressScale = 0.97f) { onConfirm(grams, meal) },
                     contentAlignment = Alignment.Center,
                 ) {
@@ -483,7 +490,7 @@ private fun SegmentedControl(
                     .clip(RoundedCornerShape(14.dp))
                     .then(
                         if (active) {
-                            Modifier.background(Brush.horizontalGradient(listOf(palette.accent, palette.accentAlt)))
+                            Modifier.background(palette.accent)
                         } else {
                             Modifier
                         },
@@ -518,7 +525,7 @@ private fun SearchBar(
             .padding(horizontal = 16.dp, vertical = 14.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text("🔍", fontSize = 13.sp)
+        Icon(Icons.Rounded.Search, contentDescription = null, tint = palette.textTertiary, modifier = Modifier.size(16.dp))
         Spacer(Modifier.width(10.dp))
         Box(Modifier.weight(1f)) {
             if (value.isEmpty()) {
@@ -554,7 +561,7 @@ private fun FoodRow(food: FoodEntity, onClick: () -> Unit) {
                 .background(palette.accent.copy(alpha = 0.14f)),
             contentAlignment = Alignment.Center,
         ) {
-            Text("🥗", fontSize = 15.sp)
+            Icon(Icons.Rounded.Restaurant, contentDescription = null, tint = palette.accent, modifier = Modifier.size(16.dp))
         }
         Spacer(Modifier.width(12.dp))
         Column(Modifier.weight(1f)) {
@@ -663,15 +670,7 @@ private fun WorkoutTimerCard(state: SportUiState, onStart: () -> Unit, onStop: (
             Box(
                 Modifier
                     .clip(RoundedCornerShape(16.dp))
-                    .background(
-                        Brush.horizontalGradient(
-                            if (state.running) {
-                                listOf(palette.danger, palette.accentAlt)
-                            } else {
-                                listOf(palette.accent, palette.accentAlt)
-                            },
-                        ),
-                    )
+                    .background(if (state.running) palette.danger else palette.accent)
                     .bounceClick(pressScale = 0.95f) { if (state.running) onStop() else onStart() }
                     .padding(horizontal = 18.dp, vertical = 11.dp),
             ) {
@@ -697,7 +696,7 @@ private fun WorkoutRow(workout: WorkoutEntity) {
             .padding(horizontal = 14.dp, vertical = 11.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text("🏋️", fontSize = 14.sp)
+        Icon(Icons.Rounded.FitnessCenter, contentDescription = null, tint = palette.textSecondary, modifier = Modifier.size(15.dp))
         Spacer(Modifier.width(10.dp))
         Column(Modifier.weight(1f)) {
             Text(workout.type, color = palette.textPrimary, fontSize = 12.sp, fontWeight = FontWeight.Medium)

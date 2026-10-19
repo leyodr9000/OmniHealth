@@ -44,7 +44,7 @@
 
     <!-- Quick log -->
     <string name="quick_log_title">Quick log</string>
-    <string name="quick_log_subtitle">One tap, logged</string>
+    <string name="quick_log_subtitle">Log weight, water, sleep and steps</string>
     <string name="quick_log_save">Save record</string>
     <string name="quick_log_weight">Weight</string>
     <string name="quick_log_water">Water</string>
@@ -54,8 +54,8 @@
 
     <!-- Themes -->
     <string name="theme_miui_label">MIUIX Glass</string>
-    <string name="theme_miui_tagline">HyperOS · frosted</string>
-    <string name="theme_miui_blurb">Soft mesh gradient / 24dp squircle / physical spring press</string>
+    <string name="theme_miui_tagline">HyperOS · clean</string>
+    <string name="theme_miui_blurb">Solid cards / 18dp radius / spring press</string>
     <string name="theme_morandi_label">Morandi MD3</string>
     <string name="theme_morandi_tagline">Material You · muted</string>
     <string name="theme_morandi_blurb">Geometric cards / soft shadows / high legibility</string>
@@ -73,7 +73,7 @@
 
     <!-- Home -->
     <string name="home_greeting">Hi, %1$s</string>
-    <string name="home_status">%1$s · keep the rhythm</string>
+    <string name="home_status">%1$s</string>
     <string name="home_health_index">Health index</string>
     <string name="home_score_label">Score</string>
     <string name="home_score_delta">+%1$d vs last week</string>
@@ -90,8 +90,8 @@
     <string name="home_remaining">%1$d kcal left</string>
     <string name="home_section_quick">Quick actions</string>
     <string name="home_quick_hint">One tap to log</string>
-    <string name="home_ai_title">AI health advisor</string>
-    <string name="home_ai_cta">7-day report →</string>
+    <string name="home_ai_title">This week</string>
+    <string name="home_ai_cta">View</string>
     <string name="home_bmi">BMI %1$s</string>
     <string name="home_tdee">TDEE %1$d</string>
     <string name="home_habits">Habits %1$d/%2$d</string>
@@ -103,8 +103,8 @@
     <string name="dim_consistency">Habits</string>
 
     <!-- Diet & Sport -->
-    <string name="diet_tab">🍽 Diet</string>
-    <string name="sport_tab">🏃 Sport</string>
+    <string name="diet_tab">Diet</string>
+    <string name="sport_tab">Sport</string>
     <string name="diet_today_title">Today\'s intake</string>
     <string name="diet_left">%1$d kcal left</string>
     <string name="diet_search_hint">Search food, e.g. chicken breast</string>
@@ -156,7 +156,7 @@
 
     <!-- AI advisor -->
     <string name="ai_title">AI health advisor</string>
-    <string name="ai_subtitle">Built on your last 7 days · works offline</string>
+    <string name="ai_subtitle">Based on your last 7 days</string>
     <string name="ai_provider_cloud">%1$s</string>
     <string name="ai_provider_offline">Offline engine</string>
     <string name="ai_generate">Generate 7-day report</string>

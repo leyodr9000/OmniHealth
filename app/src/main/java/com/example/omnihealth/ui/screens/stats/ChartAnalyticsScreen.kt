@@ -97,7 +97,7 @@ fun ChartAnalyticsScreen() {
                             .clip(RoundedCornerShape(14.dp))
                             .then(
                                 if (active) {
-                                    Modifier.background(Brush.horizontalGradient(listOf(palette.accent, palette.accentAlt)))
+                                    Modifier.background(palette.accent)
                                 } else {
                                     Modifier.background(palette.textPrimary.copy(alpha = 0.06f))
                                 },
