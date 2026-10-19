@@ -65,11 +65,13 @@ import com.example.omnihealth.ui.components.MetricTile
 import com.example.omnihealth.ui.components.ProgressRing
 import com.example.omnihealth.ui.components.SectionHeader
 import com.example.omnihealth.ui.di.LocalHealthRepository
+import com.example.omnihealth.ui.di.activityScopedViewModelOwner
 import com.example.omnihealth.ui.i18n.LocalAppLanguage
 import com.example.omnihealth.ui.i18n.LocalizedApp
 import com.example.omnihealth.ui.theme.GlassCard
 import com.example.omnihealth.ui.theme.OmniTheme
 import com.example.omnihealth.ui.theme.bounceClick
+import com.example.omnihealth.ui.theme.quietClick
 import java.util.Locale
 
 @Composable
@@ -81,6 +83,7 @@ fun DietSportScreen(
     val repository = LocalHealthRepository.current
     val app = LocalContext.current.applicationContext as Application
     val viewModel: DietSportViewModel = viewModel(
+        viewModelStoreOwner = activityScopedViewModelOwner(),
         factory = viewModelFactory { initializer { DietSportViewModel(app, repository) } },
     )
     LaunchedEffect(Unit) { viewModel.startSensorIfPossible() }
@@ -151,7 +154,7 @@ fun DietSportScreen(
                         )
                     }
                 } else {
-                    items(results, key = { "s-${it.id}" }) { food ->
+                    items(results, key = { "s-${it.id}" }, contentType = { "food" }) { food ->
                         FoodRow(food) { pending = food }
                     }
                 }
@@ -162,7 +165,7 @@ fun DietSportScreen(
                         subtitle = stringResource(R.string.diet_dict_sub, dictionary.size),
                     )
                 }
-                items(dictionary.take(40), key = { "d-${it.id}" }) { food ->
+                items(dictionary.take(40), key = { "d-${it.id}" }, contentType = { "food" }) { food ->
                     FoodRow(food) { pending = food }
                 }
             }
@@ -174,7 +177,7 @@ fun DietSportScreen(
                         subtitle = "${diet.calories} kcal",
                     )
                 }
-                items(diet.logs, key = { "l-${it.id}" }) { log ->
+                items(diet.logs, key = { "l-${it.id}" }, contentType = { "log" }) { log ->
                     LogRow(log) { viewModel.deleteLog(log) }
                 }
             }
@@ -550,7 +553,7 @@ private fun FoodRow(food: FoodEntity, onClick: () -> Unit) {
             .fillMaxWidth()
             .clip(RoundedCornerShape(20.dp))
             .background(palette.cardFill)
-            .bounceClick(pressScale = 0.985f, haptics = false, onClick = onClick)
+            .quietClick(onClick = onClick)
             .padding(14.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {

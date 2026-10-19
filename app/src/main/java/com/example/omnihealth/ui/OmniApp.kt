@@ -1,5 +1,7 @@
 package com.example.omnihealth.ui
 
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
@@ -75,6 +77,12 @@ fun OmniApp(
             NavHost(
                 navController = navController,
                 startDestination = OmniDest.Home.route,
+                // 底部 Tab 之间不做转场动画：动画期间新页首帧同时合成，
+                // 切完立刻滑动会明显掉帧；国内 App 的 Tab 切换也基本都是瞬切。
+                enterTransition = { EnterTransition.None },
+                exitTransition = { ExitTransition.None },
+                popEnterTransition = { EnterTransition.None },
+                popExitTransition = { ExitTransition.None },
                 modifier = Modifier.padding(bottom = innerPadding.calculateBottomPadding() + extraBottom),
             ) {
                 composable(OmniDest.Home.route) {

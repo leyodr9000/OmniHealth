@@ -45,6 +45,7 @@ import com.example.omnihealth.ui.components.ProgressRing
 import com.example.omnihealth.ui.components.SectionHeader
 import com.example.omnihealth.ui.components.StatChip
 import com.example.omnihealth.ui.di.LocalHealthRepository
+import com.example.omnihealth.ui.di.activityScopedViewModelOwner
 import com.example.omnihealth.ui.theme.GlassCard
 import com.example.omnihealth.ui.theme.OmniTheme
 import com.example.omnihealth.ui.theme.bounceClick
@@ -62,6 +63,7 @@ fun HomeScreen(
 ) {
     val repository = LocalHealthRepository.current
     val viewModel: HomeViewModel = viewModel(
+        viewModelStoreOwner = activityScopedViewModelOwner(),
         factory = viewModelFactory { initializer { HomeViewModel(repository) } },
     )
     val state by viewModel.uiState.collectAsStateWithLifecycle()

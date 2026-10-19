@@ -56,6 +56,7 @@ import com.example.omnihealth.ui.theme.OmniTheme
 import com.example.omnihealth.ui.theme.ThemeMode
 import com.example.omnihealth.ui.theme.UiFramework
 import com.example.omnihealth.ui.theme.bounceClick
+import com.example.omnihealth.ui.theme.quietClick
 import kotlinx.coroutines.launch
 import java.util.Locale
 
@@ -294,7 +295,7 @@ private fun SettingItem(
     Row(
         Modifier
             .fillMaxWidth()
-            .bounceClick(pressScale = 0.99f, haptics = false, onClick = onClick)
+            .quietClick(onClick = onClick)
             .padding(horizontal = 14.dp, vertical = 13.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {

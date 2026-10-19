@@ -4,6 +4,7 @@ import android.app.Activity
 import androidx.annotation.StringRes
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Shapes
 import androidx.compose.material3.Typography
 import androidx.compose.material3.darkColorScheme
@@ -349,16 +350,23 @@ fun OmniHealthTheme(
             typography = typography,
             shapes = shapes,
         ) {
-            // 始终包一层 MiuixTheme：它只提供 CompositionLocal，不改变布局。
-            // 这样在 MIUIX / Material3 之间切换时组件树结构不变，导航栈不会丢。
-            MiuixTheme(
-                colors = if (palette.dark) {
-                    top.yukonga.miuix.kmp.theme.darkColorScheme()
-                } else {
-                    top.yukonga.miuix.kmp.theme.lightColorScheme()
-                },
-                content = content,
-            )
+            // 全站数字使用等宽字形（tnum），大数字与单位对齐不再跳动。
+            CompositionLocalProvider(
+                LocalTextStyle provides MaterialTheme.typography.bodyMedium.copy(
+                    fontFeatureSettings = "tnum",
+                ),
+            ) {
+                // 始终包一层 MiuixTheme：它只提供 CompositionLocal，不改变布局。
+                // 这样在 MIUIX / Material3 之间切换时组件树结构不变，导航栈不会丢。
+                MiuixTheme(
+                    colors = if (palette.dark) {
+                        top.yukonga.miuix.kmp.theme.darkColorScheme()
+                    } else {
+                        top.yukonga.miuix.kmp.theme.lightColorScheme()
+                    },
+                    content = content,
+                )
+            }
         }
     }
 }

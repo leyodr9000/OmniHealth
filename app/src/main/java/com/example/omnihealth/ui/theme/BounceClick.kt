@@ -3,7 +3,9 @@ package com.example.omnihealth.ui.theme
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -58,4 +60,23 @@ fun Modifier.bounceClick(
             },
         )
     }
+}
+
+/**
+ * 列表项专用点击：水波纹与缩放层都不要。
+ *
+ * 滚动时每个 item 都持有 graphicsLayer 会触发离屏合成，是快速滑动掉帧的主因；
+ * 列表行用这个替代 [bounceClick]，大卡片/按钮再保留弹性反馈。
+ */
+fun Modifier.quietClick(
+    enabled: Boolean = true,
+    onClick: () -> Unit,
+): Modifier = composed {
+    val interactionSource = remember { MutableInteractionSource() }
+    clickable(
+        interactionSource = interactionSource,
+        indication = null,
+        enabled = enabled,
+        onClick = onClick,
+    )
 }

@@ -44,6 +44,7 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.omnihealth.R
 import com.example.omnihealth.ui.components.SectionHeader
 import com.example.omnihealth.ui.di.LocalHealthRepository
+import com.example.omnihealth.ui.di.activityScopedViewModelOwner
 import com.example.omnihealth.ui.theme.GlassCard
 import com.example.omnihealth.ui.theme.OmniTheme
 import com.example.omnihealth.ui.theme.bounceClick
@@ -52,6 +53,7 @@ import com.example.omnihealth.ui.theme.bounceClick
 fun AiAdvisorScreen() {
     val repository = LocalHealthRepository.current
     val viewModel: AiAdvisorViewModel = viewModel(
+        viewModelStoreOwner = activityScopedViewModelOwner(),
         factory = viewModelFactory { initializer { AiAdvisorViewModel(repository) } },
     )
     val state by viewModel.state.collectAsStateWithLifecycle()

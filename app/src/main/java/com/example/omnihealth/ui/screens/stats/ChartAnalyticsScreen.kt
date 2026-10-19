@@ -43,6 +43,7 @@ import com.example.omnihealth.ui.chart.MacroPieChart
 import com.example.omnihealth.ui.chart.StepsBarChart
 import com.example.omnihealth.ui.components.SectionHeader
 import com.example.omnihealth.ui.di.LocalHealthRepository
+import com.example.omnihealth.ui.di.activityScopedViewModelOwner
 import com.example.omnihealth.ui.theme.GlassCard
 import com.example.omnihealth.ui.theme.OmniTheme
 import com.example.omnihealth.ui.theme.bounceClick
@@ -52,6 +53,7 @@ import java.util.Locale
 fun ChartAnalyticsScreen() {
     val repository = LocalHealthRepository.current
     val viewModel: StatsViewModel = viewModel(
+        viewModelStoreOwner = activityScopedViewModelOwner(),
         factory = viewModelFactory { initializer { StatsViewModel(repository) } },
     )
     val state by viewModel.uiState.collectAsStateWithLifecycle()
