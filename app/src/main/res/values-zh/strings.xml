@@ -327,4 +327,6 @@
     <string name="review_image_footer">数据来自本机记录，缺失的天未被当作 0</string>
     <string name="review_share_title">分享周复盘</string>
     <string name="plan_estimate_note">按参考份量估算，实际以称重为准</string>
+    <string name="sleep_today">今天</string>
+    <string name="sleep_last_night">昨晚</string>
 </resources>

@@ -327,4 +327,6 @@
     <string name="review_image_footer">Based on this device only; missing days are never treated as zero</string>
     <string name="review_share_title">Share weekly review</string>
     <string name="plan_estimate_note">Estimated from reference portions; weigh when you can</string>
+    <string name="sleep_today">Today</string>
+    <string name="sleep_last_night">Last night</string>
 </resources>

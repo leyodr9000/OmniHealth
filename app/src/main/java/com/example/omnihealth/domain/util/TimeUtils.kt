@@ -24,4 +24,8 @@ object TimeUtils {
         (days - 1 downTo 0).map { endEpochDay - it }
 
     fun localDate(epochDay: Long): LocalDate = LocalDate.ofEpochDay(epochDay)
+
+    /** 某天的中午（本地时区）：用于「归属某天」但不关心具体时刻的记录。 */
+    fun noonOfDayMillis(epochDay: Long): Long =
+        LocalDate.ofEpochDay(epochDay).atTime(12, 0).atZone(zone).toInstant().toEpochMilli()
 }

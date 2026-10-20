@@ -78,8 +78,20 @@ class HealthRepository(
         VitalEntity(type = VitalType.WATER, value = ml, unit = "ml", tzOffsetMinutes = tzOffset()),
     )
 
-    suspend fun logSleep(hours: Float) = db.vitalDao().insert(
-        VitalEntity(type = VitalType.SLEEP, value = hours, unit = "h", tzOffsetMinutes = tzOffset()),
+    /**
+     * 记录睡眠。
+     *
+     * 睡眠跨零点，"记在哪一天"必须显式指定：默认今天，用户可在记录面板选「昨晚」。
+     * 归属信息通过 recordedAt 落在当天的 23:59 表达，不引入新列。
+     */
+    suspend fun logSleep(hours: Float, epochDay: Long = TimeUtils.epochDayNow()) = db.vitalDao().insert(
+        VitalEntity(
+            type = VitalType.SLEEP,
+            value = hours,
+            unit = "h",
+            recordedAt = TimeUtils.noonOfDayMillis(epochDay),
+            tzOffsetMinutes = tzOffset(),
+        ),
     )
 
     suspend fun logMood(score: Float) = db.vitalDao().insert(

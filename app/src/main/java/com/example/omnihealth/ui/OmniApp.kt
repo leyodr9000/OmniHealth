@@ -201,12 +201,15 @@ fun OmniApp(
         QuickLogBottomSheet(
             initialType = initialType,
             onDismiss = { quickLogType = null },
-            onSave = { type, value ->
+            onSave = { type, value, sleepDay ->
                 scope.launch {
                     when (type) {
                         QuickLogType.WEIGHT -> repository.logWeight(value)
                         QuickLogType.WATER -> repository.logWater(value)
-                        QuickLogType.SLEEP -> repository.logSleep(value)
+                        QuickLogType.SLEEP -> repository.logSleep(
+                            value,
+                            com.example.omnihealth.domain.util.TimeUtils.epochDayNow() + (sleepDay ?: 0L),
+                        )
                         QuickLogType.STEPS -> repository.saveSteps(value.toInt())
                         QuickLogType.MOOD -> repository.logMood(value)
                     }

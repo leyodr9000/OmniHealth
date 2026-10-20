@@ -38,6 +38,7 @@ import com.example.omnihealth.R
 import com.example.omnihealth.ui.i18n.LocalAppLanguage
 import com.example.omnihealth.ui.i18n.LocalizedApp
 import com.example.omnihealth.ui.theme.OmniTheme
+import com.example.omnihealth.ui.theme.quietClick
 import com.example.omnihealth.ui.theme.bounceClick
 import com.example.omnihealth.ui.theme.frostBar
 import kotlin.math.roundToInt
@@ -71,13 +72,15 @@ enum class QuickLogType(
 @Composable
 fun QuickLogBottomSheet(
     onDismiss: () -> Unit,
-    onSave: (QuickLogType, Float) -> Unit,
+    onSave: (QuickLogType, Float, Long?) -> Unit,
     initialType: QuickLogType = QuickLogType.WATER,
 ) {
     val palette = OmniTheme.palette
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var type by remember(initialType) { mutableStateOf(initialType) }
     var value by remember(initialType) { mutableStateOf(initialType.defaultValue) }
+    // 仅睡眠用到：按昨晚还是今天归属（null = 今天）
+    var sleepDay by remember(initialType) { mutableStateOf<Long?>(null) }
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -188,11 +191,37 @@ fun QuickLogBottomSheet(
                     }
                 }
 
+                if (type == QuickLogType.SLEEP) {
+                    Spacer(Modifier.height(12.dp))
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        listOf(
+                            null to stringResource(R.string.sleep_today),
+                            -1L to stringResource(R.string.sleep_last_night),
+                        ).forEach { (delta, label) ->
+                            val selected = sleepDay == delta
+                            Text(
+                                text = label,
+                                color = if (selected) palette.accent else palette.textTertiary,
+                                fontSize = 11.sp,
+                                fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal,
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(10.dp))
+                                    .background(
+                                        if (selected) palette.accent.copy(alpha = 0.12f)
+                                        else palette.textPrimary.copy(alpha = 0.05f),
+                                    )
+                                    .quietClick { sleepDay = delta }
+                                    .padding(horizontal = 12.dp, vertical = 7.dp),
+                            )
+                        }
+                    }
+                }
+
                 Spacer(Modifier.height(22.dp))
 
                 AppPrimaryButton(
                     text = stringResource(R.string.quick_log_save),
-                    onClick = { onSave(type, value) },
+                    onClick = { onSave(type, value, sleepDay) },
                 )
             }
         }
