@@ -196,7 +196,7 @@ fun HomeScreen(
                     ) else stringResource(R.string.home_not_recorded),
                     unrecorded = !state.hasWater,
                     modifier = Modifier.weight(1f),
-                    onClick = { onQuickLog(QuickLogType.STEPS) },
+                    onClick = { onQuickLog(QuickLogType.WATER) },
                 )
             }
         }
@@ -216,7 +216,7 @@ fun HomeScreen(
                     ) else stringResource(R.string.home_not_recorded),
                     unrecorded = !state.hasSleep,
                     modifier = Modifier.weight(1f),
-                    onClick = { onQuickLog(QuickLogType.STEPS) },
+                    onClick = { onQuickLog(QuickLogType.SLEEP) },
                 )
                 MetricTile(
                     icon = Icons.Rounded.LocalFireDepartment,
@@ -233,6 +233,7 @@ fun HomeScreen(
             }
         }
 
+        // 健康分放在「今日已记录什么」之后：先给事实，再给结论。
         // 健康分放在「今日已记录什么」之后：先给事实，再给结论。
         item { AppearOnScreen(index = 1) { HealthScoreCard(state) } }
 

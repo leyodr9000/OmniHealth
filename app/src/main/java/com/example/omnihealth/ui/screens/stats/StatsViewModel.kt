@@ -10,6 +10,7 @@ import com.example.omnihealth.data.local.entity.StepEntity
 import com.example.omnihealth.data.local.entity.VitalEntity
 import com.example.omnihealth.data.repository.HealthRepository
 import com.example.omnihealth.domain.util.HealthCalculator
+import com.example.omnihealth.domain.util.TrendInterpreter
 import com.example.omnihealth.domain.util.TimeUtils
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -32,6 +33,10 @@ data class StatsUiState(
     val score: HealthCalculator.ScoreBreakdown = HealthCalculator.ScoreBreakdown(0, 0, 0, 0, 0),
     val stepGoal: Int = 10_000,
     val hasData: Boolean = false,
+    /** 由确定性规则生成，数字与图表同源；覆盖不足时只说明缺什么。 */
+    val weightInsight: TrendInterpreter.Insight? = null,
+    val calorieInsight: TrendInterpreter.Insight? = null,
+    val stepsInsight: TrendInterpreter.Insight? = null,
 )
 
 private data class StatsCore(
@@ -126,6 +131,12 @@ class StatsViewModel(private val repository: HealthRepository) : ViewModel() {
             habitsRecorded = core.habitTotal > 0,
         )
 
+        // 近 14 天（含前 7 天）的可空序列：缺失天为 null，不补 0
+        val twoWeeks = TimeUtils.lastDays(14)
+        val weightSeries14 = twoWeeks.map { weightByDay[it] }
+        val calorieSeries14 = twoWeeks.map { dietByDay[it]?.toFloat() }
+        val stepSeries14 = twoWeeks.map { stepsByDay[it]?.steps?.toFloat() }
+
         return StatsUiState(
             labels = days.map { LocalDate.ofEpochDay(it).format(labelFormatter) },
             weight = weights,
@@ -138,6 +149,9 @@ class StatsViewModel(private val repository: HealthRepository) : ViewModel() {
             score = score,
             stepGoal = core.settings.stepGoal,
             hasData = stepRows.isNotEmpty() || dietRows.isNotEmpty() || weightRows.isNotEmpty(),
+            weightInsight = TrendInterpreter.compareWeeks(weightSeries14, "kg", true, "体重"),
+            calorieInsight = TrendInterpreter.compareWeeks(calorieSeries14, "kcal", false, "摄入"),
+            stepsInsight = TrendInterpreter.compareWeeks(stepSeries14, "步", false, "步数"),
         )
     }
 }
