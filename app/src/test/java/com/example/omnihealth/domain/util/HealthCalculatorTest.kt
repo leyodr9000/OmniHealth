@@ -135,4 +135,40 @@ class HealthCalculatorTest {
         assertFalse(stepsOnly.reliable)
         assertEquals(50, stepsOnly.overall)
     }
+    @Test
+    fun zero_goals_do_not_crash_or_inflate() {
+        val score = HealthCalculator.fiveDimensionScore(
+            caloriesIn = 0f, calorieTarget = 0,
+            steps = 0, stepGoal = 0,
+            sleepHours = 0f, sleepGoalHours = 0f,
+            waterMl = 0f, waterGoalMl = 0f,
+            habitChecks = 0, habitTarget = 0,
+        )
+        assertEquals(0, score.activity)
+        assertEquals(0, score.hydration)
+        assertTrue(score.overall in 0..100)
+    }
+
+    @Test
+    fun over_goal_is_capped_at_hundred() {
+        val score = HealthCalculator.fiveDimensionScore(
+            caloriesIn = 2_000f, calorieTarget = 2_000,
+            steps = 40_000, stepGoal = 10_000,
+            sleepHours = 20f, sleepGoalHours = 8f,
+            waterMl = 9_000f, waterGoalMl = 2_500f,
+            habitChecks = 20, habitTarget = 4,
+        )
+        assertEquals(100, score.activity)
+        assertEquals(100, score.hydration)
+        assertEquals(100, score.consistency)
+        assertTrue(score.sleep <= 100)
+    }
+
+    @Test
+    fun bmr_and_tdee_are_positive_and_ordered() {
+        val bmr = HealthCalculator.bmr(62.4f, 178f, 26, true)
+        val tdee = HealthCalculator.tdee(bmr, 1.55f)
+        assertTrue(bmr > 1_000f)
+        assertTrue(tdee > bmr)
+    }
 }
