@@ -108,6 +108,7 @@ fun DietSportScreen(
     val dictionary by viewModel.dictionary.collectAsStateWithLifecycle()
     val query by viewModel.query.collectAsStateWithLifecycle()
     val palette = OmniTheme.palette
+    val mealTypeNow = viewModel.mealTypeForNow()
 
     var tab by remember { mutableIntStateOf(initialTab) }
     var pending by remember { mutableStateOf<FoodEntity?>(null) }
@@ -185,236 +186,39 @@ fun DietSportScreen(
         }
 
         if (page == 0) {
-            item { AppearOnScreen(0) { CalorieSummaryCard(diet) } }
-
-            item {
-                SearchBar(
-                    value = query,
-                    placeholder = stringResource(R.string.diet_search_hint),
-                    onValueChange = viewModel::onQueryChange,
-                )
-            }
-
-            if (page == 0) {
-                if (recentFoods.isNotEmpty()) {
-                    item {
-                        Column {
-                            Text(
-                                text = stringResource(R.string.recents_title),
-                                color = palette.textTertiary,
-                                fontSize = 10.sp,
-                                modifier = Modifier.padding(bottom = 6.dp),
-                            )
-                            LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                items(recentFoods, key = { "r-${it.foodId}" }) { recent ->
-                                    Text(
-                                        text = recent.foodName,
-                                        color = palette.textPrimary,
-                                        fontSize = 11.sp,
-                                        modifier = Modifier
-                                            .clip(RoundedCornerShape(9.dp))
-                                            .background(palette.cardFill)
-                                            .quietClick {
-                                                cardScope.launch {
-                                                    val food = viewModel.foodById(recent.foodId)
-                                                    if (food != null) {
-                                                        pendingGrams = recent.grams
-                                                        pending = food
-                                                    }
-                                                }
-                                            }
-                                            .padding(horizontal = 10.dp, vertical = 7.dp),
-                                    )
-                                }
-                            }
+            dietTabItems(
+                page = page,
+                diet = diet,
+                query = query,
+                results = results,
+                dictionary = dictionary,
+                recentFoods = recentFoods,
+                templates = templates,
+                mealTypeNow = mealTypeNow,
+                palette = palette,
+                cardContext = cardContext,
+                onQueryChange = viewModel::onQueryChange,
+                onPickFood = { pending = it },
+                onPickRecent = { recent ->
+                    cardScope.launch {
+                        val food = viewModel.foodById(recent.foodId)
+                        if (food != null) {
+                            pendingGrams = recent.grams
+                            pending = food
                         }
                     }
-                }
-                if (templates.isNotEmpty()) {
-                    item {
-                        Column {
-                            Text(
-                                text = stringResource(R.string.templates_title),
-                                color = palette.textTertiary,
-                                fontSize = 10.sp,
-                                modifier = Modifier.padding(bottom = 6.dp),
-                            )
-                            LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                items(templates, key = { "t-${it.id}" }) { template ->
-                                    Text(
-                                        text = template.name,
-                                        color = palette.textPrimary,
-                                        fontSize = 11.sp,
-                                        modifier = Modifier
-                                            .clip(RoundedCornerShape(9.dp))
-                                            .background(palette.accent.copy(alpha = 0.09f))
-                                            .quietClick {
-                                                viewModel.logTemplate(template, viewModel.mealTypeForNow()) { count ->
-                                                    android.widget.Toast.makeText(
-                                                        cardContext,
-                                                        cardContext.getString(R.string.copy_last_done, count),
-                                                        android.widget.Toast.LENGTH_SHORT,
-                                                    ).show()
-                                                }
-                                            }
-                                            .padding(horizontal = 10.dp, vertical = 7.dp),
-                                    )
-                                }
-                            }
-                        }
-                    }
-                }
-                item {
-                    Text(
-                        text = stringResource(R.string.copy_last_meal, mealLabel(viewModel.mealTypeForNow())),
-                        color = palette.accent,
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.Medium,
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(9.dp))
-                            .background(palette.accent.copy(alpha = 0.10f))
-                            .quietClick {
-                                viewModel.copyLastMeal(viewModel.mealTypeForNow()) { count ->
-                                    val message = if (count > 0) {
-                                        cardContext.getString(R.string.copy_last_done, count)
-                                    } else {
-                                        cardContext.getString(R.string.copy_last_empty)
-                                    }
-                                    android.widget.Toast.makeText(cardContext, message, android.widget.Toast.LENGTH_SHORT).show()
-                                }
-                            }
-                            .padding(horizontal = 12.dp, vertical = 8.dp),
-                    )
-                }
-                item {
-                    Text(
-                        text = stringResource(R.string.save_as_template),
-                        color = palette.textSecondary,
-                        fontSize = 11.sp,
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(9.dp))
-                            .background(palette.textPrimary.copy(alpha = 0.05f))
-                            .quietClick {
-                                viewModel.saveLastMealAsTemplate(viewModel.mealTypeForNow()) { ok ->
-                                    val message = if (ok) {
-                                        cardContext.getString(R.string.save_template_done)
-                                    } else {
-                                        cardContext.getString(R.string.copy_last_empty)
-                                    }
-                                    android.widget.Toast.makeText(cardContext, message, android.widget.Toast.LENGTH_SHORT).show()
-                                }
-                            }
-                            .padding(horizontal = 12.dp, vertical = 8.dp),
-                    )
-                }
-                item {
-                    Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                        ActionButton(
-                            text = stringResource(R.string.smart_meal_entry),
-                            modifier = Modifier.weight(1f),
-                        ) { smartOpen = true }
-                        ActionButton(
-                            text = stringResource(R.string.plan_entry),
-                            modifier = Modifier.weight(1f),
-                        ) {
-                            viewModel.generatePlans()
-                            planOpen = true
-                        }
-                    }
-                }
-            }
-
-            // 今日记录放在字典之前：录完能马上看到、马上改。
-            if (diet.logs.isNotEmpty()) {
-                item {
-                    SectionHeader(
-                        title = stringResource(R.string.diet_logged_title),
-                        subtitle = "${diet.calories} kcal",
-                    )
-                }
-                listOf(
-                    MealType.BREAKFAST to R.string.meal_breakfast,
-                    MealType.LUNCH to R.string.meal_lunch,
-                    MealType.DINNER to R.string.meal_dinner,
-                    MealType.SNACK to R.string.meal_snack,
-                ).forEach { (mealId, labelRes) ->
-                    val group = diet.logs.filter { it.mealType == mealId }
-                    item {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text(
-                                text = stringResource(labelRes),
-                                color = palette.textSecondary,
-                                fontSize = 11.sp,
-                                fontWeight = FontWeight.Medium,
-                                modifier = Modifier.weight(1f),
-                            )
-                            Text(
-                                text = if (group.isEmpty()) {
-                                    stringResource(R.string.meal_empty)
-                                } else {
-                                    "${group.sumOf { it.calories.toDouble() }.toInt()} kcal"
-                                },
-                                color = palette.textTertiary,
-                                fontSize = 10.sp,
-                            )
-                        }
-                    }
-                    items(group, key = { "l-${it.id}" }, contentType = { "log" }) { log ->
-                        Box(Modifier.animateItem()) {
-                            LogRow(
-                                log = log,
-                                onEdit = { editing = log },
-                                onDelete = { viewModel.deleteLog(log) },
-                            )
-                        }
-                    }
-                }
-            }
-
-            if (query.isNotBlank()) {
-                if (results.isEmpty()) {
-                    item {
-                        Column {
-                            Text(
-                                text = stringResource(R.string.diet_search_empty),
-                                color = palette.textTertiary,
-                                fontSize = 12.sp,
-                                modifier = Modifier.padding(top = 12.dp),
-                            )
-                            Text(
-                                text = stringResource(R.string.empty_describe_meal),
-                                color = palette.accent,
-                                fontSize = 12.sp,
-                                fontWeight = FontWeight.Medium,
-                                modifier = Modifier
-                                    .padding(top = 8.dp)
-                                    .clip(RoundedCornerShape(10.dp))
-                                    .background(palette.accent.copy(alpha = 0.10f))
-                                    .quietClick { smartOpen = true }
-                                    .padding(horizontal = 12.dp, vertical = 8.dp),
-                            )
-                        }
-                    }
-                } else {
-                    items(results, key = { "s-${it.id}" }, contentType = { "food" }) { food ->
-                        Box(Modifier.animateItem()) {
-                            FoodRow(food) { pending = food }
-                        }
-                    }
-                }
-            } else {
-                item {
-                    SectionHeader(
-                        title = stringResource(R.string.diet_dict_title),
-                        subtitle = stringResource(R.string.diet_dict_sub, dictionary.size),
-                    )
-                }
-                items(dictionary.take(40), key = { "d-${it.id}" }, contentType = { "food" }) { food ->
-                    Box(Modifier.animateItem()) {
-                        FoodRow(food) { pending = food }
-                    }
-                }
-            }
+                },
+                onLogTemplate = { template, done -> viewModel.logTemplate(template, mealTypeNow, done) },
+                onCopyMeal = { done -> viewModel.copyLastMeal(mealTypeNow, done) },
+                onSaveTemplate = { done -> viewModel.saveLastMealAsTemplate(mealTypeNow, done) },
+                onOpenSmart = { smartOpen = true },
+                onOpenPlan = {
+                    viewModel.generatePlans()
+                    planOpen = true
+                },
+                onEdit = { editing = it },
+                onDelete = { viewModel.deleteLog(it) },
+            )
         } else {
             item {
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
