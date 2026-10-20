@@ -6,6 +6,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
@@ -64,6 +65,9 @@ data class AppSettings(
     val sleepGoalMin: Int = 480,
     val calorieGoal: Int = 2_000,
     val waterReminder: Boolean = false,
+    val waterStartHour: Int = 8,
+    val waterEndHour: Int = 22,
+    val waterIntervalHours: Int = 2,
     val sleepReminder: Boolean = false,
     val onboarded: Boolean = false,
 )
@@ -97,6 +101,9 @@ class SettingsPreferences(private val context: Context) {
         val calorieGoal = intPreferencesKey("goal_calories")
         val onboarded = booleanPreferencesKey("onboarded")
         val waterReminder = booleanPreferencesKey("reminder_water")
+        val waterStart = intPreferencesKey("water_start_hour")
+        val waterEnd = intPreferencesKey("water_end_hour")
+        val waterInterval = intPreferencesKey("water_interval_hours")
         val sleepReminder = booleanPreferencesKey("reminder_sleep")
     }
 
@@ -129,6 +136,9 @@ class SettingsPreferences(private val context: Context) {
             sleepGoalMin = p[Keys.sleepGoal] ?: 480,
             calorieGoal = p[Keys.calorieGoal] ?: 2_000,
             waterReminder = p[Keys.waterReminder] ?: false,
+            waterStartHour = p[Keys.waterStart] ?: 8,
+            waterEndHour = p[Keys.waterEnd] ?: 22,
+            waterIntervalHours = p[Keys.waterInterval] ?: 2,
             sleepReminder = p[Keys.sleepReminder] ?: false,
             onboarded = p[Keys.onboarded] ?: false,
         )
@@ -178,4 +188,12 @@ class SettingsPreferences(private val context: Context) {
 
     suspend fun setSleepReminder(enabled: Boolean) =
         context.omniDataStore.edit { it[Keys.sleepReminder] = enabled }
+
+    /** 饮水提醒时段与间隔；时段外的触发由 Worker 跳过。 */
+    suspend fun setWaterWindow(startHour: Int, endHour: Int, intervalHours: Int) =
+        context.omniDataStore.edit {
+            it[Keys.waterStart] = startHour.coerceIn(0, 23)
+            it[Keys.waterEnd] = endHour.coerceIn(1, 24)
+            it[Keys.waterInterval] = intervalHours.coerceIn(1, 6)
+        }
 }

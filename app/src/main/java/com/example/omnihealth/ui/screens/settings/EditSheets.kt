@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -44,6 +45,7 @@ import com.example.omnihealth.ui.components.AppPrimaryButton
 import com.example.omnihealth.ui.i18n.LocalAppLanguage
 import com.example.omnihealth.ui.i18n.LocalizedApp
 import com.example.omnihealth.ui.theme.OmniTheme
+import com.example.omnihealth.ui.theme.quietClick
 import com.example.omnihealth.ui.theme.bounceClick
 import java.util.Locale
 
@@ -443,9 +445,13 @@ private fun PrimaryButton(label: String, onClick: () -> Unit) {
 fun RemindersSheet(
     water: Boolean,
     sleep: Boolean,
+    startHour: Int,
+    endHour: Int,
+    intervalHours: Int,
     onDismiss: () -> Unit,
     onWaterChange: (Boolean) -> Unit,
     onSleepChange: (Boolean) -> Unit,
+    onWindowChange: (Int, Int, Int) -> Unit,
 ) {
     val palette = OmniTheme.palette
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -476,6 +482,39 @@ fun RemindersSheet(
                     checked = water,
                     onCheckedChange = onWaterChange,
                 )
+
+                if (water) {
+                    WindowStepper(
+                        label = stringResource(R.string.reminder_window_start),
+                        value = String.format(java.util.Locale.US, "%02d:00", startHour),
+                        onMinus = {
+                            onWindowChange(startHour - 1.coerceAtLeast(0).coerceAtMost(endHour - 1), endHour, intervalHours)
+                        },
+                        onPlus = {
+                            onWindowChange((startHour + 1).coerceAtMost(endHour - 1), endHour, intervalHours)
+                        },
+                    )
+                    WindowStepper(
+                        label = stringResource(R.string.reminder_window_end),
+                        value = String.format(java.util.Locale.US, "%02d:00", endHour),
+                        onMinus = {
+                            onWindowChange(startHour, (endHour - 1).coerceAtLeast(startHour + 1), intervalHours)
+                        },
+                        onPlus = {
+                            onWindowChange(startHour, (endHour + 1).coerceAtMost(24), intervalHours)
+                        },
+                    )
+                    WindowStepper(
+                        label = stringResource(R.string.reminder_window_interval),
+                        value = stringResource(R.string.reminder_hours, intervalHours),
+                        onMinus = {
+                            onWindowChange(startHour, endHour, (intervalHours - 1).coerceAtLeast(1))
+                        },
+                        onPlus = {
+                            onWindowChange(startHour, endHour, (intervalHours + 1).coerceAtMost(6))
+                        },
+                    )
+                }
                 ReminderRow(
                     title = stringResource(R.string.reminder_sleep),
                     desc = stringResource(R.string.reminder_sleep_desc),
@@ -581,5 +620,53 @@ fun AboutSheet(
                 )
             }
         }
+    }
+}
+
+/** 提醒时段步进条：标签 + 当前值 + 减/加。 */
+@Composable
+private fun WindowStepper(
+    label: String,
+    value: String,
+    onMinus: () -> Unit,
+    onPlus: () -> Unit,
+) {
+    val palette = OmniTheme.palette
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 4.dp, vertical = 6.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            text = label,
+            color = palette.textSecondary,
+            fontSize = 12.sp,
+            modifier = Modifier.weight(1f),
+        )
+        StepperButton("−", onMinus)
+        Text(
+            text = value,
+            color = palette.textPrimary,
+            fontSize = 12.sp,
+            fontWeight = FontWeight.Medium,
+            modifier = Modifier.padding(horizontal = 12.dp),
+        )
+        StepperButton("+", onPlus)
+    }
+}
+
+@Composable
+private fun StepperButton(label: String, onClick: () -> Unit) {
+    val palette = OmniTheme.palette
+    Box(
+        Modifier
+            .size(26.dp)
+            .clip(RoundedCornerShape(8.dp))
+            .background(palette.textPrimary.copy(alpha = 0.06f))
+            .quietClick(onClick = onClick),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(label, color = palette.textSecondary, fontSize = 13.sp)
     }
 }

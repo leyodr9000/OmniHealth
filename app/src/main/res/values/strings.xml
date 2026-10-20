@@ -277,4 +277,8 @@
     <string name="dark_system">System</string>
     <string name="dark_light">Light</string>
     <string name="dark_dark">Dark</string>
+    <string name="reminder_window_start">Start</string>
+    <string name="reminder_window_end">End</string>
+    <string name="reminder_window_interval">Every</string>
+    <string name="reminder_hours">%1$d h</string>
 </resources>

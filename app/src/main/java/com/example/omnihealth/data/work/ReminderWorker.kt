@@ -13,6 +13,7 @@ import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
+import kotlinx.coroutines.flow.first
 import com.example.omnihealth.R
 import java.time.Duration
 import java.time.LocalDateTime
@@ -29,8 +30,20 @@ class ReminderWorker(
 
     override suspend fun doWork(): Result {
         val kind = inputData.getString(KEY_KIND) ?: KIND_WATER
+        if (kind == KIND_WATER && !insideWaterWindow()) {
+            // 静默跳过：不在用户设定的时段内，不打扰。
+            return Result.success()
+        }
         notify(applicationContext, kind)
         return Result.success()
+    }
+
+    private suspend fun insideWaterWindow(): Boolean {
+        val settings = runCatching {
+            com.example.omnihealth.data.datastore.SettingsPreferences(applicationContext)
+                .settings.first()
+        }.getOrNull() ?: return true
+        return LocalTime.now().hour in settings.waterStartHour until settings.waterEndHour
     }
 
     private fun notify(context: Context, kind: String) {
@@ -87,14 +100,33 @@ object ReminderScheduler {
     private const val WATER_WORK = "reminder_water"
     private const val SLEEP_WORK = "reminder_sleep"
 
-    fun setWaterReminder(context: Context, enabled: Boolean) {
+    /**
+     * 饮水提醒：按用户设定的时段与间隔调度。
+     *
+     * 首个提醒对齐到时段起点（若当前已在时段内则等一个间隔），
+     * 时段之外的触发由 Worker 自行跳过。
+     */
+    fun setWaterReminder(
+        context: Context,
+        enabled: Boolean,
+        startHour: Int = 8,
+        endHour: Int = 22,
+        intervalHours: Int = 2,
+    ) {
         val manager = WorkManager.getInstance(context)
         if (!enabled) {
             manager.cancelUniqueWork(WATER_WORK)
             return
         }
-        val request = PeriodicWorkRequestBuilder<ReminderWorker>(2, TimeUnit.HOURS)
-            .setInitialDelay(2, TimeUnit.HOURS)
+        val now = LocalDateTime.now()
+        val inWindow = now.hour in startHour until endHour
+        val delay = if (inWindow) {
+            Duration.ofHours(intervalHours.toLong()).toMillis()
+        } else {
+            millisUntil(LocalTime.of(startHour.coerceIn(0, 23), 0))
+        }
+        val request = PeriodicWorkRequestBuilder<ReminderWorker>(intervalHours.toLong(), TimeUnit.HOURS)
+            .setInitialDelay(delay, TimeUnit.MILLISECONDS)
             .setInputData(androidx.work.workDataOf(ReminderWorker.KEY_KIND to ReminderWorker.KIND_WATER))
             .build()
         manager.enqueueUniquePeriodicWork(WATER_WORK, ExistingPeriodicWorkPolicy.UPDATE, request)

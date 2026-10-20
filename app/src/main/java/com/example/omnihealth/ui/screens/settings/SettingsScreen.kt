@@ -412,16 +412,37 @@ fun SettingsScreen(
         SettingsSheet.REMINDERS -> RemindersSheet(
             water = settings.waterReminder,
             sleep = settings.sleepReminder,
+            startHour = settings.waterStartHour,
+            endHour = settings.waterEndHour,
+            intervalHours = settings.waterIntervalHours,
             onDismiss = { sheet = SettingsSheet.NONE },
             onWaterChange = { enabled ->
                 ensureNotificationPermission()
                 scope.launch { repository.setWaterReminder(enabled) }
-                ReminderScheduler.setWaterReminder(context, enabled)
+                ReminderScheduler.setWaterReminder(
+                    context = context,
+                    enabled = enabled,
+                    startHour = settings.waterStartHour,
+                    endHour = settings.waterEndHour,
+                    intervalHours = settings.waterIntervalHours,
+                )
             },
             onSleepChange = { enabled ->
                 ensureNotificationPermission()
                 scope.launch { repository.setSleepReminder(enabled) }
                 ReminderScheduler.setSleepReminder(context, enabled)
+            },
+            onWindowChange = { start, end, interval ->
+                scope.launch {
+                    repository.setWaterWindow(start, end, interval)
+                    ReminderScheduler.setWaterReminder(
+                        context = context,
+                        enabled = settings.waterReminder,
+                        startHour = start,
+                        endHour = end,
+                        intervalHours = interval,
+                    )
+                }
             },
         )
 

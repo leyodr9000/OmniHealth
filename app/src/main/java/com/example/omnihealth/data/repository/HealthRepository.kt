@@ -373,6 +373,9 @@ class HealthRepository(
 
     suspend fun setWaterReminder(enabled: Boolean) = preferences.setWaterReminder(enabled)
 
+    suspend fun setWaterWindow(startHour: Int, endHour: Int, intervalHours: Int) =
+        preferences.setWaterWindow(startHour, endHour, intervalHours)
+
     suspend fun setSleepReminder(enabled: Boolean) = preferences.setSleepReminder(enabled)
 
     /** 导出全部记录为 CSV，返回文件路径。 */

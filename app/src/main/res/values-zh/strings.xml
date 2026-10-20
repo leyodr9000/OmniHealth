@@ -277,4 +277,8 @@
     <string name="dark_system">跟随系统</string>
     <string name="dark_light">浅色</string>
     <string name="dark_dark">深色</string>
+    <string name="reminder_window_start">开始</string>
+    <string name="reminder_window_end">结束</string>
+    <string name="reminder_window_interval">间隔</string>
+    <string name="reminder_hours">%1$d 小时</string>
 </resources>
