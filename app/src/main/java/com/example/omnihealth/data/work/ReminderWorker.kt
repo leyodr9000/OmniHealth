@@ -57,10 +57,14 @@ class ReminderWorker(
         val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         ensureChannel(manager)
 
+        // 文案走资源，跟随应用语言（英文用户不该收到中文通知）
         val (title, text) = when (kind) {
-            KIND_SLEEP -> "该准备睡觉了" to "距离目标睡眠还差一点，放下手机，给自己留 40 分钟缓冲。"
-            KIND_MEAL_LOG -> "今天记全了吗" to "花一分钟补一下今天的餐食，明天的趋势才有依据。"
-            else -> "该喝水了" to "起身活动一下，补充 200–300 ml 水。"
+            KIND_SLEEP -> context.getString(R.string.reminder_sleep_notif_title) to
+                context.getString(R.string.reminder_sleep_notif_body)
+            KIND_MEAL_LOG -> context.getString(R.string.reminder_meal_notif_title) to
+                context.getString(R.string.reminder_meal_notif_body)
+            else -> context.getString(R.string.reminder_water_notif_title) to
+                context.getString(R.string.reminder_water_notif_body)
         }
 
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)

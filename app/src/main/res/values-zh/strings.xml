@@ -333,4 +333,10 @@
     <string name="empty_describe_meal">或者直接用一句话描述这一餐</string>
     <string name="write_failed">保存失败，输入已保留</string>
     <string name="dismiss">知道了</string>
+    <string name="reminder_water_notif_title">该喝水了</string>
+    <string name="reminder_water_notif_body">起身活动一下，补充 200–300 ml 水。</string>
+    <string name="reminder_sleep_notif_title">该准备睡觉了</string>
+    <string name="reminder_sleep_notif_body">距离目标睡眠还差一点，放下手机，给自己留 40 分钟缓冲。</string>
+    <string name="reminder_meal_notif_title">今天记全了吗</string>
+    <string name="reminder_meal_notif_body">花一分钟补一下今天的餐食，明天的趋势才有依据。</string>
 </resources>

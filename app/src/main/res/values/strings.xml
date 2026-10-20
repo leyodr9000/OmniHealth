@@ -333,4 +333,10 @@
     <string name="empty_describe_meal">Or describe the meal in one sentence</string>
     <string name="write_failed">Could not save — your entry was kept</string>
     <string name="dismiss">Dismiss</string>
+    <string name="reminder_water_notif_title">Time for water</string>
+    <string name="reminder_water_notif_body">Stand up and drink 200–300 ml.</string>
+    <string name="reminder_sleep_notif_title">Time to wind down</string>
+    <string name="reminder_sleep_notif_body">Save 40 minutes of buffer before bed.</string>
+    <string name="reminder_meal_notif_title">Did you log today?</string>
+    <string name="reminder_meal_notif_body">One minute to fill in today\'s meals keeps tomorrow\'s trend honest.</string>
 </resources>
