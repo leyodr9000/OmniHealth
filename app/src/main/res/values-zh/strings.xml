@@ -291,4 +291,13 @@
     <string name="ai_insecure_endpoint">接口地址不是 HTTPS，已阻止云端调用，改用本地分析。</string>
     <string name="reminder_sleep_hour">小时</string>
     <string name="reminder_sleep_minute">分钟</string>
+    <string name="smart_meal_entry">描述这一餐</string>
+    <string name="smart_meal_title">描述这一餐</string>
+    <string name="smart_meal_hint">食物只在本地字典里匹配；营养值按字典资料换算，不由模型编造。</string>
+    <string name="smart_meal_placeholder">例如：一碗米饭、两个鸡蛋、一杯无糖豆浆</string>
+    <string name="smart_meal_parse">识别</string>
+    <string name="smart_meal_unmatched">未匹配到食物，请调整描述</string>
+    <string name="smart_meal_save">保存 %1$d 条</string>
+    <string name="settings_section_ai">智能服务</string>
+    <string name="ai_assistant_entry">AI 助手</string>
 </resources>

@@ -291,4 +291,13 @@
     <string name="ai_insecure_endpoint">Custom endpoint is not HTTPS - cloud calls are blocked, showing local analysis instead.</string>
     <string name="reminder_sleep_hour">Hour</string>
     <string name="reminder_sleep_minute">Minute</string>
+    <string name="smart_meal_entry">Describe a meal</string>
+    <string name="smart_meal_title">Describe this meal</string>
+    <string name="smart_meal_hint">Foods are matched against the local dictionary; nutrition is computed from those records, not guessed.</string>
+    <string name="smart_meal_placeholder">e.g. a bowl of rice, two eggs, a cup of soy milk</string>
+    <string name="smart_meal_parse">Recognize</string>
+    <string name="smart_meal_unmatched">No match — adjust the wording</string>
+    <string name="smart_meal_save">Save %1$d items</string>
+    <string name="settings_section_ai">AI</string>
+    <string name="ai_assistant_entry">AI assistant</string>
 </resources>

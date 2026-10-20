@@ -95,6 +95,7 @@ fun SettingsScreen(
     onFrameworkChange: (UiFramework) -> Unit,
     onReduceMotionChange: (Boolean) -> Unit,
     onDarkModeChange: (String) -> Unit,
+    onOpenAi: () -> Unit,
 ) {
     val palette = OmniTheme.palette
     val repository = LocalHealthRepository.current
@@ -244,6 +245,21 @@ fun SettingsScreen(
                         settings.api.model
                     },
                     onClick = { sheet = SettingsSheet.API },
+                )
+            }
+        }
+
+        item {
+            SettingsGroup(title = stringResource(R.string.settings_section_ai)) {
+                SettingItem(
+                    icon = Icons.Rounded.AutoAwesome,
+                    title = stringResource(R.string.ai_assistant_entry),
+                    value = if (settings.api.apiKey.isBlank()) {
+                        stringResource(R.string.ai_provider_offline)
+                    } else {
+                        settings.api.model
+                    },
+                    onClick = onOpenAi,
                 )
             }
         }

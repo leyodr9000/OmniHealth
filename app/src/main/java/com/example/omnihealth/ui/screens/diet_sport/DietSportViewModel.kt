@@ -11,6 +11,7 @@ import com.example.omnihealth.data.local.entity.MealType
 import com.example.omnihealth.data.local.entity.WorkoutEntity
 import com.example.omnihealth.data.repository.HealthRepository
 import com.example.omnihealth.domain.util.HealthCalculator
+import com.example.omnihealth.domain.util.MealParser
 import com.example.omnihealth.domain.util.TimeUtils
 import com.example.omnihealth.domain.util.StepSensorManager
 import kotlinx.coroutines.FlowPreview
@@ -19,6 +20,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
@@ -160,6 +162,49 @@ class DietSportViewModel(
     /** 编辑已有记录：只改克数与餐次，日期与时间保持不变。 */
     fun updateLog(log: DietLogEntity, grams: Float, mealType: String) {
         viewModelScope.launch { repository.updateDietLog(log, grams, mealType) }
+    }
+
+    /* ---------------- 一句话记餐 ---------------- */
+
+    private val _drafts = MutableStateFlow<List<MealParser.Draft>>(emptyList())
+    val drafts: StateFlow<List<MealParser.Draft>> = _drafts
+
+    /** 只做识别与匹配；营养值由 UI 用食物资料换算，解析器不产生数字。 */
+    fun parseMeal(text: String) {
+        if (text.isBlank()) {
+            _drafts.value = emptyList()
+            return
+        }
+        viewModelScope.launch {
+            val foods = repository.allFoods().first()
+            _drafts.value = MealParser.parse(text, foods)
+        }
+    }
+
+    fun updateDraftGrams(index: Int, grams: Float) {
+        _drafts.value = _drafts.value.mapIndexed { i, draft ->
+            if (i == index) draft.copy(grams = grams.coerceIn(1f, 2000f)) else draft
+        }
+    }
+
+    fun removeDraft(index: Int) {
+        _drafts.value = _drafts.value.filterIndexed { i, _ -> i != index }
+    }
+
+    fun clearDrafts() {
+        _drafts.value = emptyList()
+    }
+
+    /** 仅保存已匹配且份量已确认的条目；未匹配项不写入。 */
+    fun saveDrafts(mealType: String, epochDay: Long = _selectedDay.value) {
+        val ready = _drafts.value.filter { it.food != null && it.grams != null }
+        if (ready.isEmpty()) return
+        viewModelScope.launch {
+            ready.forEach { draft ->
+                repository.logFood(draft.food!!, draft.grams!!, mealType, epochDay)
+            }
+            _drafts.value = emptyList()
+        }
     }
 
     private val _pendingUndo = MutableStateFlow<DietLogEntity?>(null)

@@ -109,6 +109,8 @@ fun DietSportScreen(
     ) { viewModel.refreshSensorPermission() }
 
     val pendingUndo by viewModel.pendingUndo.collectAsStateWithLifecycle()
+    val drafts by viewModel.drafts.collectAsStateWithLifecycle()
+    var smartOpen by remember { mutableStateOf(false) }
 
     Box(Modifier.fillMaxSize()) {
     LazyColumn(
@@ -168,6 +170,15 @@ fun DietSportScreen(
                     placeholder = stringResource(R.string.diet_search_hint),
                     onValueChange = viewModel::onQueryChange,
                 )
+            }
+
+            if (tab == 0) {
+                item {
+                    ActionButton(
+                        text = stringResource(R.string.smart_meal_entry),
+                        modifier = Modifier.fillMaxWidth(),
+                    ) { smartOpen = true }
+                }
             }
 
             // 今日记录放在字典之前：录完能马上看到、马上改。
@@ -306,6 +317,24 @@ fun DietSportScreen(
                 .padding(horizontal = 18.dp, vertical = 12.dp),
         )
     }
+    }
+
+    if (smartOpen) {
+        SmartMealSheet(
+            drafts = drafts,
+            onTextChange = {},
+            onParse = { viewModel.parseMeal(it) },
+            onGramsChange = { index, grams -> viewModel.updateDraftGrams(index, grams) },
+            onRemove = { index -> viewModel.removeDraft(index) },
+            onSave = { meal ->
+                viewModel.saveDrafts(meal)
+                smartOpen = false
+            },
+            onDismiss = {
+                viewModel.clearDrafts()
+                smartOpen = false
+            },
+        )
     }
 
     editing?.let { log ->

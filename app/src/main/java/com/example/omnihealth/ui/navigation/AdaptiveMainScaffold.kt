@@ -71,9 +71,9 @@ enum class OmniDest(
 
     companion object {
         fun itemsFor(layout: NavLayoutMode): List<OmniDest> = when (layout) {
-            NavLayoutMode.A_FAB -> listOf(Home, Diet, Stats, Ai)
-            NavLayoutMode.B_FIVE -> listOf(Home, Diet, Stats, Ai, Settings)
-            NavLayoutMode.C_BENTO -> listOf(Home, Stats, Settings)
+            NavLayoutMode.A_FAB -> listOf(Home, Diet, Stats, Settings)
+            NavLayoutMode.B_FIVE -> listOf(Home, Diet, Stats, Settings)
+            NavLayoutMode.C_BENTO -> listOf(Home, Diet, Stats, Settings)
         }
 
         fun fromRoute(route: String?): OmniDest? = entries.firstOrNull { it.route == route }

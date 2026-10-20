@@ -178,6 +178,7 @@ fun OmniApp(
                         onLanguageChange = onLanguageChange,
                         onFrameworkChange = onFrameworkChange,
                         onDarkModeChange = onDarkModeChange,
+                        onOpenAi = { navController.navigateSingleTop(OmniDest.Ai) },
                         reduceMotion = reduceMotion,
                         onReduceMotionChange = onReduceMotionChange,
                     )
