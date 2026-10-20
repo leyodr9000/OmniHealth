@@ -1,7 +1,8 @@
-package com.example.omnihealth.domain.util
+package com.example.omnihealth.data.sensor
 
 import android.Manifest
 import android.content.Context
+import com.example.omnihealth.domain.util.TimeUtils
 import android.content.pm.PackageManager
 import android.hardware.Sensor
 import android.hardware.SensorEvent

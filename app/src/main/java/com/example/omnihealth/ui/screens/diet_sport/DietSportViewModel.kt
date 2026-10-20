@@ -14,7 +14,7 @@ import com.example.omnihealth.domain.util.HealthCalculator
 import com.example.omnihealth.domain.util.MealParser
 import com.example.omnihealth.domain.util.MealPlanner
 import com.example.omnihealth.domain.util.TimeUtils
-import com.example.omnihealth.domain.util.StepSensorManager
+import com.example.omnihealth.data.sensor.StepSensorManager
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
