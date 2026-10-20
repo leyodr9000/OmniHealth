@@ -25,6 +25,18 @@ object TimeUtils {
 
     fun localDate(epochDay: Long): LocalDate = LocalDate.ofEpochDay(epochDay)
 
+    /**
+     * 按记录当时的时区偏移还原「本地日期」。
+     *
+     * 用户出差/跨时区后，历史记录应停留在它被写下时的那一天，
+     * 而不是按今天的时区重新归属。偏移为 0 视为「未记录」，退回当前时区。
+     */
+    fun epochDayAtOffset(timestamp: Long, tzOffsetMinutes: Int): Long {
+        if (tzOffsetMinutes == 0) return epochDayOf(timestamp)
+        val zone = java.time.ZoneOffset.ofTotalSeconds(tzOffsetMinutes * 60)
+        return Instant.ofEpochMilli(timestamp).atZone(zone).toLocalDate().toEpochDay()
+    }
+
     /** 某天的中午（本地时区）：用于「归属某天」但不关心具体时刻的记录。 */
     fun noonOfDayMillis(epochDay: Long): Long =
         LocalDate.ofEpochDay(epochDay).atTime(12, 0).atZone(zone).toInstant().toEpochMilli()

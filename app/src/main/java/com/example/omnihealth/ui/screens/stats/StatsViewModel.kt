@@ -91,12 +91,12 @@ class StatsViewModel(private val repository: HealthRepository) : ViewModel() {
         val labelFormatter = DateTimeFormatter.ofPattern("M/d", Locale.getDefault())
 
         val stepsByDay = stepRows.associateBy { it.epochDay }
-        val sleepByDay = sleepRows.groupBy { TimeUtils.epochDayOf(it.recordedAt) }
+        val sleepByDay = sleepRows.groupBy { TimeUtils.epochDayAtOffset(it.recordedAt, it.tzOffsetMinutes) }
             .mapValues { (_, list) -> list.sumOf { it.value.toDouble() }.toFloat() }
         val dietByDay = dietRows.groupBy { it.epochDay }
             .mapValues { (_, list) -> list.sumOf { it.calories.toDouble() }.toInt() }
         val weightByDay = weightRows
-            .groupBy { TimeUtils.epochDayOf(it.recordedAt) }
+            .groupBy { TimeUtils.epochDayAtOffset(it.recordedAt, it.tzOffsetMinutes) }
             .mapValues { (_, list) -> list.maxByOrNull { it.recordedAt }?.value ?: 0f }
 
         var lastWeight = weightByDay.values.lastOrNull() ?: core.settings.profile.weightKg
@@ -162,7 +162,7 @@ class StatsViewModel(private val repository: HealthRepository) : ViewModel() {
                 dietDays = dietRows.filter { it.epochDay in days }.map { it.epochDay }.distinct().size,
                 breakfastDays = dietRows.filter { it.epochDay in days && it.mealType == "BREAKFAST" }
                     .map { it.epochDay }.distinct().size,
-                sleepDays = sleepRows.map { TimeUtils.epochDayOf(it.recordedAt) }.distinct()
+                sleepDays = sleepRows.map { TimeUtils.epochDayAtOffset(it.recordedAt, it.tzOffsetMinutes) }.distinct()
                     .count { it in days },
                 stepDays = stepRows.count { it.epochDay in days },
             ),
