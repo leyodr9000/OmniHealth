@@ -288,4 +288,5 @@
     <string name="ai_disclosure_body">将把最近 7 天的摘要（步数、睡眠、摄入、目标）发送到 %1$s，不含姓名与原始记录。删除 API Key 即可关闭。</string>
     <string name="ai_disclosure_ok">同意并继续</string>
     <string name="ai_disclosure_cancel">暂不</string>
+    <string name="ai_insecure_endpoint">接口地址不是 HTTPS，已阻止云端调用，改用本地分析。</string>
 </resources>

@@ -164,6 +164,16 @@ fun AiAdvisorScreen() {
                 }
             }
 
+            if (state.error == "insecure_endpoint") {
+                item {
+                    Text(
+                        text = stringResource(R.string.ai_insecure_endpoint),
+                        color = palette.warning,
+                        fontSize = 11.sp,
+                        modifier = Modifier.padding(horizontal = 2.dp, vertical = 4.dp),
+                    )
+                }
+            }
             if (state.report.isNotBlank()) {
                 item {
                     GlassCard(Modifier.fillMaxWidth()) {

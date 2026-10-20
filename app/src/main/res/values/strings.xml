@@ -288,4 +288,5 @@
     <string name="ai_disclosure_body">Your last 7 days summary (steps, sleep, intake, goals) will be sent to %1$s. No name, no raw records. You can turn this off by removing the API key.</string>
     <string name="ai_disclosure_ok">Agree and continue</string>
     <string name="ai_disclosure_cancel">Not now</string>
+    <string name="ai_insecure_endpoint">Custom endpoint is not HTTPS - cloud calls are blocked, showing local analysis instead.</string>
 </resources>

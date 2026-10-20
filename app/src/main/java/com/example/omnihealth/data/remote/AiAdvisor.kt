@@ -13,6 +13,10 @@ class AiAdvisor {
         if (config.apiKey.isBlank()) {
             return AiAnswer(text = offline, offline = true)
         }
+        // 非 HTTPS 的公网地址直接拒绝：健康摘要不能明文外发。
+        if (!AiEndpoint.isUsable(config.baseUrl)) {
+            return AiAnswer(text = offline, offline = true, error = "insecure_endpoint")
+        }
         return runCatching {
             val service = AiClientFactory.create(config.baseUrl, config.apiKey)
             val system = if (context.useChinese) {
@@ -50,6 +54,10 @@ class AiAdvisor {
         val offline = OfflineAiEngine.answer(question, context)
         if (config.apiKey.isBlank()) {
             return AiAnswer(text = offline, offline = true)
+        }
+        // 非 HTTPS 的公网地址直接拒绝：健康摘要不能明文外发。
+        if (!AiEndpoint.isUsable(config.baseUrl)) {
+            return AiAnswer(text = offline, offline = true, error = "insecure_endpoint")
         }
         return runCatching {
             val service = AiClientFactory.create(config.baseUrl, config.apiKey)
