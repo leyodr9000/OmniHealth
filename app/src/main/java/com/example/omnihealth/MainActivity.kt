@@ -13,6 +13,7 @@ import androidx.compose.runtime.remember
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.omnihealth.data.datastore.AppSettings
 import com.example.omnihealth.ui.OmniApp
+import com.example.omnihealth.ui.components.DatabaseErrorScreen
 import com.example.omnihealth.ui.di.LocalHealthRepository
 import com.example.omnihealth.ui.i18n.AppLanguage
 import com.example.omnihealth.ui.i18n.LocalizedApp
@@ -29,9 +30,20 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        val repository = (application as OmniHealthApp).repository
+        val app = application as OmniHealthApp
+        val repository = app.repository
 
         setContent {
+            if (repository == null) {
+                DatabaseErrorScreen(
+                    cause = app.databaseError?.message ?: "unknown",
+                    onRetry = {
+                        app.databaseError = null
+                        recreate()
+                    },
+                )
+                return@setContent
+            }
             val settings by repository.settings.collectAsStateWithLifecycle(initialValue = AppSettings())
             val themeMode = remember(settings.themeId) { ThemeMode.from(settings.themeId) }
             val layoutMode = remember(settings.layoutId) { NavLayoutMode.from(settings.layoutId) }

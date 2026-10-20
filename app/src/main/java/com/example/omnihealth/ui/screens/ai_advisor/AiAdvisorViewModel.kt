@@ -34,6 +34,8 @@ data class AiUiState(
     val reportGeneratedAt: Long = 0L,
     val reportCoverageDays: Int = 7,
     val reportGaps: List<String> = emptyList(),
+    val needsDisclosure: Boolean = false,
+    val disclosureTarget: String = "",
     val error: String? = null,
 )
 
@@ -57,10 +59,34 @@ class AiAdvisorViewModel(private val repository: HealthRepository) : ViewModel()
         }
     }
 
+    /** 首次使用在线 AI 前，先告知会发送什么、发到哪里。 */
+    private suspend fun gateCloud(): Boolean {
+        val settings = repository.settings.first()
+        if (!_state.value.hasApiKey) return true
+        if (settings.aiDisclosureAccepted) return true
+        _state.update { it.copy(needsDisclosure = true, disclosureTarget = settings.api.baseUrl) }
+        return false
+    }
+
+    fun acceptDisclosure(onAccepted: () -> Unit) {
+        viewModelScope.launch {
+            repository.acceptAiDisclosure()
+            _state.update { it.copy(needsDisclosure = false) }
+            onAccepted()
+        }
+    }
+
+    fun dismissDisclosure() {
+        _state.update { it.copy(needsDisclosure = false) }
+    }
     fun generateReport(useChinese: Boolean) {
         if (_state.value.loadingReport) return
         _state.update { it.copy(loadingReport = true, error = null) }
         viewModelScope.launch {
+            if (!gateCloud()) {
+                _state.update { it.copy(loadingReport = false) }
+                return@launch
+            }
             val answer = runCatching { repository.generateWeeklyReport(useChinese) }.getOrNull()
             val context = runCatching { repository.healthContext(useChinese) }.getOrNull()
             _state.update {

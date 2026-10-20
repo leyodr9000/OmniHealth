@@ -281,4 +281,11 @@
     <string name="reminder_window_end">End</string>
     <string name="reminder_window_interval">Every</string>
     <string name="reminder_hours">%1$d h</string>
+    <string name="db_error_title">Local data could not be opened</string>
+    <string name="db_error_body">Your records are still on the device. Nothing was deleted. Try again, or export a backup from a previous build before reinstalling.</string>
+    <string name="db_error_retry">Try again</string>
+    <string name="ai_disclosure_title">Send summary to the AI service?</string>
+    <string name="ai_disclosure_body">Your last 7 days summary (steps, sleep, intake, goals) will be sent to %1$s. No name, no raw records. You can turn this off by removing the API key.</string>
+    <string name="ai_disclosure_ok">Agree and continue</string>
+    <string name="ai_disclosure_cancel">Not now</string>
 </resources>

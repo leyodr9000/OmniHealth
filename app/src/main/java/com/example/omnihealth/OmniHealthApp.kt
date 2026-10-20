@@ -20,11 +20,23 @@ class OmniHealthApp : Application(), Configuration.Provider {
 
     val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
-    val database: AppDatabase by lazy { AppDatabase.build(this, applicationScope) }
+    /** 数据库打开失败时记录原因；UI 据此给出可操作提示，而不是闪退。 */
+    var databaseError: Throwable? = null
+
+    val database: AppDatabase? by lazy {
+        runCatching { AppDatabase.build(this, applicationScope) }
+            .onFailure {
+                databaseError = it
+                Log.e("OmniHealth", "database open failed", it)
+            }
+            .getOrNull()
+    }
 
     val preferences: SettingsPreferences by lazy { SettingsPreferences(this) }
 
-    val repository: HealthRepository by lazy { HealthRepository(database, preferences) }
+    val repository: HealthRepository? by lazy {
+        database?.let { HealthRepository(it, preferences) }
+    }
 
     override val workManagerConfiguration: Configuration
         get() = Configuration.Builder()

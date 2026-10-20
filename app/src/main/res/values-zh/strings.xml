@@ -281,4 +281,11 @@
     <string name="reminder_window_end">结束</string>
     <string name="reminder_window_interval">间隔</string>
     <string name="reminder_hours">%1$d 小时</string>
+    <string name="db_error_title">本地数据打不开</string>
+    <string name="db_error_body">记录仍在设备上，没有被删除。可以重试；若仍失败，请先用旧版本导出一份备份再重装。</string>
+    <string name="db_error_retry">重试</string>
+    <string name="ai_disclosure_title">把摘要发送给 AI 服务？</string>
+    <string name="ai_disclosure_body">将把最近 7 天的摘要（步数、睡眠、摄入、目标）发送到 %1$s，不含姓名与原始记录。删除 API Key 即可关闭。</string>
+    <string name="ai_disclosure_ok">同意并继续</string>
+    <string name="ai_disclosure_cancel">暂不</string>
 </resources>

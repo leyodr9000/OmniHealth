@@ -19,6 +19,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -47,6 +48,7 @@ import com.example.omnihealth.ui.di.LocalHealthRepository
 import com.example.omnihealth.ui.di.activityScopedViewModelOwner
 import com.example.omnihealth.ui.theme.GlassCard
 import com.example.omnihealth.ui.theme.OmniTheme
+import com.example.omnihealth.ui.theme.quietClick
 import com.example.omnihealth.ui.theme.bounceClick
 
 @Composable
@@ -75,7 +77,14 @@ fun AiAdvisorScreen() {
             .fillMaxSize()
             .statusBarsPadding(),
     ) {
-        LazyColumn(
+        if (state.needsDisclosure) {
+        AiDisclosureDialog(
+            target = state.disclosureTarget,
+            onAccept = { viewModel.acceptDisclosure { viewModel.generateReport(useChinese) } },
+            onDismiss = { viewModel.dismissDisclosure() },
+        )
+    }
+    LazyColumn(
             state = listState,
             modifier = Modifier
                 .weight(1f)
@@ -383,4 +392,50 @@ private fun gapText(gaps: List<String>): String {
             else -> activity
         }
     }
+}
+
+/** 首次在线生成前的一次性告知：发送范围与目标地址。 */
+@Composable
+private fun AiDisclosureDialog(
+    target: String,
+    onAccept: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    val palette = OmniTheme.palette
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        containerColor = palette.cardFill,
+        title = {
+            Text(
+                text = stringResource(R.string.ai_disclosure_title),
+                color = palette.textPrimary,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.SemiBold,
+            )
+        },
+        text = {
+            Text(
+                text = stringResource(R.string.ai_disclosure_body, target),
+                color = palette.textSecondary,
+                fontSize = 12.sp,
+            )
+        },
+        confirmButton = {
+            Text(
+                text = stringResource(R.string.ai_disclosure_ok),
+                color = palette.accent,
+                fontSize = 13.sp,
+                fontWeight = FontWeight.SemiBold,
+                modifier = Modifier.padding(8.dp).quietClick(onClick = onAccept),
+            )
+        },
+        dismissButton = {
+            Text(
+                text = stringResource(R.string.ai_disclosure_cancel),
+                color = palette.textTertiary,
+                fontSize = 13.sp,
+                modifier = Modifier.padding(8.dp).quietClick(onClick = onDismiss),
+            )
+        },
+    )
 }

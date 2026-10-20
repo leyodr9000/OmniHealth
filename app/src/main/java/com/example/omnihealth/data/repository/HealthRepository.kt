@@ -370,6 +370,8 @@ class HealthRepository(
 
     suspend fun setDarkMode(id: String) = preferences.setDarkMode(id)
 
+    suspend fun acceptAiDisclosure() = preferences.acceptAiDisclosure()
+
     suspend fun setReduceMotion(enabled: Boolean) = preferences.setReduceMotion(enabled)
 
     suspend fun setWaterReminder(enabled: Boolean) = preferences.setWaterReminder(enabled)
