@@ -300,4 +300,8 @@
     <string name="smart_meal_save">保存 %1$d 条</string>
     <string name="settings_section_ai">智能服务</string>
     <string name="ai_assistant_entry">AI 助手</string>
+    <string name="trend_weight_title">体重趋势</string>
+    <string name="trend_calorie_title">摄入趋势</string>
+    <string name="trend_steps_title">步数趋势</string>
+    <string name="trend_low_confidence">数据不足</string>
 </resources>

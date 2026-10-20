@@ -118,6 +118,17 @@ fun ChartAnalyticsScreen() {
             }
         }
 
+        // 趋势解读：结论由确定性规则给出，模型只负责措辞（当前版本直接用规则文案）
+        state.weightInsight?.let { insight ->
+            item { TrendInsightCard(title = stringResource(R.string.trend_weight_title), insight = insight) }
+        }
+        state.calorieInsight?.let { insight ->
+            item { TrendInsightCard(title = stringResource(R.string.trend_calorie_title), insight = insight) }
+        }
+        state.stepsInsight?.let { insight ->
+            item { TrendInsightCard(title = stringResource(R.string.trend_steps_title), insight = insight) }
+        }
+
         if (!state.hasData) {
             item {
                 GlassCard(Modifier.fillMaxWidth()) {
@@ -300,6 +311,56 @@ private fun SummaryCard(title: String, value: String, modifier: Modifier = Modif
             fontSize = 19.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(top = 3.dp),
+        )
+    }
+}
+
+/**
+ * 趋势解读卡：结论 → 依据 → 限制。
+ *
+ * 三段结构来自方案要求：先说发生了什么，再给区间与天数，最后说明不能过度解读的地方。
+ */
+@Composable
+private fun TrendInsightCard(
+    title: String,
+    insight: com.example.omnihealth.domain.util.TrendInterpreter.Insight,
+) {
+    val palette = OmniTheme.palette
+    GlassCard(Modifier.fillMaxWidth()) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                text = title,
+                color = palette.textSecondary,
+                fontSize = 11.sp,
+                fontWeight = FontWeight.Medium,
+                modifier = Modifier.weight(1f),
+            )
+            if (!insight.reliable) {
+                Text(
+                    text = stringResource(R.string.trend_low_confidence),
+                    color = palette.warning,
+                    fontSize = 10.sp,
+                )
+            }
+        }
+        Text(
+            text = insight.conclusion,
+            color = palette.textPrimary,
+            fontSize = 13.sp,
+            fontWeight = FontWeight.SemiBold,
+            modifier = Modifier.padding(top = 6.dp),
+        )
+        Text(
+            text = insight.evidence,
+            color = palette.textTertiary,
+            fontSize = 10.sp,
+            modifier = Modifier.padding(top = 4.dp),
+        )
+        Text(
+            text = insight.limitation,
+            color = palette.textTertiary.copy(alpha = 0.85f),
+            fontSize = 10.sp,
+            modifier = Modifier.padding(top = 2.dp),
         )
     }
 }

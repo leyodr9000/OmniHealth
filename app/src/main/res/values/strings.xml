@@ -300,4 +300,8 @@
     <string name="smart_meal_save">Save %1$d items</string>
     <string name="settings_section_ai">AI</string>
     <string name="ai_assistant_entry">AI assistant</string>
+    <string name="trend_weight_title">Weight trend</string>
+    <string name="trend_calorie_title">Intake trend</string>
+    <string name="trend_steps_title">Steps trend</string>
+    <string name="trend_low_confidence">Not enough data</string>
 </resources>
