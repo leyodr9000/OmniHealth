@@ -46,11 +46,15 @@ import com.example.omnihealth.ui.di.LocalHealthRepository
 import com.example.omnihealth.ui.di.activityScopedViewModelOwner
 import com.example.omnihealth.ui.theme.GlassCard
 import com.example.omnihealth.ui.theme.OmniTheme
+import com.example.omnihealth.ui.theme.quietClick
 import com.example.omnihealth.ui.theme.bounceClick
 import java.util.Locale
 
 @Composable
-fun ChartAnalyticsScreen() {
+fun ChartAnalyticsScreen(
+    onOpenRecords: () -> Unit = {},
+    onOpenReminders: () -> Unit = {},
+) {
     val repository = LocalHealthRepository.current
     val viewModel: StatsViewModel = viewModel(
         viewModelStoreOwner = activityScopedViewModelOwner(),
@@ -119,6 +123,10 @@ fun ChartAnalyticsScreen() {
         }
 
         // 趋势解读：结论由确定性规则给出，模型只负责措辞（当前版本直接用规则文案）
+        state.weeklyReview?.let { review ->
+            item { WeeklyReviewCard(review = review, onOpenRecords = onOpenRecords, onOpenReminders = onOpenReminders) }
+        }
+
         state.weightInsight?.let { insight ->
             item { TrendInsightCard(title = stringResource(R.string.trend_weight_title), insight = insight) }
         }
@@ -362,5 +370,60 @@ private fun TrendInsightCard(
             fontSize = 10.sp,
             modifier = Modifier.padding(top = 2.dp),
         )
+    }
+}
+
+/** 周复盘卡：本周变化 → 数据依据 → 一条可执行行动。 */
+@Composable
+private fun WeeklyReviewCard(
+    review: com.example.omnihealth.domain.util.WeeklyReview.Review,
+    onOpenRecords: () -> Unit,
+    onOpenReminders: () -> Unit,
+) {
+    val palette = OmniTheme.palette
+    GlassCard(Modifier.fillMaxWidth()) {
+        Text(
+            text = stringResource(R.string.review_title),
+            color = palette.textSecondary,
+            fontSize = 11.sp,
+            fontWeight = FontWeight.Medium,
+        )
+        Text(
+            text = review.summary,
+            color = palette.textPrimary,
+            fontSize = 13.sp,
+            fontWeight = FontWeight.SemiBold,
+            modifier = Modifier.padding(top = 6.dp),
+        )
+        Text(
+            text = review.evidence,
+            color = palette.textTertiary,
+            fontSize = 10.sp,
+            modifier = Modifier.padding(top = 4.dp),
+        )
+        review.actions.forEach { action ->
+            val onClick = when (action.type) {
+                com.example.omnihealth.domain.util.WeeklyReview.ActionType.OPEN_RECORDS -> onOpenRecords
+                com.example.omnihealth.domain.util.WeeklyReview.ActionType.OPEN_REMINDERS -> onOpenReminders
+                com.example.omnihealth.domain.util.WeeklyReview.ActionType.NONE -> null
+            }
+            Text(
+                text = action.title,
+                color = if (onClick != null) palette.accent else palette.textTertiary,
+                fontSize = 11.sp,
+                fontWeight = if (onClick != null) FontWeight.SemiBold else FontWeight.Normal,
+                modifier = Modifier
+                    .padding(top = 8.dp)
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(
+                        if (onClick != null) palette.accent.copy(alpha = 0.10f)
+                        else palette.textPrimary.copy(alpha = 0.04f),
+                    )
+                    .then(
+                        if (onClick != null) Modifier.quietClick(onClick = onClick) else Modifier,
+                    )
+                    .padding(horizontal = 12.dp, vertical = 8.dp),
+            )
+        }
     }
 }

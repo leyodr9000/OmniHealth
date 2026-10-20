@@ -11,6 +11,7 @@ import com.example.omnihealth.data.local.entity.VitalEntity
 import com.example.omnihealth.data.repository.HealthRepository
 import com.example.omnihealth.domain.util.HealthCalculator
 import com.example.omnihealth.domain.util.TrendInterpreter
+import com.example.omnihealth.domain.util.WeeklyReview
 import com.example.omnihealth.domain.util.TimeUtils
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -37,6 +38,7 @@ data class StatsUiState(
     val weightInsight: TrendInterpreter.Insight? = null,
     val calorieInsight: TrendInterpreter.Insight? = null,
     val stepsInsight: TrendInterpreter.Insight? = null,
+    val weeklyReview: WeeklyReview.Review? = null,
 )
 
 private data class StatsCore(
@@ -152,6 +154,14 @@ class StatsViewModel(private val repository: HealthRepository) : ViewModel() {
             weightInsight = TrendInterpreter.compareWeeks(weightSeries14, "kg", true, "体重"),
             calorieInsight = TrendInterpreter.compareWeeks(calorieSeries14, "kcal", false, "摄入"),
             stepsInsight = TrendInterpreter.compareWeeks(stepSeries14, "步", false, "步数"),
+            weeklyReview = WeeklyReview.build(
+                dietDays = dietRows.filter { it.epochDay in days }.map { it.epochDay }.distinct().size,
+                breakfastDays = dietRows.filter { it.epochDay in days && it.mealType == "BREAKFAST" }
+                    .map { it.epochDay }.distinct().size,
+                sleepDays = sleepRows.map { TimeUtils.epochDayOf(it.recordedAt) }.distinct()
+                    .count { it in days },
+                stepDays = stepRows.count { it.epochDay in days },
+            ),
         )
     }
 }

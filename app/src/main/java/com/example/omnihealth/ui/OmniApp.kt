@@ -166,7 +166,12 @@ fun OmniApp(
                         onOpenSport = {},
                     )
                 }
-                composable(OmniDest.Stats.route) { ChartAnalyticsScreen() }
+                composable(OmniDest.Stats.route) {
+                    ChartAnalyticsScreen(
+                        onOpenRecords = { navController.navigateSingleTop(OmniDest.Diet) },
+                        onOpenReminders = { navController.navigateSingleTop(OmniDest.Settings) },
+                    )
+                }
                 composable(OmniDest.Ai.route) { AiAdvisorScreen() }
                 composable(OmniDest.Settings.route) {
                     SettingsScreen(

@@ -304,4 +304,5 @@
     <string name="trend_calorie_title">Intake trend</string>
     <string name="trend_steps_title">Steps trend</string>
     <string name="trend_low_confidence">Not enough data</string>
+    <string name="review_title">Weekly review</string>
 </resources>
