@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -34,6 +35,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import kotlinx.coroutines.launch
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -114,6 +117,10 @@ fun DietSportScreen(
     var smartOpen by remember { mutableStateOf(false) }
     var planOpen by remember { mutableStateOf(false) }
     val plans by viewModel.plans.collectAsStateWithLifecycle()
+    val recentFoods by viewModel.recentFoods.collectAsStateWithLifecycle()
+    var pendingGrams by remember { mutableStateOf<Float?>(null) }
+    val cardScope = rememberCoroutineScope()
+    val cardContext = androidx.compose.ui.platform.LocalContext.current
 
     Box(Modifier.fillMaxSize()) {
     LazyColumn(
@@ -176,6 +183,62 @@ fun DietSportScreen(
             }
 
             if (tab == 0) {
+                if (recentFoods.isNotEmpty()) {
+                    item {
+                        Column {
+                            Text(
+                                text = stringResource(R.string.recents_title),
+                                color = palette.textTertiary,
+                                fontSize = 10.sp,
+                                modifier = Modifier.padding(bottom = 6.dp),
+                            )
+                            LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                items(recentFoods, key = { "r-${it.foodId}" }) { recent ->
+                                    Text(
+                                        text = recent.foodName,
+                                        color = palette.textPrimary,
+                                        fontSize = 11.sp,
+                                        modifier = Modifier
+                                            .clip(RoundedCornerShape(9.dp))
+                                            .background(palette.cardFill)
+                                            .quietClick {
+                                                cardScope.launch {
+                                                    val food = viewModel.foodById(recent.foodId)
+                                                    if (food != null) {
+                                                        pendingGrams = recent.grams
+                                                        pending = food
+                                                    }
+                                                }
+                                            }
+                                            .padding(horizontal = 10.dp, vertical = 7.dp),
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+                item {
+                    Text(
+                        text = stringResource(R.string.copy_last_meal, mealLabel(viewModel.mealTypeForNow())),
+                        color = palette.accent,
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Medium,
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(9.dp))
+                            .background(palette.accent.copy(alpha = 0.10f))
+                            .quietClick {
+                                viewModel.copyLastMeal(viewModel.mealTypeForNow()) { count ->
+                                    val message = if (count > 0) {
+                                        cardContext.getString(R.string.copy_last_done, count)
+                                    } else {
+                                        cardContext.getString(R.string.copy_last_empty)
+                                    }
+                                    android.widget.Toast.makeText(cardContext, message, android.widget.Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                            .padding(horizontal = 12.dp, vertical = 8.dp),
+                    )
+                }
                 item {
                     Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                         ActionButton(
@@ -389,10 +452,15 @@ fun DietSportScreen(
     pending?.let { food ->
         FoodAmountSheet(
             food = food,
-            onDismiss = { pending = null },
+            initialGrams = pendingGrams ?: food.servingGrams.coerceAtLeast(50f),
+            onDismiss = {
+                pending = null
+                pendingGrams = null
+            },
             onConfirm = { grams, meal ->
                 viewModel.logFood(food, grams, meal)
                 pending = null
+                pendingGrams = null
             },
         )
     }

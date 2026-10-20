@@ -145,6 +145,26 @@ class HealthRepository(
 
     fun allFoods(): Flow<List<FoodEntity>> = db.dietDao().observeFoods()
 
+    /** 最近常吃（最多 8 条），用于一键复记。 */
+    fun recentFoods(limit: Int = 8): Flow<List<com.example.omnihealth.data.local.dao.RecentFood>> =
+        db.dietDao().observeRecentFoods(limit)
+
+    suspend fun foodById(id: Long): FoodEntity? = db.dietDao().foodById(id)
+
+    /** 上一次同类餐的条目，用于「复制上一餐」。 */
+    suspend fun lastMeal(mealType: String): List<DietLogEntity> = db.dietDao().lastMeal(mealType)
+
+    /** 把上一次同类餐原样复制到指定日期；只改 id/日期/时间，营养值保持不变。 */
+    suspend fun copyMeal(items: List<DietLogEntity>, epochDay: Long): Int {
+        val now = System.currentTimeMillis()
+        items.forEachIndexed { index, log ->
+            db.dietDao().insertLog(
+                log.copy(id = 0L, epochDay = epochDay, timestamp = now + index),
+            )
+        }
+        return items.size
+    }
+
     suspend fun logFood(
         food: FoodEntity,
         grams: Float,

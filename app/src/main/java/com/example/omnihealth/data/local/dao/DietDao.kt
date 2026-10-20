@@ -33,6 +33,32 @@ interface DietDao {
     @Query("SELECT * FROM foods WHERE category = :category ORDER BY name ASC")
     suspend fun foodsByCategory(category: String): List<FoodEntity>
 
+    /** 最近常吃：按出现次数、再按最近时间排序，只取能对应到食物库的记录。 */
+    @Query(
+        """
+        SELECT foodId AS foodId, foodName AS foodName, COUNT(*) AS times, MAX(timestamp) AS lastAt,
+               MAX(grams) AS grams
+        FROM diet_logs
+        WHERE foodId IS NOT NULL
+        GROUP BY foodId
+        ORDER BY times DESC, lastAt DESC
+        LIMIT :limit
+        """,
+    )
+    fun observeRecentFoods(limit: Int): Flow<List<RecentFood>>
+
+    /** 上一次同类餐的记录（按时间倒序，取最近的一天）。 */
+    @Query(
+        """
+        SELECT * FROM diet_logs
+        WHERE mealType = :mealType AND epochDay = (
+            SELECT MAX(epochDay) FROM diet_logs WHERE mealType = :mealType
+        )
+        ORDER BY timestamp ASC
+        """,
+    )
+    suspend fun lastMeal(mealType: String): List<DietLogEntity>
+
     @Query("SELECT * FROM foods WHERE id = :id")
     suspend fun foodById(id: Long): FoodEntity?
 
@@ -78,3 +104,12 @@ interface DietDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertLogs(items: List<DietLogEntity>)
 }
+
+/** 最近常吃的投影：次数、最近时间、最近一次克数。 */
+data class RecentFood(
+    val foodId: Long,
+    val foodName: String,
+    val times: Int,
+    val lastAt: Long,
+    val grams: Float,
+)

@@ -196,6 +196,38 @@ class DietSportViewModel(
         _drafts.value = emptyList()
     }
 
+    /* ---------------- 最近常吃 / 复制上一餐 ---------------- */
+
+    val recentFoods: StateFlow<List<com.example.omnihealth.data.local.dao.RecentFood>> =
+        repository.recentFoods(8)
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
+    /** 按当前时钟推断该复制哪一餐。 */
+    fun mealTypeForNow(): String {
+        val hour = java.time.LocalTime.now().hour
+        return when {
+            hour < 10 -> MealType.BREAKFAST
+            hour < 15 -> MealType.LUNCH
+            hour < 21 -> MealType.DINNER
+            else -> MealType.SNACK
+        }
+    }
+
+    fun copyLastMeal(mealType: String, onDone: (Int) -> Unit = {}) {
+        viewModelScope.launch {
+            val items = repository.lastMeal(mealType)
+            if (items.isEmpty()) {
+                onDone(0)
+                return@launch
+            }
+            val count = repository.copyMeal(items, _selectedDay.value)
+            onDone(count)
+        }
+    }
+
+    suspend fun foodById(id: Long): com.example.omnihealth.data.local.entity.FoodEntity? =
+        repository.foodById(id)
+
     /* ---------------- 帮我搭配 ---------------- */
 
     private val _plans = MutableStateFlow<List<MealPlanner.Plan>>(emptyList())

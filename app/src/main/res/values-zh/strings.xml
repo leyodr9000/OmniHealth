@@ -312,4 +312,8 @@
     <string name="plan_total">合计 %1$d kcal · 蛋白 %2$d g</string>
     <string name="plan_accept">就吃这一餐，记下来</string>
     <string name="plan_regenerate">换一组</string>
+    <string name="recents_title">最近常吃</string>
+    <string name="copy_last_meal">复制上次%1$s</string>
+    <string name="copy_last_done">已复制 %1$d 条</string>
+    <string name="copy_last_empty">还没有同餐次的记录</string>
 </resources>

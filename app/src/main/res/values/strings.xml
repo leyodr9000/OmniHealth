@@ -312,4 +312,8 @@
     <string name="plan_total">Total %1$d kcal · %2$d g protein</string>
     <string name="plan_accept">Eating this — log it</string>
     <string name="plan_regenerate">Shuffle</string>
+    <string name="recents_title">Recently logged</string>
+    <string name="copy_last_meal">Copy last %1$s</string>
+    <string name="copy_last_done">Copied %1$d items</string>
+    <string name="copy_last_empty">No earlier meal of this type</string>
 </resources>
