@@ -12,6 +12,7 @@ import com.example.omnihealth.data.local.entity.WorkoutEntity
 import com.example.omnihealth.data.repository.HealthRepository
 import com.example.omnihealth.domain.util.HealthCalculator
 import com.example.omnihealth.domain.util.MealParser
+import com.example.omnihealth.domain.util.MealPlanner
 import com.example.omnihealth.domain.util.TimeUtils
 import com.example.omnihealth.domain.util.StepSensorManager
 import kotlinx.coroutines.FlowPreview
@@ -193,6 +194,41 @@ class DietSportViewModel(
 
     fun clearDrafts() {
         _drafts.value = emptyList()
+    }
+
+    /* ---------------- 帮我搭配 ---------------- */
+
+    private val _plans = MutableStateFlow<List<MealPlanner.Plan>>(emptyList())
+    val plans: StateFlow<List<MealPlanner.Plan>> = _plans
+
+    /**
+     * 生成候选搭配。
+     *
+     * 预算取「今日剩余」的三分之一（一餐），下限 300 / 上限 900，
+     * 不用剩余全部作为一餐目标；结果只是候选，不入库。
+     */
+    fun generatePlans() {
+        viewModelScope.launch {
+            val state = dietState.value
+            val remaining = (state.calorieGoal - state.calories).coerceAtLeast(0)
+            val budget = (remaining / 3f).coerceIn(300f, 900f)
+            val foods = repository.allFoods().first()
+            _plans.value = MealPlanner.plan(foods = foods, budgetKcal = budget, count = 3)
+        }
+    }
+
+    fun clearPlans() {
+        _plans.value = emptyList()
+    }
+
+    /** 用户确认「这一餐就是这么吃的」之后才写库。 */
+    fun logPlan(plan: MealPlanner.Plan, mealType: String, epochDay: Long = _selectedDay.value) {
+        viewModelScope.launch {
+            plan.items.forEach { item ->
+                repository.logFood(item.food, item.grams, mealType, epochDay)
+            }
+            _plans.value = emptyList()
+        }
     }
 
     /** 仅保存已匹配且份量已确认的条目；未匹配项不写入。 */

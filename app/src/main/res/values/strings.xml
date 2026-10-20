@@ -305,4 +305,11 @@
     <string name="trend_steps_title">Steps trend</string>
     <string name="trend_low_confidence">Not enough data</string>
     <string name="review_title">Weekly review</string>
+    <string name="plan_entry">Help me plan</string>
+    <string name="plan_title">Next meal ideas</string>
+    <string name="plan_hint">Candidates only — nothing is saved until you accept one. Nutrition is computed from the local food table.</string>
+    <string name="plan_empty">No candidate matched the constraints</string>
+    <string name="plan_total">Total %1$d kcal · %2$d g protein</string>
+    <string name="plan_accept">Eating this — log it</string>
+    <string name="plan_regenerate">Shuffle</string>
 </resources>

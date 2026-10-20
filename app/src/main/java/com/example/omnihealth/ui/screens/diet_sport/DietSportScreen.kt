@@ -112,6 +112,8 @@ fun DietSportScreen(
     val pendingUndo by viewModel.pendingUndo.collectAsStateWithLifecycle()
     val drafts by viewModel.drafts.collectAsStateWithLifecycle()
     var smartOpen by remember { mutableStateOf(false) }
+    var planOpen by remember { mutableStateOf(false) }
+    val plans by viewModel.plans.collectAsStateWithLifecycle()
 
     Box(Modifier.fillMaxSize()) {
     LazyColumn(
@@ -175,10 +177,19 @@ fun DietSportScreen(
 
             if (tab == 0) {
                 item {
-                    ActionButton(
-                        text = stringResource(R.string.smart_meal_entry),
-                        modifier = Modifier.fillMaxWidth(),
-                    ) { smartOpen = true }
+                    Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                        ActionButton(
+                            text = stringResource(R.string.smart_meal_entry),
+                            modifier = Modifier.weight(1f),
+                        ) { smartOpen = true }
+                        ActionButton(
+                            text = stringResource(R.string.plan_entry),
+                            modifier = Modifier.weight(1f),
+                        ) {
+                            viewModel.generatePlans()
+                            planOpen = true
+                        }
+                    }
                 }
             }
 
@@ -318,6 +329,21 @@ fun DietSportScreen(
                 .padding(horizontal = 18.dp, vertical = 12.dp),
         )
     }
+    }
+
+    if (planOpen) {
+        MealPlanSheet(
+            plans = plans,
+            onRegenerate = { viewModel.generatePlans() },
+            onAccept = { plan, meal ->
+                viewModel.logPlan(plan, meal)
+                planOpen = false
+            },
+            onDismiss = {
+                viewModel.clearPlans()
+                planOpen = false
+            },
+        )
     }
 
     if (smartOpen) {

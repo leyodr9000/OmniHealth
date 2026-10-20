@@ -305,4 +305,11 @@
     <string name="trend_steps_title">步数趋势</string>
     <string name="trend_low_confidence">数据不足</string>
     <string name="review_title">本周复盘</string>
+    <string name="plan_entry">帮我搭配</string>
+    <string name="plan_title">下一餐候选</string>
+    <string name="plan_hint">只是候选，确认后才会写入记录；营养按本地食物资料计算。</string>
+    <string name="plan_empty">没有符合约束的候选</string>
+    <string name="plan_total">合计 %1$d kcal · 蛋白 %2$d g</string>
+    <string name="plan_accept">就吃这一餐，记下来</string>
+    <string name="plan_regenerate">换一组</string>
 </resources>
