@@ -67,23 +67,23 @@ class HealthRepository(
     }
 
     suspend fun logWeight(kg: Float) = db.vitalDao().insert(
-        VitalEntity(type = VitalType.WEIGHT, value = kg, unit = "kg"),
+        VitalEntity(type = VitalType.WEIGHT, value = kg, unit = "kg", tzOffsetMinutes = tzOffset()),
     )
 
     suspend fun logWater(ml: Float) = db.vitalDao().insert(
-        VitalEntity(type = VitalType.WATER, value = ml, unit = "ml"),
+        VitalEntity(type = VitalType.WATER, value = ml, unit = "ml", tzOffsetMinutes = tzOffset()),
     )
 
     suspend fun logSleep(hours: Float) = db.vitalDao().insert(
-        VitalEntity(type = VitalType.SLEEP, value = hours, unit = "h"),
+        VitalEntity(type = VitalType.SLEEP, value = hours, unit = "h", tzOffsetMinutes = tzOffset()),
     )
 
     suspend fun logMood(score: Float) = db.vitalDao().insert(
-        VitalEntity(type = VitalType.MOOD, value = score, unit = "pt"),
+        VitalEntity(type = VitalType.MOOD, value = score, unit = "pt", tzOffsetMinutes = tzOffset()),
     )
 
     suspend fun logHeartRate(bpm: Float) = db.vitalDao().insert(
-        VitalEntity(type = VitalType.HEART_RATE, value = bpm, unit = "bpm"),
+        VitalEntity(type = VitalType.HEART_RATE, value = bpm, unit = "bpm", tzOffsetMinutes = tzOffset()),
     )
 
     /* ---------------- 步数 / 训练 ---------------- */
@@ -163,6 +163,7 @@ class HealthRepository(
                 carbs = food.carbs * ratio,
                 fat = food.fat * ratio,
                 epochDay = epochDay,
+                tzOffsetMinutes = tzOffset(),
             ),
         )
     }
@@ -420,4 +421,8 @@ class HealthRepository(
         uri: android.net.Uri,
     ): com.example.omnihealth.data.backup.RestoreResult =
         com.example.omnihealth.data.backup.BackupManager.restore(context, db, uri)
+
+/** 当前时区偏移（分钟），随记录一起保存。 */
+private fun tzOffset(): Int =
+    java.util.TimeZone.getDefault().getOffset(System.currentTimeMillis()) / 60_000
 }

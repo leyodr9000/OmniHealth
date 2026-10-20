@@ -25,6 +25,7 @@ data class VitalEntity(
     val unit: String,
     val note: String = "",
     val recordedAt: Long = System.currentTimeMillis(),
+    val tzOffsetMinutes: Int = 0,
 )
 
 object VitalType {
@@ -122,6 +123,8 @@ data class DietLogEntity(
     val fat: Float,
     val epochDay: Long,
     val timestamp: Long = System.currentTimeMillis(),
+    /** 记录时的时区偏移（分钟），用于跨时区回看时保持归属不变。 */
+    val tzOffsetMinutes: Int = 0,
 )
 
 object MealType {
@@ -166,6 +169,8 @@ data class WorkoutEntity(
     val note: String = "",
     val epochDay: Long,
     val timestamp: Long = System.currentTimeMillis(),
+    /** 记录时的时区偏移（分钟），用于跨时区回看时保持归属不变。 */
+    val tzOffsetMinutes: Int = 0,
 )
 
 /* ------------------------------------------------------------------ */

@@ -34,7 +34,7 @@ import kotlinx.coroutines.launch
         WorkoutEntity::class,
         AiReportEntity::class,
     ],
-    version = 1,
+    version = 2,
     exportSchema = false,
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -55,7 +55,15 @@ abstract class AppDatabase : RoomDatabase() {
          * 刻意不用 `fallbackToDestructiveMigration()`：健康数据的迁移失败必须暴露，
          * 而不是静默清库。每次 schema 变更都要在这里补一条 Migration 并加迁移测试。
          */
-        private val MIGRATIONS: Array<Migration> = emptyArray()
+        private val MIGRATION_1_2 = object : Migration(1, 2) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE diet_logs ADD COLUMN tzOffsetMinutes INTEGER NOT NULL DEFAULT 0")
+                db.execSQL("ALTER TABLE vitals ADD COLUMN tzOffsetMinutes INTEGER NOT NULL DEFAULT 0")
+                db.execSQL("ALTER TABLE workouts ADD COLUMN tzOffsetMinutes INTEGER NOT NULL DEFAULT 0")
+            }
+        }
+
+        private val MIGRATIONS: Array<Migration> = arrayOf(MIGRATION_1_2)
 
         fun build(context: Context, scope: CoroutineScope): AppDatabase =
             INSTANCE ?: synchronized(this) {
