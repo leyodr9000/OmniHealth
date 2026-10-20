@@ -13,32 +13,17 @@
 
     <!-- 通用 -->
     <string name="save">保存</string>
-    <string name="cancel">取消</string>
-    <string name="done">完成</string>
-    <string name="back">返回</string>
 
     <!-- 设置 -->
-    <string name="settings_title">外观实验室</string>
-    <string name="settings_subtitle">主题、布局、语言实时切换，无需重启</string>
     <string name="settings_section_theme">主题引擎</string>
-    <string name="settings_section_theme_sub">3 套视觉语言</string>
     <string name="settings_section_layout">导航骨架</string>
-    <string name="settings_section_layout_sub">3 套布局结构</string>
     <string name="settings_section_language">语言</string>
-    <string name="settings_section_language_sub">切换后立即全局生效</string>
-    <string name="settings_section_profile">个人资料</string>
-    <string name="settings_section_profile_sub">用于 BMR / TDEE 计算</string>
-    <string name="settings_section_api">AI 接口</string>
-    <string name="settings_section_api_sub">OpenAI 兼容 · 留空走离线引擎</string>
     <string name="settings_footer">OmniHealth 1.0.0 · 所有健康数据保存在本机 Room 数据库，不上传云端。</string>
 
     <string name="language_system">跟随系统</string>
     <string name="language_zh">中文</string>
     <string name="language_en">English</string>
-
-    <string name="profile_nickname">昵称</string>
     <string name="profile_gender_age">性别 / 年龄</string>
-    <string name="profile_body">身高 / 体重</string>
     <string name="profile_activity">活动水平</string>
     <string name="profile_goal">目标</string>
 
@@ -76,7 +61,6 @@
     <string name="home_status">%1$s</string>
     <string name="home_health_index">生活方式参考分</string>
     <string name="home_score_label">生活方式参考分</string>
-    <string name="home_score_delta">比上周 +%1$d 分</string>
     <string name="home_section_today">今日概览</string>
     <string name="home_section_today_sub">目标完成度</string>
     <string name="home_view_stats">查看统计 →</string>
@@ -92,9 +76,6 @@
     <string name="home_quick_hint">点一下就能记</string>
     <string name="home_ai_title">本周建议</string>
     <string name="home_ai_cta">查看</string>
-    <string name="home_bmi">BMI %1$s</string>
-    <string name="home_tdee">TDEE %1$d</string>
-    <string name="home_habits">习惯 %1$d/%2$d</string>
 
     <string name="dim_nutrition">营养</string>
     <string name="dim_activity">运动</string>
@@ -138,7 +119,6 @@
     <string name="stats_tab_macro">分布</string>
     <string name="stats_tab_week">对比</string>
     <string name="stats_tab_radar">雷达</string>
-    <string name="stats_weight">体重</string>
     <string name="stats_steps">步数</string>
     <string name="stats_sleep">睡眠</string>
     <string name="stats_calories">摄入</string>
@@ -166,7 +146,6 @@
     <string name="ai_input_hint">问问你的健康状况…</string>
     <string name="ai_send">发送</string>
     <string name="ai_empty_chat">试试：「怎么改善睡眠？」「我的蛋白质够吗？」</string>
-    <string name="ai_error">出了点问题，已切换为离线回答。</string>
     <string name="ai_clear">清空</string>
     <string name="ai_score">健康分 %1$d / 100</string>
 
@@ -208,9 +187,7 @@
     <string name="habits_add">添加习惯</string>
     <string name="habits_empty">还没有习惯，加一个来点亮「一致性」评分。</string>
     <string name="habit_name">习惯名称</string>
-    <string name="habit_delete">删除</string>
     <!-- 设置页 -->
-    <string name="settings_me">我的</string>
     <string name="settings_group_personal">个人</string>
     <string name="settings_group_preferences">偏好</string>
     <string name="settings_group_about">数据与关于</string>
@@ -220,15 +197,12 @@
     <string name="settings_row_ai">AI 接口</string>
     <string name="settings_row_reminders">提醒</string>
     <string name="settings_row_about">关于 OmniHealth</string>
-    <string name="settings_reminders_off">未开启</string>
-    <string name="settings_version">版本 1.0.0</string>
     <string name="settings_back">返回</string>
     <string name="settings_appearance_title">外观</string>
     <string name="settings_appearance_sub">框架、配色、语言、动效</string>
     <string name="framework_miuix">MIUIX</string>
     <string name="framework_md3">Material 3</string>
     <string name="settings_section_framework">界面框架</string>
-    <string name="settings_section_framework_sub">切换整套组件体系，而非只换配色</string>
     <string name="insight_steps_left">距离今日目标还差 %1$s 步</string>
     <string name="insight_water_left">再喝 %1$s 就达饮水目标</string>
     <string name="insight_calories_left">今日还可摄入 %1$s kcal</string>
@@ -243,7 +217,6 @@
     <string name="reminder_off">未开启</string>
     <string name="reminder_permission_hint">需要通知权限才能收到提醒</string>
     <string name="settings_row_export">导出数据</string>
-    <string name="export_done">已保存到 %1$s</string>
     <string name="export_failed">导出失败</string>
     <string name="about_title">关于 OmniHealth</string>
     <string name="about_version">版本 %1$s</string>
@@ -253,14 +226,12 @@
     <string name="motion_title">减少动效</string>
     <string name="motion_desc">关闭页面滑动动画，切换零延迟</string>
     <string name="score_insufficient">数据不足</string>
-    <string name="score_insufficient_hint">记录睡眠、饮水或饮食后才计算分数</string>
     <string name="deleted_hint">已删除「%1$s」</string>
     <string name="undo">撤销</string>
     <string name="day_today">今天</string>
     <string name="diet_edit_title">编辑记录</string>
     <string name="settings_row_backup">备份数据</string>
     <string name="settings_row_restore">恢复备份</string>
-    <string name="backup_detail">%1$d 条记录 · v%2$d</string>
     <string name="restore_confirm_title">确认恢复这份备份？</string>
     <string name="restore_confirm_body">文件包含 %1$d 条记录（格式 v%2$d）。恢复会覆盖当前全部数据。</string>
     <string name="restore_done">已恢复 %1$d 条记录</string>
@@ -334,4 +305,26 @@
     <string name="theme_monet_label">莫奈</string>
     <string name="theme_monet_tagline">跟随壁纸取色</string>
     <string name="theme_monet_blurb">从系统壁纸提取主色与表面色（Android 12 及以上）；不支持时退化为低饱和青灰。</string>
+    <string name="trend_no_recent">%1$s：最近 7 天没有记录</string>
+    <string name="trend_insufficient">%1$s：数据不足，暂不比较趋势</string>
+    <string name="trend_flat">%1$s 与前 7 天基本持平</string>
+    <string name="trend_change">%1$s 近 7 天 %2$s %3$s %4$s</string>
+    <string name="trend_up">上升</string>
+    <string name="trend_down">下降</string>
+    <string name="trend_evidence">最近 7 天均值 %1$s %2$s（%3$d 天记录），前 7 天均值 %4$s %5$s（%6$d 天记录）</string>
+    <string name="trend_coverage">有效记录：本周 %1$d 天，上周 %2$d 天</string>
+    <string name="trend_limitation">均值受记录天数影响，单日波动不代表整体趋势；缺记录的天已排除。</string>
+    <string name="review_summary_no_data">本周还没有可用记录</string>
+    <string name="review_summary_few">本周有 %1$d 天记录了饮食，记录本身还不够稳定</string>
+    <string name="review_summary_breakfast">本周有 %1$d 天记录了饮食，其中 %2$d 天没有早餐记录</string>
+    <string name="review_summary_stable">本周记录了 %1$d 天饮食，节奏基本稳定</string>
+    <string name="review_coverage">饮食 %1$d/7 天（含早餐 %2$d 天）· 睡眠 %3$d/7 天 · 步数 %4$d/7 天</string>
+    <string name="review_action_fix">固定一个记录时间，先把记录补起来</string>
+    <string name="review_action_breakfast">看看缺早餐的那几天，是没记录还是没吃</string>
+    <string name="review_action_sleep">补一条睡眠记录，趋势才有依据</string>
+    <string name="review_action_none">保持当前节奏，暂不调整目标</string>
+    <string name="review_image_title">OmniHealth · 本周复盘</string>
+    <string name="review_image_footer">数据来自本机记录，缺失的天未被当作 0</string>
+    <string name="review_share_title">分享周复盘</string>
+    <string name="plan_estimate_note">按参考份量估算，实际以称重为准</string>
 </resources>

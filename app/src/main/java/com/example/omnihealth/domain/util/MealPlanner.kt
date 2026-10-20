@@ -25,13 +25,12 @@ object MealPlanner {
     data class Plan(
         val index: Int,
         val items: List<Item>,
-        val note: String,
+        /** 是否包含蔬果候选；文案由 UI 生成 */
+        val hasVegetable: Boolean,
     ) {
         val kcal: Float get() = items.sumOf { it.kcal.toDouble() }.toFloat()
         val protein: Float get() = items.sumOf { it.protein.toDouble() }.toFloat()
 
-        /** 估算属性必须随结果一起展示，不假装是精确值。 */
-        val estimateNote: String get() = "按参考份量估算，实际以称重为准"
     }
 
     /**
@@ -77,7 +76,7 @@ object MealPlanner {
             Plan(
                 index = index,
                 items = items,
-                note = if (vegetable == null) "缺少蔬菜候选，只有主食与蛋白" else "主食 + 蛋白 + 蔬果",
+                hasVegetable = vegetable != null,
             )
         }
     }

@@ -156,7 +156,7 @@ fun MealPlanSheet(
                             modifier = Modifier.padding(top = 6.dp),
                         )
                         Text(
-                            text = plan.estimateNote,
+                            text = stringResource(R.string.plan_estimate_note),
                             color = palette.textTertiary,
                             fontSize = 9.sp,
                             modifier = Modifier.padding(top = 2.dp),

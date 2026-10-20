@@ -8,7 +8,7 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Rect
 import androidx.core.content.FileProvider
-import com.example.omnihealth.domain.util.WeeklyReview
+import com.example.omnihealth.R
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -25,7 +25,13 @@ object ReportImageExporter {
     private const val WIDTH = 1080
     private const val HEIGHT = 1350
 
-    fun export(context: Context, review: WeeklyReview.Review, fiberDays: Int): File? = runCatching {
+    fun export(
+        context: Context,
+        summary: String,
+        evidence: String,
+        actions: List<String>,
+        fiberDays: Int,
+    ): File? = runCatching {
         val bitmap = Bitmap.createBitmap(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
         canvas.drawColor(Color.parseColor("#0A0D14"))
@@ -46,7 +52,7 @@ object ReportImageExporter {
         }
 
         var y = 140f
-        canvas.drawText("OmniHealth · 本周复盘", 80f, y, title)
+        canvas.drawText(context.getString(R.string.review_image_title), 80f, y, title)
         y += 60f
         canvas.drawText(
             SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date()),
@@ -56,15 +62,15 @@ object ReportImageExporter {
         )
 
         y += 90f
-        drawWrapped(canvas, review.summary, 80f, y, WIDTH - 160f, accent)
+        drawWrapped(canvas, summary, 80f, y, WIDTH - 160f, accent)
         y += 150f
-        drawWrapped(canvas, review.evidence, 80f, y, WIDTH - 160f, body)
+        drawWrapped(canvas, evidence, 80f, y, WIDTH - 160f, body)
         y += 120f
-        drawWrapped(canvas, "纤维达标 $fiberDays/7 天", 80f, y, WIDTH - 160f, body)
+        drawWrapped(canvas, context.getString(R.string.review_fiber, fiberDays), 80f, y, WIDTH - 160f, body)
 
         y += 160f
-        review.actions.forEach { action ->
-            drawWrapped(canvas, "· ${action.title}", 80f, y, WIDTH - 160f, body)
+        actions.forEach { action ->
+            drawWrapped(canvas, "· $action", 80f, y, WIDTH - 160f, body)
             y += 70f
         }
 
@@ -73,7 +79,7 @@ object ReportImageExporter {
             color = Color.parseColor("#6B7686")
             textSize = 28f
         }
-        drawWrapped(canvas, review.evidence.takeIf { false } ?: "数据来自本机记录，缺失的天未被当作 0", 80f, y, WIDTH - 160f, footer)
+        drawWrapped(canvas, context.getString(R.string.review_image_footer), 80f, y, WIDTH - 160f, footer)
 
         val dir = File(context.getExternalFilesDir(null), "exports").apply { mkdirs() }
         val file = File(dir, "omnihealth-review-${System.currentTimeMillis()}.png")
@@ -93,7 +99,7 @@ object ReportImageExporter {
         }
         runCatching {
             context.startActivity(
-                Intent.createChooser(intent, "分享周复盘").addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
+                Intent.createChooser(intent, context.getString(R.string.review_share_title)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
             )
         }
     }

@@ -357,7 +357,32 @@ private fun TrendInsightCard(
             }
         }
         Text(
-            text = insight.conclusion,
+            text = when (insight.status) {
+                com.example.omnihealth.domain.util.TrendInterpreter.Status.NO_RECENT_DATA ->
+                    stringResource(R.string.trend_no_recent, title)
+                com.example.omnihealth.domain.util.TrendInterpreter.Status.INSUFFICIENT ->
+                    stringResource(R.string.trend_insufficient, title)
+                com.example.omnihealth.domain.util.TrendInterpreter.Status.READY -> when (insight.direction) {
+                    com.example.omnihealth.domain.util.TrendInterpreter.Direction.FLAT ->
+                        stringResource(R.string.trend_flat, title)
+                    com.example.omnihealth.domain.util.TrendInterpreter.Direction.UP ->
+                        stringResource(
+                            R.string.trend_change,
+                            title,
+                            stringResource(R.string.trend_up),
+                            com.example.omnihealth.domain.util.TrendInterpreter.format(kotlin.math.abs(insight.delta)),
+                            insight.unit,
+                        )
+                    com.example.omnihealth.domain.util.TrendInterpreter.Direction.DOWN ->
+                        stringResource(
+                            R.string.trend_change,
+                            title,
+                            stringResource(R.string.trend_down),
+                            com.example.omnihealth.domain.util.TrendInterpreter.format(kotlin.math.abs(insight.delta)),
+                            insight.unit,
+                        )
+                }
+            },
             color = palette.textPrimary,
             fontSize = 13.sp,
             fontWeight = FontWeight.SemiBold,
@@ -375,13 +400,25 @@ private fun TrendInsightCard(
         )
         if (expanded) {
             Text(
-                text = insight.evidence,
+                text = if (insight.reliable) {
+                    stringResource(
+                        R.string.trend_evidence,
+                        com.example.omnihealth.domain.util.TrendInterpreter.format(insight.recentAvg),
+                        insight.unit,
+                        insight.recentDays,
+                        com.example.omnihealth.domain.util.TrendInterpreter.format(insight.previousAvg),
+                        insight.unit,
+                        insight.previousDays,
+                    )
+                } else {
+                    stringResource(R.string.trend_coverage, insight.recentDays, insight.previousDays)
+                },
                 color = palette.textTertiary,
                 fontSize = 10.sp,
                 modifier = Modifier.padding(top = 4.dp),
             )
             Text(
-                text = insight.limitation,
+                text = stringResource(R.string.trend_limitation),
                 color = palette.textTertiary.copy(alpha = 0.85f),
                 fontSize = 10.sp,
                 modifier = Modifier.padding(top = 2.dp),
@@ -407,7 +444,20 @@ private fun WeeklyReviewCard(
             fontWeight = FontWeight.Medium,
         )
         Text(
-            text = review.summary,
+            text = when (review.summary) {
+                com.example.omnihealth.domain.util.WeeklyReview.Summary.NO_DATA ->
+                    stringResource(R.string.review_summary_no_data)
+                com.example.omnihealth.domain.util.WeeklyReview.Summary.FEW_DAYS ->
+                    stringResource(R.string.review_summary_few, review.dietDays)
+                com.example.omnihealth.domain.util.WeeklyReview.Summary.MISSING_BREAKFAST ->
+                    stringResource(
+                        R.string.review_summary_breakfast,
+                        review.dietDays,
+                        review.missingBreakfast,
+                    )
+                com.example.omnihealth.domain.util.WeeklyReview.Summary.STABLE ->
+                    stringResource(R.string.review_summary_stable, review.dietDays)
+            },
             color = palette.textPrimary,
             fontSize = 13.sp,
             fontWeight = FontWeight.SemiBold,
@@ -420,7 +470,13 @@ private fun WeeklyReviewCard(
             modifier = Modifier.padding(top = 4.dp),
         )
         Text(
-            text = review.evidence,
+            text = stringResource(
+                R.string.review_coverage,
+                review.dietDays,
+                review.breakfastDays,
+                review.sleepDays,
+                review.stepDays,
+            ),
             color = palette.textTertiary,
             fontSize = 10.sp,
             modifier = Modifier.padding(top = 4.dp),
@@ -439,8 +495,41 @@ private fun WeeklyReviewCard(
                 .background(palette.accent.copy(alpha = 0.10f))
                 .quietClick {
                     imageScope.launch {
+                        val summaryText = when (review.summary) {
+                            com.example.omnihealth.domain.util.WeeklyReview.Summary.NO_DATA ->
+                                imageContext.getString(R.string.review_summary_no_data)
+                            com.example.omnihealth.domain.util.WeeklyReview.Summary.FEW_DAYS ->
+                                imageContext.getString(R.string.review_summary_few, review.dietDays)
+                            com.example.omnihealth.domain.util.WeeklyReview.Summary.MISSING_BREAKFAST ->
+                                imageContext.getString(
+                                    R.string.review_summary_breakfast,
+                                    review.dietDays,
+                                    review.missingBreakfast,
+                                )
+                            com.example.omnihealth.domain.util.WeeklyReview.Summary.STABLE ->
+                                imageContext.getString(R.string.review_summary_stable, review.dietDays)
+                        }
+                        val evidenceText = imageContext.getString(
+                            R.string.review_coverage,
+                            review.dietDays,
+                            review.breakfastDays,
+                            review.sleepDays,
+                            review.stepDays,
+                        )
+                        val actionTexts = review.actions.map { action ->
+                            when (action.kind) {
+                                com.example.omnihealth.domain.util.WeeklyReview.ActionKind.FIX_LOGGING ->
+                                    imageContext.getString(R.string.review_action_fix)
+                                com.example.omnihealth.domain.util.WeeklyReview.ActionKind.CHECK_BREAKFAST ->
+                                    imageContext.getString(R.string.review_action_breakfast)
+                                com.example.omnihealth.domain.util.WeeklyReview.ActionKind.LOG_SLEEP ->
+                                    imageContext.getString(R.string.review_action_sleep)
+                                com.example.omnihealth.domain.util.WeeklyReview.ActionKind.NO_CHANGE ->
+                                    imageContext.getString(R.string.review_action_none)
+                            }
+                        }
                         val file = com.example.omnihealth.data.export.ReportImageExporter
-                            .export(imageContext, review, fiberDays)
+                            .export(imageContext, summaryText, evidenceText, actionTexts, fiberDays)
                         if (file != null) {
                             com.example.omnihealth.data.export.ReportImageExporter.share(imageContext, file)
                         }
@@ -455,7 +544,16 @@ private fun WeeklyReviewCard(
                 com.example.omnihealth.domain.util.WeeklyReview.ActionType.NONE -> null
             }
             Text(
-                text = action.title,
+                text = when (action.kind) {
+                    com.example.omnihealth.domain.util.WeeklyReview.ActionKind.FIX_LOGGING ->
+                        stringResource(R.string.review_action_fix)
+                    com.example.omnihealth.domain.util.WeeklyReview.ActionKind.CHECK_BREAKFAST ->
+                        stringResource(R.string.review_action_breakfast)
+                    com.example.omnihealth.domain.util.WeeklyReview.ActionKind.LOG_SLEEP ->
+                        stringResource(R.string.review_action_sleep)
+                    com.example.omnihealth.domain.util.WeeklyReview.ActionKind.NO_CHANGE ->
+                        stringResource(R.string.review_action_none)
+                },
                 color = if (onClick != null) palette.accent else palette.textTertiary,
                 fontSize = 11.sp,
                 fontWeight = if (onClick != null) FontWeight.SemiBold else FontWeight.Normal,

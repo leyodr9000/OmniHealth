@@ -13,32 +13,17 @@
 
     <!-- Generic -->
     <string name="save">Save</string>
-    <string name="cancel">Cancel</string>
-    <string name="done">Done</string>
-    <string name="back">Back</string>
 
     <!-- Settings -->
-    <string name="settings_title">Appearance Lab</string>
-    <string name="settings_subtitle">Switch theme, layout and language instantly — no restart</string>
     <string name="settings_section_theme">Theme engine</string>
-    <string name="settings_section_theme_sub">3 visual languages</string>
     <string name="settings_section_layout">Navigation skeleton</string>
-    <string name="settings_section_layout_sub">3 structural layouts</string>
     <string name="settings_section_language">Language</string>
-    <string name="settings_section_language_sub">Applies immediately across the UI</string>
-    <string name="settings_section_profile">Profile</string>
-    <string name="settings_section_profile_sub">Used for BMR / TDEE</string>
-    <string name="settings_section_api">AI endpoint</string>
-    <string name="settings_section_api_sub">OpenAI compatible · blank = offline engine</string>
     <string name="settings_footer">OmniHealth 1.0.0 · All health data stays on this device in a local Room database. Nothing is uploaded.</string>
 
     <string name="language_system">System</string>
     <string name="language_zh">中文</string>
     <string name="language_en">English</string>
-
-    <string name="profile_nickname">Nickname</string>
     <string name="profile_gender_age">Gender / Age</string>
-    <string name="profile_body">Height / Weight</string>
     <string name="profile_activity">Activity level</string>
     <string name="profile_goal">Goal</string>
 
@@ -76,7 +61,6 @@
     <string name="home_status">%1$s</string>
     <string name="home_health_index">Lifestyle score</string>
     <string name="home_score_label">Lifestyle score</string>
-    <string name="home_score_delta">+%1$d vs last week</string>
     <string name="home_section_today">Today</string>
     <string name="home_section_today_sub">Goal completion</string>
     <string name="home_view_stats">Stats →</string>
@@ -92,9 +76,6 @@
     <string name="home_quick_hint">One tap to log</string>
     <string name="home_ai_title">This week</string>
     <string name="home_ai_cta">View</string>
-    <string name="home_bmi">BMI %1$s</string>
-    <string name="home_tdee">TDEE %1$d</string>
-    <string name="home_habits">Habits %1$d/%2$d</string>
 
     <string name="dim_nutrition">Nutrition</string>
     <string name="dim_activity">Activity</string>
@@ -138,7 +119,6 @@
     <string name="stats_tab_macro">Macros</string>
     <string name="stats_tab_week">Compare</string>
     <string name="stats_tab_radar">Radar</string>
-    <string name="stats_weight">Weight</string>
     <string name="stats_steps">Steps</string>
     <string name="stats_sleep">Sleep</string>
     <string name="stats_calories">Intake</string>
@@ -166,7 +146,6 @@
     <string name="ai_input_hint">Ask anything about your health…</string>
     <string name="ai_send">Send</string>
     <string name="ai_empty_chat">Try: “How do I sleep better?” or “Is my protein enough?”</string>
-    <string name="ai_error">Something went wrong. Offline answer shown instead.</string>
     <string name="ai_clear">Clear</string>
     <string name="ai_score">Score %1$d / 100</string>
 
@@ -208,9 +187,7 @@
     <string name="habits_add">Add habit</string>
     <string name="habits_empty">No habits yet — add one to build the consistency score.</string>
     <string name="habit_name">Habit name</string>
-    <string name="habit_delete">Delete</string>
     <!-- Settings page -->
-    <string name="settings_me">Me</string>
     <string name="settings_group_personal">Personal</string>
     <string name="settings_group_preferences">Preferences</string>
     <string name="settings_group_about">Data &amp; about</string>
@@ -220,15 +197,12 @@
     <string name="settings_row_ai">AI endpoint</string>
     <string name="settings_row_reminders">Reminders</string>
     <string name="settings_row_about">About OmniHealth</string>
-    <string name="settings_reminders_off">Off</string>
-    <string name="settings_version">Version 1.0.0</string>
     <string name="settings_back">Back</string>
     <string name="settings_appearance_title">Appearance</string>
     <string name="settings_appearance_sub">Framework, palette, language, motion</string>
     <string name="framework_miuix">MIUIX</string>
     <string name="framework_md3">Material 3</string>
     <string name="settings_section_framework">UI framework</string>
-    <string name="settings_section_framework_sub">Component system, not just colors</string>
     <string name="insight_steps_left">%1$s steps left to hit today\'s goal</string>
     <string name="insight_water_left">Drink %1$s more to reach your water goal</string>
     <string name="insight_calories_left">%1$s kcal left today</string>
@@ -243,7 +217,6 @@
     <string name="reminder_off">Off</string>
     <string name="reminder_permission_hint">Allow notifications to receive reminders</string>
     <string name="settings_row_export">Export data</string>
-    <string name="export_done">Saved to %1$s</string>
     <string name="export_failed">Export failed</string>
     <string name="about_title">About OmniHealth</string>
     <string name="about_version">Version %1$s</string>
@@ -253,14 +226,12 @@
     <string name="motion_title">Reduce motion</string>
     <string name="motion_desc">Turn off page slide animations</string>
     <string name="score_insufficient">Not enough data</string>
-    <string name="score_insufficient_hint">Log sleep, water or meals to get a score</string>
     <string name="deleted_hint">Deleted “%1$s”</string>
     <string name="undo">Undo</string>
     <string name="day_today">Today</string>
     <string name="diet_edit_title">Edit record</string>
     <string name="settings_row_backup">Backup data</string>
     <string name="settings_row_restore">Restore backup</string>
-    <string name="backup_detail">%1$d records · v%2$d</string>
     <string name="restore_confirm_title">Restore this backup?</string>
     <string name="restore_confirm_body">It contains %1$d records (format v%2$d). Current data will be replaced.</string>
     <string name="restore_done">Restored %1$d records</string>
@@ -334,4 +305,26 @@
     <string name="theme_monet_label">Monet</string>
     <string name="theme_monet_tagline">Follows your wallpaper</string>
     <string name="theme_monet_blurb">Samples accent and surface tones from the system wallpaper (Android 12+); falls back to a soft sage palette.</string>
+    <string name="trend_no_recent">%1$s: no records in the last 7 days</string>
+    <string name="trend_insufficient">%1$s: not enough data to compare</string>
+    <string name="trend_flat">%1$s is flat versus the previous week</string>
+    <string name="trend_change">%1$s %2$s %3$s %4$s over the last week</string>
+    <string name="trend_up">up</string>
+    <string name="trend_down">down</string>
+    <string name="trend_evidence">Last 7 days avg %1$s %2$s (%3$d days), previous 7 days avg %4$s %5$s (%6$d days)</string>
+    <string name="trend_coverage">Valid records: %1$d days this week, %2$d days last week</string>
+    <string name="trend_limitation">Averages depend on how many days were logged; single-day swings are not a trend. Missing days are excluded.</string>
+    <string name="review_summary_no_data">No usable records this week</string>
+    <string name="review_summary_few">Logged meals on %1$d days — the habit itself is not steady yet</string>
+    <string name="review_summary_breakfast">Logged meals on %1$d days, %2$d of them without a breakfast entry</string>
+    <string name="review_summary_stable">Logged meals on %1$d days — pace looks steady</string>
+    <string name="review_coverage">Meals %1$d/7 (breakfast %2$d) · Sleep %3$d/7 · Steps %4$d/7</string>
+    <string name="review_action_fix">Pick a fixed time to log, start with consistency</string>
+    <string name="review_action_breakfast">Check the days without breakfast — missing entry or skipped meal?</string>
+    <string name="review_action_sleep">Add one sleep record so the trend has evidence</string>
+    <string name="review_action_none">Keep the current pace, no target changes</string>
+    <string name="review_image_title">OmniHealth · Weekly review</string>
+    <string name="review_image_footer">Based on this device only; missing days are never treated as zero</string>
+    <string name="review_share_title">Share weekly review</string>
+    <string name="plan_estimate_note">Estimated from reference portions; weigh when you can</string>
 </resources>

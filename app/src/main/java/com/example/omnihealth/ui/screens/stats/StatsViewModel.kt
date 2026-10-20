@@ -152,9 +152,9 @@ class StatsViewModel(private val repository: HealthRepository) : ViewModel() {
             score = score,
             stepGoal = core.settings.stepGoal,
             hasData = stepRows.isNotEmpty() || dietRows.isNotEmpty() || weightRows.isNotEmpty(),
-            weightInsight = TrendInterpreter.compareWeeks(weightSeries14, "kg", true, "体重"),
-            calorieInsight = TrendInterpreter.compareWeeks(calorieSeries14, "kcal", false, "摄入"),
-            stepsInsight = TrendInterpreter.compareWeeks(stepSeries14, "步", false, "步数"),
+            weightInsight = TrendInterpreter.compareWeeks(weightSeries14, "kg", true),
+            calorieInsight = TrendInterpreter.compareWeeks(calorieSeries14, "kcal", false),
+            stepsInsight = TrendInterpreter.compareWeeks(stepSeries14, "步", false),
             fiberDays = dietRows.filter { it.epochDay in days }
                 .groupBy { it.epochDay }
                 .count { (_, items) -> items.sumOf { it.fiber.toDouble() } >= 25.0 },

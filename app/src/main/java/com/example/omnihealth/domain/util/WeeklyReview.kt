@@ -3,87 +3,72 @@ package com.example.omnihealth.domain.util
 /**
  * 周复盘的**确定性**生成器。
  *
- * 对应方案第六节：
- * - 只讲三件事：本周发生了什么、依据有多少、下周做一件事；
- * - 「未记录早餐」不等于「没吃早餐」，文案必须区分；
- * - 行动要能连接到真实功能，不是一个按钮都不给的文字；
- * - 不自动改目标、不创建已完成记录、不做惩罚式表达。
+ * 产出结构化结论（枚举 + 数字），文案由 UI 组装；
+ * 规则：只说发生了什么、有多少依据、下一步做什么；未记录不等于没吃；不自动改目标。
  */
 object WeeklyReview {
 
-    enum class ActionType {
-        /** 打开记录页补录 */
-        OPEN_RECORDS,
+    enum class Summary { NO_DATA, FEW_DAYS, MISSING_BREAKFAST, STABLE }
 
-        /** 打开提醒设置 */
-        OPEN_REMINDERS,
+    enum class ActionKind {
+        /** 固定记录习惯 */
+        FIX_LOGGING,
 
-        /** 不需要动作 */
-        NONE,
+        /** 核对缺早餐的那几天 */
+        CHECK_BREAKFAST,
+
+        /** 补睡眠记录 */
+        LOG_SLEEP,
+
+        /** 保持现状 */
+        NO_CHANGE,
     }
 
-    data class Action(
-        val title: String,
-        val type: ActionType,
-    )
+    enum class ActionType { OPEN_RECORDS, OPEN_REMINDERS, NONE }
+
+    data class Action(val kind: ActionKind, val type: ActionType)
 
     data class Review(
-        val summary: String,
-        val evidence: String,
+        val summary: Summary,
+        val dietDays: Int,
+        val breakfastDays: Int,
+        val sleepDays: Int,
+        val stepDays: Int,
+        val missingBreakfast: Int,
         val actions: List<Action>,
-        /** 是否值得展示（完全没数据时不硬编一段复盘） */
-        val hasData: Boolean,
-    )
+    ) {
+        val hasData: Boolean get() = dietDays > 0 || sleepDays > 0 || stepDays > 0
+    }
 
-    /**
-     * @param dietDays 近 7 天里「有饮食记录」的天数
-     * @param breakfastDays 其中记录了早餐的天数
-     * @param sleepDays 有睡眠记录的天数
-     * @param stepDays 有步数记录的天数
-     */
-    fun build(
-        dietDays: Int,
-        breakfastDays: Int,
-        sleepDays: Int,
-        stepDays: Int,
-    ): Review {
-        val maxDays = 7
-        if (dietDays == 0 && sleepDays == 0 && stepDays == 0) {
-            return Review(
-                summary = "本周还没有可用记录",
-                evidence = "饮食 0 天 · 睡眠 0 天 · 步数 0 天",
-                actions = listOf(Action("先记录今天的一餐", ActionType.OPEN_RECORDS)),
-                hasData = false,
-            )
-        }
-
+    fun build(dietDays: Int, breakfastDays: Int, sleepDays: Int, stepDays: Int): Review {
         val missingBreakfast = (dietDays - breakfastDays).coerceAtLeast(0)
-        val summary = when {
-            dietDays < 4 ->
-                "本周有 $dietDays 天记录了饮食，记录本身还不够稳定"
-            missingBreakfast >= 3 ->
-                "本周有 $dietDays 天记录了饮食，其中 $missingBreakfast 天没有早餐记录"
-            else ->
-                "本周记录了 $dietDays 天饮食，节奏基本稳定"
-        }
+        val hasData = dietDays > 0 || sleepDays > 0 || stepDays > 0
 
-        val evidence = "饮食 $dietDays/$maxDays 天（含早餐 $breakfastDays 天）· " +
-            "睡眠 $sleepDays/$maxDays 天 · 步数 $stepDays/$maxDays 天"
+        val summary = when {
+            !hasData -> Summary.NO_DATA
+            dietDays < 4 -> Summary.FEW_DAYS
+            missingBreakfast >= 3 -> Summary.MISSING_BREAKFAST
+            else -> Summary.STABLE
+        }
 
         val actions = buildList {
-            if (dietDays < 4) {
-                add(Action("固定一个记录时间，先把记录补起来", ActionType.OPEN_REMINDERS))
-            } else if (missingBreakfast >= 3) {
-                add(Action("看看缺早餐的那几天，是没记录还是没吃", ActionType.OPEN_RECORDS))
+            when {
+                !hasData -> add(Action(ActionKind.FIX_LOGGING, ActionType.OPEN_RECORDS))
+                dietDays < 4 -> add(Action(ActionKind.FIX_LOGGING, ActionType.OPEN_REMINDERS))
+                missingBreakfast >= 3 -> add(Action(ActionKind.CHECK_BREAKFAST, ActionType.OPEN_RECORDS))
             }
-            if (sleepDays == 0) {
-                add(Action("补一条睡眠记录，趋势才有依据", ActionType.OPEN_RECORDS))
-            }
-            if (isEmpty()) {
-                add(Action("保持当前节奏，暂不调整目标", ActionType.NONE))
-            }
+            if (hasData && sleepDays == 0) add(Action(ActionKind.LOG_SLEEP, ActionType.OPEN_RECORDS))
+            if (isEmpty()) add(Action(ActionKind.NO_CHANGE, ActionType.NONE))
         }
 
-        return Review(summary = summary, evidence = evidence, actions = actions, hasData = true)
+        return Review(
+            summary = summary,
+            dietDays = dietDays,
+            breakfastDays = breakfastDays,
+            sleepDays = sleepDays,
+            stepDays = stepDays,
+            missingBreakfast = missingBreakfast,
+            actions = actions,
+        )
     }
 }
