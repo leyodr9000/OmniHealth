@@ -455,6 +455,19 @@ fun SettingsScreen(
             },
             sleepHour = settings.sleepHour,
             sleepMinute = settings.sleepMinute,
+            mealLog = settings.mealLogReminder,
+            mealLogHour = settings.mealLogHour,
+            onMealLogChange = { enabled ->
+                ensureNotificationPermission()
+                scope.launch { repository.setMealLogReminder(enabled) }
+                ReminderScheduler.setMealLogReminder(context, enabled, settings.mealLogHour)
+            },
+            onMealLogHourChange = { hour ->
+                scope.launch {
+                    repository.setMealLogHour(hour)
+                    ReminderScheduler.setMealLogReminder(context, settings.mealLogReminder, hour)
+                }
+            },
             onSleepTimeChange = { hour, minute ->
                 scope.launch {
                     repository.setSleepTime(hour, minute)

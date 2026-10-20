@@ -228,6 +228,7 @@ class HealthRepository(
                 protein = food.protein * ratio,
                 carbs = food.carbs * ratio,
                 fat = food.fat * ratio,
+                fiber = food.fiber * ratio,
                 epochDay = epochDay,
                 tzOffsetMinutes = tzOffset(),
             ),
@@ -448,6 +449,10 @@ class HealthRepository(
     suspend fun setSleepReminder(enabled: Boolean) = preferences.setSleepReminder(enabled)
 
     suspend fun setSleepTime(hour: Int, minute: Int) = preferences.setSleepTime(hour, minute)
+
+    suspend fun setMealLogReminder(enabled: Boolean) = preferences.setMealLogReminder(enabled)
+
+    suspend fun setMealLogHour(hour: Int) = preferences.setMealLogHour(hour)
 
     /** 导出全部记录为 CSV，返回文件路径。 */
     suspend fun exportCsv(context: android.content.Context): java.io.File? =

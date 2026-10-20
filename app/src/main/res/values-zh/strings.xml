@@ -322,4 +322,13 @@
     <string name="meal_empty">未记录</string>
     <string name="trend_show_basis">查看依据</string>
     <string name="trend_hide_basis">收起依据</string>
+    <string name="unit_gram">克</string>
+    <string name="unit_serving">份（%1$d g）</string>
+    <string name="reminder_meal_log">记录提醒</string>
+    <string name="reminder_meal_log_desc">每天固定时间提醒补记当天餐食</string>
+    <string name="widget_title">今天</string>
+    <string name="widget_hint">点击去记录</string>
+    <string name="widget_logged">kcal 已记录</string>
+    <string name="review_fiber">本周纤维达标 %1$d/7 天</string>
+    <string name="review_share_image">存成图片</string>
 </resources>

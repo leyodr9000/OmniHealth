@@ -322,4 +322,13 @@
     <string name="meal_empty">not logged</string>
     <string name="trend_show_basis">Show basis</string>
     <string name="trend_hide_basis">Hide basis</string>
+    <string name="unit_gram">Grams</string>
+    <string name="unit_serving">Portion (%1$d g)</string>
+    <string name="reminder_meal_log">Meal logging</string>
+    <string name="reminder_meal_log_desc">Daily nudge to fill in today\u2019s meals</string>
+    <string name="widget_title">Today</string>
+    <string name="widget_hint">Open to log</string>
+    <string name="widget_logged">kcal logged today</string>
+    <string name="review_fiber">Fiber target met on %1$d/7 days</string>
+    <string name="review_share_image">Save as image</string>
 </resources>

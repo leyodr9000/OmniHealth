@@ -19,11 +19,17 @@ import com.example.omnihealth.ui.i18n.AppLanguage
 import com.example.omnihealth.ui.i18n.LocalizedApp
 import com.example.omnihealth.ui.navigation.NavLayoutMode
 import com.example.omnihealth.ui.theme.OmniHealthTheme
+import com.example.omnihealth.widget.TodayWidgetProvider
 import com.example.omnihealth.ui.theme.ThemeMode
 import com.example.omnihealth.ui.theme.UiFramework
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
+
+    override fun onResume() {
+        super.onResume()
+        TodayWidgetProvider.refresh(this)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()

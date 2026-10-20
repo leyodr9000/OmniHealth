@@ -450,11 +450,15 @@ fun RemindersSheet(
     intervalHours: Int,
     sleepHour: Int,
     sleepMinute: Int,
+    mealLog: Boolean,
+    mealLogHour: Int,
     onDismiss: () -> Unit,
     onWaterChange: (Boolean) -> Unit,
     onSleepChange: (Boolean) -> Unit,
     onWindowChange: (Int, Int, Int) -> Unit,
     onSleepTimeChange: (Int, Int) -> Unit,
+    onMealLogChange: (Boolean) -> Unit,
+    onMealLogHourChange: (Int) -> Unit,
 ) {
     val palette = OmniTheme.palette
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -537,6 +541,21 @@ fun RemindersSheet(
                         value = String.format(java.util.Locale.US, "%02d", sleepMinute),
                         onMinus = { onSleepTimeChange(sleepHour, (sleepMinute - 15 + 60) % 60) },
                         onPlus = { onSleepTimeChange(sleepHour, (sleepMinute + 15) % 60) },
+                    )
+                }
+
+                ReminderRow(
+                    title = stringResource(R.string.reminder_meal_log),
+                    desc = stringResource(R.string.reminder_meal_log_desc),
+                    checked = mealLog,
+                    onCheckedChange = onMealLogChange,
+                )
+                if (mealLog) {
+                    WindowStepper(
+                        label = stringResource(R.string.reminder_sleep_hour),
+                        value = String.format(java.util.Locale.US, "%02d:00", mealLogHour),
+                        onMinus = { onMealLogHourChange((mealLogHour - 1 + 24) % 24) },
+                        onPlus = { onMealLogHourChange((mealLogHour + 1) % 24) },
                     )
                 }
 

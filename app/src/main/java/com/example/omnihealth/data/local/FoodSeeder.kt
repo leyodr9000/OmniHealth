@@ -4,6 +4,7 @@ import android.content.Context
 import com.example.omnihealth.data.local.dao.DietDao
 import com.example.omnihealth.data.local.entity.FoodEntity
 import kotlinx.serialization.Serializable
+import kotlinx.coroutines.flow.first
 import kotlinx.serialization.json.Json
 
 @Serializable
@@ -55,5 +56,38 @@ object FoodSeeder {
             )
         }
         dietDao.insertFoods(rows)
+    }
+
+    /**
+     * 增量同步：把 assets 里新增的条目补进已有库。
+     *
+     * 首次建库仍走 [seed]；老用户升级后靠这里补新食物，避免「只有新装用户能搜到」。
+     */
+    suspend fun sync(context: Context, dietDao: DietDao) {
+        val existing = dietDao.observeFoods().first().map { it.name }.toSet()
+        val raw = runCatching {
+            context.assets.open("foods_extra.json").bufferedReader().use { it.readText() }
+        }.getOrNull() ?: return
+        val seeds = runCatching { json.decodeFromString<List<FoodSeed>>(raw) }.getOrNull() ?: return
+
+        val missing = seeds.filter { it.name !in existing }
+        if (missing.isEmpty()) return
+
+        dietDao.insertFoods(
+            missing.map { seed ->
+                FoodEntity(
+                    name = seed.name,
+                    nameEn = seed.nameEn,
+                    category = seed.category,
+                    calories = seed.calories,
+                    protein = seed.protein,
+                    carbs = seed.carbs,
+                    fat = seed.fat,
+                    fiber = seed.fiber,
+                    servingGrams = seed.serving,
+                    isCustom = false,
+                )
+            },
+        )
     }
 }

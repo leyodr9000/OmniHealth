@@ -59,6 +59,7 @@ class ReminderWorker(
 
         val (title, text) = when (kind) {
             KIND_SLEEP -> "该准备睡觉了" to "距离目标睡眠还差一点，放下手机，给自己留 40 分钟缓冲。"
+            KIND_MEAL_LOG -> "今天记全了吗" to "花一分钟补一下今天的餐食，明天的趋势才有依据。"
             else -> "该喝水了" to "起身活动一下，补充 200–300 ml 水。"
         }
 
@@ -88,6 +89,7 @@ class ReminderWorker(
         const val KEY_KIND = "kind"
         const val KIND_WATER = "water"
         const val KIND_SLEEP = "sleep"
+        const val KIND_MEAL_LOG = "meal_log"
         private const val CHANNEL_ID = "omni_health_reminders"
     }
 }
@@ -99,6 +101,7 @@ object ReminderScheduler {
 
     private const val WATER_WORK = "reminder_water"
     private const val SLEEP_WORK = "reminder_sleep"
+    private const val MEAL_LOG_WORK = "reminder_meal_log"
 
     /**
      * 饮水提醒：按用户设定的时段与间隔调度。
@@ -148,6 +151,20 @@ object ReminderScheduler {
             .setInputData(androidx.work.workDataOf(ReminderWorker.KEY_KIND to ReminderWorker.KIND_SLEEP))
             .build()
         manager.enqueueUniquePeriodicWork(SLEEP_WORK, ExistingPeriodicWorkPolicy.UPDATE, request)
+    }
+
+    /** 记录提醒：每天固定时刻提醒补记当天餐食。 */
+    fun setMealLogReminder(context: Context, enabled: Boolean, hour: Int = 20) {
+        val manager = WorkManager.getInstance(context)
+        if (!enabled) {
+            manager.cancelUniqueWork(MEAL_LOG_WORK)
+            return
+        }
+        val request = PeriodicWorkRequestBuilder<ReminderWorker>(24, TimeUnit.HOURS)
+            .setInitialDelay(millisUntil(LocalTime.of(hour.coerceIn(0, 23), 0)), TimeUnit.MILLISECONDS)
+            .setInputData(androidx.work.workDataOf(ReminderWorker.KEY_KIND to ReminderWorker.KIND_MEAL_LOG))
+            .build()
+        manager.enqueueUniquePeriodicWork(MEAL_LOG_WORK, ExistingPeriodicWorkPolicy.UPDATE, request)
     }
 
     private fun millisUntil(target: LocalTime): Long {

@@ -39,6 +39,7 @@ data class StatsUiState(
     val calorieInsight: TrendInterpreter.Insight? = null,
     val stepsInsight: TrendInterpreter.Insight? = null,
     val weeklyReview: WeeklyReview.Review? = null,
+    val fiberDays: Int = 0,
 )
 
 private data class StatsCore(
@@ -154,6 +155,9 @@ class StatsViewModel(private val repository: HealthRepository) : ViewModel() {
             weightInsight = TrendInterpreter.compareWeeks(weightSeries14, "kg", true, "体重"),
             calorieInsight = TrendInterpreter.compareWeeks(calorieSeries14, "kcal", false, "摄入"),
             stepsInsight = TrendInterpreter.compareWeeks(stepSeries14, "步", false, "步数"),
+            fiberDays = dietRows.filter { it.epochDay in days }
+                .groupBy { it.epochDay }
+                .count { (_, items) -> items.sumOf { it.fiber.toDouble() } >= 25.0 },
             weeklyReview = WeeklyReview.build(
                 dietDays = dietRows.filter { it.epochDay in days }.map { it.epochDay }.distinct().size,
                 breakfastDays = dietRows.filter { it.epochDay in days && it.mealType == "BREAKFAST" }

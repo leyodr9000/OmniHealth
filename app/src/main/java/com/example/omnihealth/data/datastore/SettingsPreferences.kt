@@ -70,6 +70,8 @@ data class AppSettings(
     val waterEndHour: Int = 22,
     val waterIntervalHours: Int = 2,
     val sleepReminder: Boolean = false,
+    val mealLogReminder: Boolean = false,
+    val mealLogHour: Int = 20,
     val sleepHour: Int = 22,
     val sleepMinute: Int = 30,
     val onboarded: Boolean = false,
@@ -109,6 +111,8 @@ class SettingsPreferences(private val context: Context) {
         val waterEnd = intPreferencesKey("water_end_hour")
         val waterInterval = intPreferencesKey("water_interval_hours")
         val sleepReminder = booleanPreferencesKey("reminder_sleep")
+        val mealLogReminder = booleanPreferencesKey("reminder_meal_log")
+        val mealLogHour = intPreferencesKey("meal_log_hour")
         val sleepHour = intPreferencesKey("sleep_hour")
         val sleepMinute = intPreferencesKey("sleep_minute")
     }
@@ -147,6 +151,8 @@ class SettingsPreferences(private val context: Context) {
             waterEndHour = p[Keys.waterEnd] ?: 22,
             waterIntervalHours = p[Keys.waterInterval] ?: 2,
             sleepReminder = p[Keys.sleepReminder] ?: false,
+            mealLogReminder = p[Keys.mealLogReminder] ?: false,
+            mealLogHour = p[Keys.mealLogHour] ?: 20,
             sleepHour = p[Keys.sleepHour] ?: 22,
             sleepMinute = p[Keys.sleepMinute] ?: 30,
             onboarded = p[Keys.onboarded] ?: false,
@@ -209,6 +215,12 @@ class SettingsPreferences(private val context: Context) {
         }
 
     /** 睡眠提醒时间（本地时区）。 */
+    suspend fun setMealLogReminder(enabled: Boolean) =
+        context.omniDataStore.edit { it[Keys.mealLogReminder] = enabled }
+
+    suspend fun setMealLogHour(hour: Int) =
+        context.omniDataStore.edit { it[Keys.mealLogHour] = hour.coerceIn(0, 23) }
+
     suspend fun setSleepTime(hour: Int, minute: Int) =
         context.omniDataStore.edit {
             it[Keys.sleepHour] = hour.coerceIn(0, 23)

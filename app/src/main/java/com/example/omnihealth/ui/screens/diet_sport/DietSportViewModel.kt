@@ -42,6 +42,7 @@ data class DietUiState(
     val protein: Int = 0,
     val carbs: Int = 0,
     val fat: Int = 0,
+    val fiber: Float = 0f,
     val calorieGoal: Int = 2_000,
 ) {
     val left: Int get() = (calorieGoal - calories).coerceAtLeast(0)
@@ -120,6 +121,7 @@ class DietSportViewModel(
             protein = logs.sumOf { it.protein.toDouble() }.toInt(),
             carbs = logs.sumOf { it.carbs.toDouble() }.toInt(),
             fat = logs.sumOf { it.fat.toDouble() }.toInt(),
+            fiber = logs.sumOf { it.fiber.toDouble() }.toFloat(),
             calorieGoal = HealthCalculator.calorieTarget(tdee, profile.goal.calorieDelta),
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), DietUiState())

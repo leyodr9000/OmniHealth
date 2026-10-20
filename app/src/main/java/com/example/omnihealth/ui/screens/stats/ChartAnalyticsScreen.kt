@@ -19,6 +19,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import kotlinx.coroutines.launch
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.getValue
@@ -269,7 +270,7 @@ fun ChartAnalyticsScreen(
             }
         }
         state.weeklyReview?.let { review ->
-            item { WeeklyReviewCard(review = review, onOpenRecords = onOpenRecords, onOpenReminders = onOpenReminders) }
+            item { WeeklyReviewCard(review = review, fiberDays = state.fiberDays, onOpenRecords = onOpenRecords, onOpenReminders = onOpenReminders) }
         }
 
         if (selected == 0) state.weightInsight?.let { insight ->
@@ -393,6 +394,7 @@ private fun TrendInsightCard(
 @Composable
 private fun WeeklyReviewCard(
     review: com.example.omnihealth.domain.util.WeeklyReview.Review,
+    fiberDays: Int,
     onOpenRecords: () -> Unit,
     onOpenReminders: () -> Unit,
 ) {
@@ -412,10 +414,39 @@ private fun WeeklyReviewCard(
             modifier = Modifier.padding(top = 6.dp),
         )
         Text(
+            text = stringResource(R.string.review_fiber, fiberDays),
+            color = palette.textSecondary,
+            fontSize = 10.sp,
+            modifier = Modifier.padding(top = 4.dp),
+        )
+        Text(
             text = review.evidence,
             color = palette.textTertiary,
             fontSize = 10.sp,
             modifier = Modifier.padding(top = 4.dp),
+        )
+        // 存成图片：给一个「带得走」的出口，而不只是留在 App 里
+        val imageContext = androidx.compose.ui.platform.LocalContext.current
+        val imageScope = androidx.compose.runtime.rememberCoroutineScope()
+        Text(
+            text = stringResource(R.string.review_share_image),
+            color = palette.accent,
+            fontSize = 11.sp,
+            fontWeight = FontWeight.Medium,
+            modifier = Modifier
+                .padding(top = 10.dp)
+                .clip(RoundedCornerShape(10.dp))
+                .background(palette.accent.copy(alpha = 0.10f))
+                .quietClick {
+                    imageScope.launch {
+                        val file = com.example.omnihealth.data.export.ReportImageExporter
+                            .export(imageContext, review, fiberDays)
+                        if (file != null) {
+                            com.example.omnihealth.data.export.ReportImageExporter.share(imageContext, file)
+                        }
+                    }
+                }
+                .padding(horizontal = 12.dp, vertical = 8.dp),
         )
         review.actions.forEach { action ->
             val onClick = when (action.type) {

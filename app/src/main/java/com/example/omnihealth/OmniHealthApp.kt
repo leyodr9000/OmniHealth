@@ -9,6 +9,7 @@ import com.example.omnihealth.data.repository.HealthRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 
 /**
  * 应用入口 + 手写依赖容器（无 DI 框架，保持构建简单）。
@@ -46,6 +47,15 @@ class OmniHealthApp : Application(), Configuration.Provider {
     override fun onCreate() {
         super.onCreate()
         instance = this
+        // 增量补库：老用户升级后也能搜到新加的食物
+        applicationScope.launch {
+            runCatching {
+                database?.let { db ->
+                    com.example.omnihealth.data.local.FoodSeeder.sync(this@OmniHealthApp, db.dietDao())
+                    com.example.omnihealth.widget.TodayWidgetProvider.refresh(this@OmniHealthApp)
+                }
+            }
+        }
     }
 
     companion object {

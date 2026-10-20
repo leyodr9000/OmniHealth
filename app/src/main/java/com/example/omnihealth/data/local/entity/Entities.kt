@@ -121,6 +121,7 @@ data class DietLogEntity(
     val protein: Float,
     val carbs: Float,
     val fat: Float,
+    val fiber: Float = 0f,
     val epochDay: Long,
     val timestamp: Long = System.currentTimeMillis(),
     /** 记录时的时区偏移（分钟），用于跨时区回看时保持归属不变。 */

@@ -575,6 +575,8 @@ private fun FoodAmountSheet(
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var grams by remember { mutableStateOf(initialGrams) }
     var meal by remember { mutableStateOf(initialMeal) }
+    var byServing by remember { mutableStateOf(false) }
+    val serving = food.servingGrams.coerceAtLeast(1f)
 
     val meals = listOf(
         MealType.BREAKFAST to stringResource(R.string.meal_breakfast),
@@ -651,10 +653,40 @@ private fun FoodAmountSheet(
                         modifier = Modifier.weight(1f),
                     )
                     Text(
-                        text = "${grams.toInt()} g",
+                        text = if (byServing) {
+                            "${(grams / serving).let { if (it >= 10f) String.format(java.util.Locale.US, "%.0f", it) else String.format(java.util.Locale.US, "%.1f", it) }} 份"
+                        } else {
+                            "${grams.toInt()} g"
+                        },
                         color = palette.textPrimary,
                         fontSize = 22.sp,
                         fontWeight = FontWeight.Bold,
+                    )
+                }
+
+                Spacer(Modifier.height(6.dp))
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    listOf(false to stringResource(R.string.unit_gram), true to stringResource(R.string.unit_serving, serving.toInt()))
+                        .forEach { (isServing, label) ->
+                            Text(
+                                text = label,
+                                color = if (byServing == isServing) palette.accent else palette.textTertiary,
+                                fontSize = 11.sp,
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(9.dp))
+                                    .background(
+                                        if (byServing == isServing) palette.accent.copy(alpha = 0.12f)
+                                        else palette.textPrimary.copy(alpha = 0.05f),
+                                    )
+                                    .quietClick { byServing = isServing }
+                                    .padding(horizontal = 10.dp, vertical = 6.dp),
+                            )
+                        }
+                    Text(
+                        text = "${grams.toInt()} g",
+                        color = palette.textTertiary,
+                        fontSize = 10.sp,
+                        modifier = Modifier.padding(start = 4.dp, top = 6.dp),
                     )
                 }
 
@@ -668,7 +700,8 @@ private fun FoodAmountSheet(
                                 .clip(RoundedCornerShape(12.dp))
                                 .background(palette.textPrimary.copy(alpha = 0.05f))
                                 .bounceClick(pressScale = 0.93f, haptics = false) {
-                                    grams = (grams + delta).coerceIn(5f, 1000f)
+                                    val step = if (byServing) serving * (delta / 50f) else delta
+                                    grams = (grams + step).coerceIn(5f, 1000f)
                                 }
                                 .padding(vertical = 10.dp),
                             contentAlignment = Alignment.Center,
