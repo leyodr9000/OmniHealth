@@ -430,7 +430,25 @@ fun SettingsScreen(
             onSleepChange = { enabled ->
                 ensureNotificationPermission()
                 scope.launch { repository.setSleepReminder(enabled) }
-                ReminderScheduler.setSleepReminder(context, enabled)
+                ReminderScheduler.setSleepReminder(
+                    context = context,
+                    enabled = enabled,
+                    hour = settings.sleepHour,
+                    minute = settings.sleepMinute,
+                )
+            },
+            sleepHour = settings.sleepHour,
+            sleepMinute = settings.sleepMinute,
+            onSleepTimeChange = { hour, minute ->
+                scope.launch {
+                    repository.setSleepTime(hour, minute)
+                    ReminderScheduler.setSleepReminder(
+                        context = context,
+                        enabled = settings.sleepReminder,
+                        hour = hour,
+                        minute = minute,
+                    )
+                }
             },
             onWindowChange = { start, end, interval ->
                 scope.launch {

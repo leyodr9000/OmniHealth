@@ -132,14 +132,19 @@ object ReminderScheduler {
         manager.enqueueUniquePeriodicWork(WATER_WORK, ExistingPeriodicWorkPolicy.UPDATE, request)
     }
 
-    fun setSleepReminder(context: Context, enabled: Boolean) {
+    fun setSleepReminder(
+        context: Context,
+        enabled: Boolean,
+        hour: Int = 22,
+        minute: Int = 30,
+    ) {
         val manager = WorkManager.getInstance(context)
         if (!enabled) {
             manager.cancelUniqueWork(SLEEP_WORK)
             return
         }
         val request = PeriodicWorkRequestBuilder<ReminderWorker>(24, TimeUnit.HOURS)
-            .setInitialDelay(millisUntil(LocalTime.of(22, 30)), TimeUnit.MILLISECONDS)
+            .setInitialDelay(millisUntil(LocalTime.of(hour.coerceIn(0, 23), minute.coerceIn(0, 59))), TimeUnit.MILLISECONDS)
             .setInputData(androidx.work.workDataOf(ReminderWorker.KEY_KIND to ReminderWorker.KIND_SLEEP))
             .build()
         manager.enqueueUniquePeriodicWork(SLEEP_WORK, ExistingPeriodicWorkPolicy.UPDATE, request)

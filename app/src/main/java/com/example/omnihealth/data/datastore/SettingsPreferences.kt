@@ -70,6 +70,8 @@ data class AppSettings(
     val waterEndHour: Int = 22,
     val waterIntervalHours: Int = 2,
     val sleepReminder: Boolean = false,
+    val sleepHour: Int = 22,
+    val sleepMinute: Int = 30,
     val onboarded: Boolean = false,
 )
 
@@ -107,6 +109,8 @@ class SettingsPreferences(private val context: Context) {
         val waterEnd = intPreferencesKey("water_end_hour")
         val waterInterval = intPreferencesKey("water_interval_hours")
         val sleepReminder = booleanPreferencesKey("reminder_sleep")
+        val sleepHour = intPreferencesKey("sleep_hour")
+        val sleepMinute = intPreferencesKey("sleep_minute")
     }
 
     val settings: Flow<AppSettings> = context.omniDataStore.data.map { p ->
@@ -143,6 +147,8 @@ class SettingsPreferences(private val context: Context) {
             waterEndHour = p[Keys.waterEnd] ?: 22,
             waterIntervalHours = p[Keys.waterInterval] ?: 2,
             sleepReminder = p[Keys.sleepReminder] ?: false,
+            sleepHour = p[Keys.sleepHour] ?: 22,
+            sleepMinute = p[Keys.sleepMinute] ?: 30,
             onboarded = p[Keys.onboarded] ?: false,
         )
     }
@@ -200,5 +206,12 @@ class SettingsPreferences(private val context: Context) {
             it[Keys.waterStart] = startHour.coerceIn(0, 23)
             it[Keys.waterEnd] = endHour.coerceIn(1, 24)
             it[Keys.waterInterval] = intervalHours.coerceIn(1, 6)
+        }
+
+    /** 睡眠提醒时间（本地时区）。 */
+    suspend fun setSleepTime(hour: Int, minute: Int) =
+        context.omniDataStore.edit {
+            it[Keys.sleepHour] = hour.coerceIn(0, 23)
+            it[Keys.sleepMinute] = minute.coerceIn(0, 59)
         }
 }

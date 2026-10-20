@@ -289,4 +289,6 @@
     <string name="ai_disclosure_ok">同意并继续</string>
     <string name="ai_disclosure_cancel">暂不</string>
     <string name="ai_insecure_endpoint">接口地址不是 HTTPS，已阻止云端调用，改用本地分析。</string>
+    <string name="reminder_sleep_hour">小时</string>
+    <string name="reminder_sleep_minute">分钟</string>
 </resources>

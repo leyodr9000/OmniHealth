@@ -381,6 +381,8 @@ class HealthRepository(
 
     suspend fun setSleepReminder(enabled: Boolean) = preferences.setSleepReminder(enabled)
 
+    suspend fun setSleepTime(hour: Int, minute: Int) = preferences.setSleepTime(hour, minute)
+
     /** 导出全部记录为 CSV，返回文件路径。 */
     suspend fun exportCsv(context: android.content.Context): java.io.File? =
         com.example.omnihealth.data.export.CsvExporter.export(context, db)

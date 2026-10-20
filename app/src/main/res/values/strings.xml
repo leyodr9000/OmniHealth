@@ -289,4 +289,6 @@
     <string name="ai_disclosure_ok">Agree and continue</string>
     <string name="ai_disclosure_cancel">Not now</string>
     <string name="ai_insecure_endpoint">Custom endpoint is not HTTPS - cloud calls are blocked, showing local analysis instead.</string>
+    <string name="reminder_sleep_hour">Hour</string>
+    <string name="reminder_sleep_minute">Minute</string>
 </resources>
