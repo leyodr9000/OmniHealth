@@ -187,16 +187,6 @@ internal fun genderLabel(gender: Gender): String = stringResource(
     if (gender == Gender.FEMALE) R.string.gender_female else R.string.gender_male,
 )
 
-@Composable
-internal fun activityLabel(level: ActivityLevel): String = stringResource(
-    when (level) {
-        ActivityLevel.SEDENTARY -> R.string.activity_sedentary
-        ActivityLevel.LIGHT -> R.string.activity_light
-        ActivityLevel.MODERATE -> R.string.activity_moderate
-        ActivityLevel.ACTIVE -> R.string.activity_active
-        ActivityLevel.ATHLETE -> R.string.activity_athlete
-    },
-)
 
 @Composable
 internal fun goalLabel(goal: HealthGoal): String = stringResource(
