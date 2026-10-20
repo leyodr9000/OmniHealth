@@ -18,6 +18,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -123,19 +127,6 @@ fun ChartAnalyticsScreen(
         }
 
         // 趋势解读：结论由确定性规则给出，模型只负责措辞（当前版本直接用规则文案）
-        state.weeklyReview?.let { review ->
-            item { WeeklyReviewCard(review = review, onOpenRecords = onOpenRecords, onOpenReminders = onOpenReminders) }
-        }
-
-        state.weightInsight?.let { insight ->
-            item { TrendInsightCard(title = stringResource(R.string.trend_weight_title), insight = insight) }
-        }
-        state.calorieInsight?.let { insight ->
-            item { TrendInsightCard(title = stringResource(R.string.trend_calorie_title), insight = insight) }
-        }
-        state.stepsInsight?.let { insight ->
-            item { TrendInsightCard(title = stringResource(R.string.trend_steps_title), insight = insight) }
-        }
 
         if (!state.hasData) {
             item {
@@ -277,6 +268,19 @@ fun ChartAnalyticsScreen(
                 }
             }
         }
+        state.weeklyReview?.let { review ->
+            item { WeeklyReviewCard(review = review, onOpenRecords = onOpenRecords, onOpenReminders = onOpenReminders) }
+        }
+
+        if (selected == 0) state.weightInsight?.let { insight ->
+            item { TrendInsightCard(title = stringResource(R.string.trend_weight_title), insight = insight) }
+        }
+        if (selected == 0) state.calorieInsight?.let { insight ->
+            item { TrendInsightCard(title = stringResource(R.string.trend_calorie_title), insight = insight) }
+        }
+        if (selected == 0) state.stepsInsight?.let { insight ->
+            item { TrendInsightCard(title = stringResource(R.string.trend_steps_title), insight = insight) }
+        }
     }
 }
 
@@ -358,18 +362,30 @@ private fun TrendInsightCard(
             fontWeight = FontWeight.SemiBold,
             modifier = Modifier.padding(top = 6.dp),
         )
+        // 依据与限制默认收起：首屏只留一句结论，需要时再展开
+        var expanded by remember { mutableStateOf(false) }
         Text(
-            text = insight.evidence,
-            color = palette.textTertiary,
+            text = if (expanded) stringResource(R.string.trend_hide_basis) else stringResource(R.string.trend_show_basis),
+            color = palette.accent,
             fontSize = 10.sp,
-            modifier = Modifier.padding(top = 4.dp),
+            modifier = Modifier
+                .padding(top = 4.dp)
+                .quietClick { expanded = !expanded },
         )
-        Text(
-            text = insight.limitation,
-            color = palette.textTertiary.copy(alpha = 0.85f),
-            fontSize = 10.sp,
-            modifier = Modifier.padding(top = 2.dp),
-        )
+        if (expanded) {
+            Text(
+                text = insight.evidence,
+                color = palette.textTertiary,
+                fontSize = 10.sp,
+                modifier = Modifier.padding(top = 4.dp),
+            )
+            Text(
+                text = insight.limitation,
+                color = palette.textTertiary.copy(alpha = 0.85f),
+                fontSize = 10.sp,
+                modifier = Modifier.padding(top = 2.dp),
+            )
+        }
     }
 }
 

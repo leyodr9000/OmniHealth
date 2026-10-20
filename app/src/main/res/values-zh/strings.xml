@@ -320,4 +320,6 @@
     <string name="save_as_template">存为套餐</string>
     <string name="save_template_done">已保存</string>
     <string name="meal_empty">未记录</string>
+    <string name="trend_show_basis">查看依据</string>
+    <string name="trend_hide_basis">收起依据</string>
 </resources>

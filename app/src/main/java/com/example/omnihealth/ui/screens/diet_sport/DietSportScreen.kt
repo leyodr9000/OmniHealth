@@ -5,6 +5,11 @@ import android.app.Application
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -124,6 +129,13 @@ fun DietSportScreen(
     val cardContext = androidx.compose.ui.platform.LocalContext.current
 
     Box(Modifier.fillMaxSize()) {
+    AnimatedContent(
+        targetState = tab,
+        transitionSpec = {
+            slideInHorizontally(tween(220)) { it / 4 } togetherWith slideOutHorizontally(tween(220)) { -it / 4 }
+        },
+        label = "dietSportTab",
+    ) { page ->
     LazyColumn(
         modifier = Modifier
             .fillMaxWidth()
@@ -133,7 +145,7 @@ fun DietSportScreen(
     ) {
         item {
             Text(
-                text = if (tab == 0) stringResource(R.string.diet_tab).replace("🍽 ", "") else stringResource(R.string.sport_tab).replace("🏃 ", ""),
+                text = if (page == 0) stringResource(R.string.diet_tab) else stringResource(R.string.sport_tab),
                 color = palette.textPrimary,
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
@@ -144,9 +156,8 @@ fun DietSportScreen(
                 fontSize = 12.sp,
                 modifier = Modifier.padding(top = 3.dp),
             )
-            if (tab == 0) {
-                Spacer(Modifier.height(10.dp))
-                Row(verticalAlignment = Alignment.CenterVertically) {
+            Spacer(Modifier.height(10.dp))
+            Row(verticalAlignment = Alignment.CenterVertically) {
                     DayStepper(label = "‹", enabled = true, onClick = { viewModel.shiftDay(-1) })
                     Text(
                         text = dayLabel(diet.day),
@@ -158,9 +169,8 @@ fun DietSportScreen(
                     DayStepper(
                         label = "›",
                         enabled = diet.day < TimeUtils.epochDayNow(),
-                        onClick = { viewModel.shiftDay(1) },
-                    )
-                }
+                    onClick = { viewModel.shiftDay(1) },
+                )
             }
         }
 
@@ -172,7 +182,7 @@ fun DietSportScreen(
             )
         }
 
-        if (tab == 0) {
+        if (page == 0) {
             item { AppearOnScreen(0) { CalorieSummaryCard(diet) } }
 
             item {
@@ -183,7 +193,7 @@ fun DietSportScreen(
                 )
             }
 
-            if (tab == 0) {
+            if (page == 0) {
                 if (recentFoods.isNotEmpty()) {
                     item {
                         Column {
@@ -464,6 +474,7 @@ fun DietSportScreen(
                 }
             }
         }
+    }
     }
 
     pendingUndo?.let { log ->

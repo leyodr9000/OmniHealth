@@ -320,4 +320,6 @@
     <string name="save_as_template">Save this as a combo</string>
     <string name="save_template_done">Saved</string>
     <string name="meal_empty">not logged</string>
+    <string name="trend_show_basis">Show basis</string>
+    <string name="trend_hide_basis">Hide basis</string>
 </resources>
