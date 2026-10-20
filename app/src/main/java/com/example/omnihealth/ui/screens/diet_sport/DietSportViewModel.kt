@@ -159,12 +159,18 @@ class DietSportViewModel(
         mealType: String = MealType.LUNCH,
         epochDay: Long = _selectedDay.value,
     ) {
-        viewModelScope.launch { repository.logFood(food, grams, mealType, epochDay) }
+        viewModelScope.launch {
+            runCatching { repository.logFood(food, grams, mealType, epochDay) }
+                .onFailure { _error.value = "save_failed" }
+        }
     }
 
     /** 编辑已有记录：只改克数与餐次，日期与时间保持不变。 */
     fun updateLog(log: DietLogEntity, grams: Float, mealType: String) {
-        viewModelScope.launch { repository.updateDietLog(log, grams, mealType) }
+        viewModelScope.launch {
+            runCatching { repository.updateDietLog(log, grams, mealType) }
+                .onFailure { _error.value = "save_failed" }
+        }
     }
 
     /* ---------------- 一句话记餐 ---------------- */
@@ -314,6 +320,14 @@ class DietSportViewModel(
             }
             _drafts.value = emptyList()
         }
+    }
+
+    /** 最近一次写入失败；UI 消费后置空，避免重复弹提示。 */
+    private val _error = MutableStateFlow<String?>(null)
+    val error: StateFlow<String?> = _error
+
+    fun consumeError() {
+        _error.value = null
     }
 
     private val _pendingUndo = MutableStateFlow<DietLogEntity?>(null)

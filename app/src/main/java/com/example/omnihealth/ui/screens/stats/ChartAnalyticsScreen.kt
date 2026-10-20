@@ -137,6 +137,18 @@ fun ChartAnalyticsScreen(
                         color = palette.textSecondary,
                         fontSize = 12.sp,
                     )
+                    Text(
+                        text = stringResource(R.string.empty_go_log),
+                        color = palette.accent,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        modifier = Modifier
+                            .padding(top = 10.dp)
+                            .clip(RoundedCornerShape(10.dp))
+                            .background(palette.accent.copy(alpha = 0.10f))
+                            .quietClick(onClick = onOpenRecords)
+                            .padding(horizontal = 12.dp, vertical = 8.dp),
+                    )
                 }
             }
         }

@@ -118,6 +118,7 @@ fun DietSportScreen(
     ) { viewModel.refreshSensorPermission() }
 
     val pendingUndo by viewModel.pendingUndo.collectAsStateWithLifecycle()
+    val writeError by viewModel.error.collectAsStateWithLifecycle()
     val drafts by viewModel.drafts.collectAsStateWithLifecycle()
     var smartOpen by remember { mutableStateOf(false) }
     var planOpen by remember { mutableStateOf(false) }
@@ -373,12 +374,26 @@ fun DietSportScreen(
             if (query.isNotBlank()) {
                 if (results.isEmpty()) {
                     item {
-                        Text(
-                            text = stringResource(R.string.diet_search_empty),
-                            color = palette.textTertiary,
-                            fontSize = 12.sp,
-                            modifier = Modifier.padding(vertical = 12.dp),
-                        )
+                        Column {
+                            Text(
+                                text = stringResource(R.string.diet_search_empty),
+                                color = palette.textTertiary,
+                                fontSize = 12.sp,
+                                modifier = Modifier.padding(top = 12.dp),
+                            )
+                            Text(
+                                text = stringResource(R.string.empty_describe_meal),
+                                color = palette.accent,
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Medium,
+                                modifier = Modifier
+                                    .padding(top = 8.dp)
+                                    .clip(RoundedCornerShape(10.dp))
+                                    .background(palette.accent.copy(alpha = 0.10f))
+                                    .quietClick { smartOpen = true }
+                                    .padding(horizontal = 12.dp, vertical = 8.dp),
+                            )
+                        }
                     }
                 } else {
                     items(results, key = { "s-${it.id}" }, contentType = { "food" }) { food ->
@@ -476,6 +491,17 @@ fun DietSportScreen(
             }
         }
     }
+    }
+
+    writeError?.let {
+        UndoBar(
+            text = stringResource(R.string.write_failed),
+            actionLabel = stringResource(R.string.dismiss),
+            onAction = { viewModel.consumeError() },
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(horizontal = 18.dp, vertical = 12.dp),
+        )
     }
 
     pendingUndo?.let { log ->

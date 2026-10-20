@@ -329,4 +329,8 @@
     <string name="plan_estimate_note">Estimated from reference portions; weigh when you can</string>
     <string name="sleep_today">Today</string>
     <string name="sleep_last_night">Last night</string>
+    <string name="empty_go_log">Log a first entry</string>
+    <string name="empty_describe_meal">Or describe the meal in one sentence</string>
+    <string name="write_failed">Could not save — your entry was kept</string>
+    <string name="dismiss">Dismiss</string>
 </resources>

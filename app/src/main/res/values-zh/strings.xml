@@ -329,4 +329,8 @@
     <string name="plan_estimate_note">按参考份量估算，实际以称重为准</string>
     <string name="sleep_today">今天</string>
     <string name="sleep_last_night">昨晚</string>
+    <string name="empty_go_log">先记一条</string>
+    <string name="empty_describe_meal">或者直接用一句话描述这一餐</string>
+    <string name="write_failed">保存失败，输入已保留</string>
+    <string name="dismiss">知道了</string>
 </resources>
