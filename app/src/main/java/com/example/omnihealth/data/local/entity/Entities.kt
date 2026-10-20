@@ -193,3 +193,29 @@ object AiReportKind {
     const val WEEKLY = "WEEKLY"
     const val CHAT = "CHAT"
 }
+
+/**
+ * 我的套餐：一条可复用的餐食组合。
+ *
+ * payload 是 [TemplateItem] 的 JSON 数组；之所以不做成关联表，
+ * 是因为套餐本身就是「一次性快照」，不随食物库变化而改变。
+ */
+@Serializable
+@Entity(tableName = "meal_templates")
+data class MealTemplateEntity(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0L,
+    val name: String,
+    val payload: String,
+    val createdAt: Long = System.currentTimeMillis(),
+)
+
+@Serializable
+data class TemplateItem(
+    val foodId: Long?,
+    val foodName: String,
+    val grams: Float,
+    val calories: Float,
+    val protein: Float,
+    val carbs: Float,
+    val fat: Float,
+)

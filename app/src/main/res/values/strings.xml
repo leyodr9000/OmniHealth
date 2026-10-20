@@ -316,4 +316,8 @@
     <string name="copy_last_meal">Copy last %1$s</string>
     <string name="copy_last_done">Copied %1$d items</string>
     <string name="copy_last_empty">No earlier meal of this type</string>
+    <string name="templates_title">My combos</string>
+    <string name="save_as_template">Save this as a combo</string>
+    <string name="save_template_done">Saved</string>
+    <string name="meal_empty">not logged</string>
 </resources>

@@ -10,6 +10,10 @@ import com.example.omnihealth.data.local.entity.AiReportEntity
 import com.example.omnihealth.data.local.entity.AiReportKind
 import com.example.omnihealth.data.local.entity.DietLogEntity
 import com.example.omnihealth.data.local.entity.FoodEntity
+import com.example.omnihealth.data.local.entity.MealTemplateEntity
+import com.example.omnihealth.data.local.entity.TemplateItem
+import kotlinx.serialization.builtins.ListSerializer
+import kotlinx.serialization.json.Json
 import com.example.omnihealth.data.local.entity.HabitEntity
 import com.example.omnihealth.data.local.entity.HabitLogEntity
 import com.example.omnihealth.data.local.entity.MealType
@@ -150,6 +154,48 @@ class HealthRepository(
         db.dietDao().observeRecentFoods(limit)
 
     suspend fun foodById(id: Long): FoodEntity? = db.dietDao().foodById(id)
+
+    /* ---------------- 我的套餐 ---------------- */
+
+    fun templates(): Flow<List<MealTemplateEntity>> = db.dietDao().observeTemplates()
+
+    /** 把一组记录存成套餐快照（保留当时的营养值，不随食物库变化）。 */
+    suspend fun saveTemplate(name: String, items: List<DietLogEntity>): Long {
+        val payload = Json.encodeToString(
+            ListSerializer(TemplateItem.serializer()),
+            items.map {
+                TemplateItem(it.foodId, it.foodName, it.grams, it.calories, it.protein, it.carbs, it.fat)
+            },
+        )
+        return db.dietDao().insertTemplate(MealTemplateEntity(name = name, payload = payload))
+    }
+
+    suspend fun deleteTemplate(id: Long) = db.dietDao().deleteTemplate(id)
+
+    /** 一键记录套餐：营养值取自快照，保证与保存当时一致。 */
+    suspend fun logTemplate(template: MealTemplateEntity, mealType: String, epochDay: Long): Int {
+        val items = runCatching {
+            Json.decodeFromString(ListSerializer(TemplateItem.serializer()), template.payload)
+        }.getOrDefault(emptyList())
+        val now = System.currentTimeMillis()
+        items.forEachIndexed { index, item ->
+            db.dietDao().insertLog(
+                DietLogEntity(
+                    foodId = item.foodId,
+                    foodName = item.foodName,
+                    grams = item.grams,
+                    mealType = mealType,
+                    calories = item.calories,
+                    protein = item.protein,
+                    carbs = item.carbs,
+                    fat = item.fat,
+                    epochDay = epochDay,
+                    timestamp = now + index,
+                ),
+            )
+        }
+        return items.size
+    }
 
     /** 上一次同类餐的条目，用于「复制上一餐」。 */
     suspend fun lastMeal(mealType: String): List<DietLogEntity> = db.dietDao().lastMeal(mealType)

@@ -316,4 +316,8 @@
     <string name="copy_last_meal">复制上次%1$s</string>
     <string name="copy_last_done">已复制 %1$d 条</string>
     <string name="copy_last_empty">还没有同餐次的记录</string>
+    <string name="templates_title">我的套餐</string>
+    <string name="save_as_template">存为套餐</string>
+    <string name="save_template_done">已保存</string>
+    <string name="meal_empty">未记录</string>
 </resources>

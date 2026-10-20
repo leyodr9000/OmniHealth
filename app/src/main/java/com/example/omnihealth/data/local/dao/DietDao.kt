@@ -7,6 +7,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.example.omnihealth.data.local.entity.DietLogEntity
+import com.example.omnihealth.data.local.entity.MealTemplateEntity
 import com.example.omnihealth.data.local.entity.FoodEntity
 import kotlinx.coroutines.flow.Flow
 
@@ -58,6 +59,15 @@ interface DietDao {
         """,
     )
     suspend fun lastMeal(mealType: String): List<DietLogEntity>
+
+    @Query("SELECT * FROM meal_templates ORDER BY createdAt DESC LIMIT 8")
+    fun observeTemplates(): Flow<List<MealTemplateEntity>>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertTemplate(template: MealTemplateEntity): Long
+
+    @Query("DELETE FROM meal_templates WHERE id = :id")
+    suspend fun deleteTemplate(id: Long)
 
     @Query("SELECT * FROM foods WHERE id = :id")
     suspend fun foodById(id: Long): FoodEntity?

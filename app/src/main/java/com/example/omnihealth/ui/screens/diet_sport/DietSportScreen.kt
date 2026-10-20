@@ -118,6 +118,7 @@ fun DietSportScreen(
     var planOpen by remember { mutableStateOf(false) }
     val plans by viewModel.plans.collectAsStateWithLifecycle()
     val recentFoods by viewModel.recentFoods.collectAsStateWithLifecycle()
+    val templates by viewModel.templates.collectAsStateWithLifecycle()
     var pendingGrams by remember { mutableStateOf<Float?>(null) }
     val cardScope = rememberCoroutineScope()
     val cardContext = androidx.compose.ui.platform.LocalContext.current
@@ -217,6 +218,40 @@ fun DietSportScreen(
                         }
                     }
                 }
+                if (templates.isNotEmpty()) {
+                    item {
+                        Column {
+                            Text(
+                                text = stringResource(R.string.templates_title),
+                                color = palette.textTertiary,
+                                fontSize = 10.sp,
+                                modifier = Modifier.padding(bottom = 6.dp),
+                            )
+                            LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                items(templates, key = { "t-${it.id}" }) { template ->
+                                    Text(
+                                        text = template.name,
+                                        color = palette.textPrimary,
+                                        fontSize = 11.sp,
+                                        modifier = Modifier
+                                            .clip(RoundedCornerShape(9.dp))
+                                            .background(palette.accent.copy(alpha = 0.09f))
+                                            .quietClick {
+                                                viewModel.logTemplate(template, viewModel.mealTypeForNow()) { count ->
+                                                    android.widget.Toast.makeText(
+                                                        cardContext,
+                                                        cardContext.getString(R.string.copy_last_done, count),
+                                                        android.widget.Toast.LENGTH_SHORT,
+                                                    ).show()
+                                                }
+                                            }
+                                            .padding(horizontal = 10.dp, vertical = 7.dp),
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
                 item {
                     Text(
                         text = stringResource(R.string.copy_last_meal, mealLabel(viewModel.mealTypeForNow())),
@@ -230,6 +265,27 @@ fun DietSportScreen(
                                 viewModel.copyLastMeal(viewModel.mealTypeForNow()) { count ->
                                     val message = if (count > 0) {
                                         cardContext.getString(R.string.copy_last_done, count)
+                                    } else {
+                                        cardContext.getString(R.string.copy_last_empty)
+                                    }
+                                    android.widget.Toast.makeText(cardContext, message, android.widget.Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                            .padding(horizontal = 12.dp, vertical = 8.dp),
+                    )
+                }
+                item {
+                    Text(
+                        text = stringResource(R.string.save_as_template),
+                        color = palette.textSecondary,
+                        fontSize = 11.sp,
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(9.dp))
+                            .background(palette.textPrimary.copy(alpha = 0.05f))
+                            .quietClick {
+                                viewModel.saveLastMealAsTemplate(viewModel.mealTypeForNow()) { ok ->
+                                    val message = if (ok) {
+                                        cardContext.getString(R.string.save_template_done)
                                     } else {
                                         cardContext.getString(R.string.copy_last_empty)
                                     }
@@ -264,13 +320,41 @@ fun DietSportScreen(
                         subtitle = "${diet.calories} kcal",
                     )
                 }
-                items(diet.logs, key = { "l-${it.id}" }, contentType = { "log" }) { log ->
-                    Box(Modifier.animateItem()) {
-                        LogRow(
-                            log = log,
-                            onEdit = { editing = log },
-                            onDelete = { viewModel.deleteLog(log) },
-                        )
+                listOf(
+                    MealType.BREAKFAST to R.string.meal_breakfast,
+                    MealType.LUNCH to R.string.meal_lunch,
+                    MealType.DINNER to R.string.meal_dinner,
+                    MealType.SNACK to R.string.meal_snack,
+                ).forEach { (mealId, labelRes) ->
+                    val group = diet.logs.filter { it.mealType == mealId }
+                    item {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(
+                                text = stringResource(labelRes),
+                                color = palette.textSecondary,
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Medium,
+                                modifier = Modifier.weight(1f),
+                            )
+                            Text(
+                                text = if (group.isEmpty()) {
+                                    stringResource(R.string.meal_empty)
+                                } else {
+                                    "${group.sumOf { it.calories.toDouble() }.toInt()} kcal"
+                                },
+                                color = palette.textTertiary,
+                                fontSize = 10.sp,
+                            )
+                        }
+                    }
+                    items(group, key = { "l-${it.id}" }, contentType = { "log" }) { log ->
+                        Box(Modifier.animateItem()) {
+                            LogRow(
+                                log = log,
+                                onEdit = { editing = log },
+                                onDelete = { viewModel.deleteLog(log) },
+                            )
+                        }
                     }
                 }
             }

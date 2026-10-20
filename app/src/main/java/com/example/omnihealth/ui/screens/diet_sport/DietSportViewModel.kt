@@ -228,6 +228,45 @@ class DietSportViewModel(
     suspend fun foodById(id: Long): com.example.omnihealth.data.local.entity.FoodEntity? =
         repository.foodById(id)
 
+    /* ---------------- 我的套餐 ---------------- */
+
+    val templates: StateFlow<List<com.example.omnihealth.data.local.entity.MealTemplateEntity>> =
+        repository.templates()
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
+    /** 把「上一次同类餐」存成套餐，名字按餐次自动生成。 */
+    fun saveLastMealAsTemplate(mealType: String, onDone: (Boolean) -> Unit = {}) {
+        viewModelScope.launch {
+            val items = repository.lastMeal(mealType)
+            if (items.isEmpty()) {
+                onDone(false)
+                return@launch
+            }
+            val label = when (mealType) {
+                MealType.BREAKFAST -> "早餐套餐"
+                MealType.LUNCH -> "午餐套餐"
+                MealType.DINNER -> "晚餐套餐"
+                else -> "加餐套餐"
+            }
+            repository.saveTemplate(label, items)
+            onDone(true)
+        }
+    }
+
+    fun logTemplate(
+        template: com.example.omnihealth.data.local.entity.MealTemplateEntity,
+        mealType: String,
+        onDone: (Int) -> Unit = {},
+    ) {
+        viewModelScope.launch {
+            onDone(repository.logTemplate(template, mealType, _selectedDay.value))
+        }
+    }
+
+    fun deleteTemplate(id: Long) {
+        viewModelScope.launch { repository.deleteTemplate(id) }
+    }
+
     /* ---------------- 帮我搭配 ---------------- */
 
     private val _plans = MutableStateFlow<List<MealPlanner.Plan>>(emptyList())

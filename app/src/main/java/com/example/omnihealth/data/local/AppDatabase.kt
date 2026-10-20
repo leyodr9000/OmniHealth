@@ -13,6 +13,7 @@ import com.example.omnihealth.data.local.dao.StepDao
 import com.example.omnihealth.data.local.dao.VitalDao
 import com.example.omnihealth.data.local.entity.AiReportEntity
 import com.example.omnihealth.data.local.entity.DietLogEntity
+import com.example.omnihealth.data.local.entity.MealTemplateEntity
 import com.example.omnihealth.data.local.entity.FoodEntity
 import com.example.omnihealth.data.local.entity.HabitEntity
 import com.example.omnihealth.data.local.entity.HabitLogEntity
@@ -30,11 +31,12 @@ import kotlinx.coroutines.launch
         HabitLogEntity::class,
         FoodEntity::class,
         DietLogEntity::class,
+        MealTemplateEntity::class,
         StepEntity::class,
         WorkoutEntity::class,
         AiReportEntity::class,
     ],
-    version = 2,
+    version = 3,
     exportSchema = false,
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -63,7 +65,22 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
-        private val MIGRATIONS: Array<Migration> = arrayOf(MIGRATION_1_2)
+        private val MIGRATION_2_3 = object : Migration(2, 3) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    """
+                    CREATE TABLE IF NOT EXISTS meal_templates (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                        name TEXT NOT NULL,
+                        payload TEXT NOT NULL,
+                        createdAt INTEGER NOT NULL
+                    )
+                    """.trimIndent(),
+                )
+            }
+        }
+
+        private val MIGRATIONS: Array<Migration> = arrayOf(MIGRATION_1_2, MIGRATION_2_3)
 
         fun build(context: Context, scope: CoroutineScope): AppDatabase =
             INSTANCE ?: synchronized(this) {
