@@ -60,6 +60,22 @@ class TodayWidgetProvider : AppWidgetProvider() {
         views.setOnClickPendingIntent(R.id.widget_calories, pendingIntent)
         views.setOnClickPendingIntent(R.id.widget_detail, pendingIntent)
 
+        // 小组件跟随系统深浅色：不跟主题走会突兀
+        val night = (context.resources.configuration.uiMode and
+            android.content.res.Configuration.UI_MODE_NIGHT_MASK) ==
+            android.content.res.Configuration.UI_MODE_NIGHT_YES
+        views.setInt(
+            R.id.widget_root,
+            "setBackgroundResource",
+            if (night) R.drawable.widget_bg else R.drawable.widget_bg_light,
+        )
+        val titleColor = if (night) 0xFF8A93A3.toInt() else 0xFF6B7686.toInt()
+        val valueColor = if (night) 0xFFF1F4F9.toInt() else 0xFF10141C.toInt()
+        val detailColor = if (night) 0xFFA7B2C4.toInt() else 0xFF5A6472.toInt()
+        views.setTextColor(R.id.widget_title, titleColor)
+        views.setTextColor(R.id.widget_calories, valueColor)
+        views.setTextColor(R.id.widget_detail, detailColor)
+
         if (today == null) {
             views.setTextViewText(R.id.widget_calories, "—")
             views.setTextViewText(R.id.widget_detail, context.getString(R.string.widget_hint))

@@ -188,7 +188,7 @@ fun HomeScreen(
                     title = stringResource(R.string.home_water),
                     value = String.format(Locale.US, "%.2f", animatedFloat(state.waterMl / 1000f)),
                     unit = "L",
-                    accent = Color(0xFF4FB3FF),
+                    accent = palette.water,
                     progress = if (state.hasWater) state.waterProgress else null,
                     hint = if (state.hasWater) stringResource(
                         R.string.home_goal_water,
@@ -208,7 +208,7 @@ fun HomeScreen(
                     title = stringResource(R.string.home_sleep),
                     value = String.format(Locale.US, "%.1f", animatedFloat(state.sleepHours)),
                     unit = "h",
-                    accent = Color(0xFF8B7CFF),
+                    accent = palette.sleep,
                     progress = if (state.hasSleep) state.sleepProgress else null,
                     hint = if (state.hasSleep) stringResource(
                         R.string.home_goal_sleep,
@@ -223,7 +223,7 @@ fun HomeScreen(
                     title = stringResource(R.string.home_calories),
                     value = formatInt(animatedInt(state.caloriesIn)),
                     unit = "kcal",
-                    accent = Color(0xFFFF8A5B),
+                    accent = palette.calorie,
                     progress = if (state.hasCalories) state.calorieProgress else null,
                     hint = if (state.hasCalories) stringResource(R.string.home_remaining, state.caloriesLeft) else stringResource(R.string.home_not_recorded),
                     unrecorded = !state.hasCalories,
@@ -503,8 +503,8 @@ private fun HealthScoreCard(state: HomeUiState) {
                 Spacer(Modifier.height(8.dp))
                 ScoreBar(stringResource(R.string.dim_nutrition), state.score.nutrition / 100f, palette.accent)
                 ScoreBar(stringResource(R.string.dim_activity), state.score.activity / 100f, palette.accentAlt)
-                ScoreBar(stringResource(R.string.dim_sleep), state.score.sleep / 100f, Color(0xFF8B7CFF))
-                ScoreBar(stringResource(R.string.dim_hydration), state.score.hydration / 100f, Color(0xFF4FB3FF))
+                ScoreBar(stringResource(R.string.dim_sleep), state.score.sleep / 100f, palette.sleep)
+                ScoreBar(stringResource(R.string.dim_hydration), state.score.hydration / 100f, palette.water)
             }
         }
         Spacer(Modifier.height(10.dp))

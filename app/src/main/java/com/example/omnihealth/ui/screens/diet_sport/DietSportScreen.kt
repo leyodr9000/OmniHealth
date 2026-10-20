@@ -138,7 +138,8 @@ fun DietSportScreen(
     ) { page ->
     LazyColumn(
         modifier = Modifier
-            .fillMaxWidth()
+            .fillMaxSize()
+            .background(palette.bgBottom)
             .statusBarsPadding(),
         contentPadding = PaddingValues(start = 18.dp, end = 18.dp, top = 8.dp, bottom = 28.dp),
         verticalArrangement = Arrangement.spacedBy(14.dp),
@@ -421,7 +422,7 @@ fun DietSportScreen(
                         title = stringResource(R.string.sport_today_workouts),
                         value = "${animatedInt(sport.burned)}",
                         unit = "kcal",
-                        accent = Color(0xFFFF8A5B),
+                        accent = palette.calorie,
                         progress = (sport.burned / 400f).coerceIn(0f, 1f),
                         hint = stringResource(R.string.sport_burned, sport.burned),
                         modifier = Modifier.weight(1f),
@@ -755,7 +756,7 @@ private fun CalorieSummaryCard(diet: DietUiState) {
             ProgressRing(
                 progress = diet.progress,
                 modifier = Modifier.size(86.dp),
-                ringColor = Color(0xFFFF8A5B),
+                ringColor = palette.calorie,
                 strokeWidth = 8.dp,
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
