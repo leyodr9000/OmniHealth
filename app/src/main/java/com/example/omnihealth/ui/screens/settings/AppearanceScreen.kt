@@ -223,7 +223,7 @@ fun AppearanceScreen(
 
         item {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                NavLayoutMode.entries.forEach { mode ->
+                NavLayoutMode.selectable.forEach { mode ->
                     LayoutOption(
                         mode = mode,
                         selected = mode == layoutMode,

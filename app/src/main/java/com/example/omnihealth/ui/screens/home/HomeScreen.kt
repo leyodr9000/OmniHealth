@@ -53,6 +53,7 @@ import androidx.compose.material.icons.rounded.WaterDrop
 import com.example.omnihealth.R
 import com.example.omnihealth.ui.components.AppearOnScreen
 import com.example.omnihealth.ui.components.MetricTile
+import com.example.omnihealth.ui.components.QuickLogType
 import com.example.omnihealth.ui.components.ProgressRing
 import com.example.omnihealth.ui.components.animatedFloat
 import com.example.omnihealth.ui.components.animatedFraction
@@ -75,7 +76,7 @@ fun HomeScreen(
     onOpenDiet: () -> Unit,
     onOpenStats: () -> Unit,
     onOpenAi: () -> Unit,
-    onQuickLog: () -> Unit,
+    onQuickLog: (QuickLogType) -> Unit,
 ) {
     val repository = LocalHealthRepository.current
     val viewModel: HomeViewModel = viewModel(
@@ -180,7 +181,7 @@ fun HomeScreen(
                     hint = if (state.hasSteps) stringResource(R.string.home_goal_steps, formatInt(state.stepGoal)) else stringResource(R.string.home_not_recorded),
                     unrecorded = !state.hasSteps,
                     modifier = Modifier.weight(1f),
-                    onClick = onQuickLog,
+                    onClick = { onQuickLog(QuickLogType.STEPS) },
                 )
                 MetricTile(
                     icon = Icons.Rounded.WaterDrop,
@@ -195,7 +196,7 @@ fun HomeScreen(
                     ) else stringResource(R.string.home_not_recorded),
                     unrecorded = !state.hasWater,
                     modifier = Modifier.weight(1f),
-                    onClick = onQuickLog,
+                    onClick = { onQuickLog(QuickLogType.STEPS) },
                 )
             }
         }
@@ -215,7 +216,7 @@ fun HomeScreen(
                     ) else stringResource(R.string.home_not_recorded),
                     unrecorded = !state.hasSleep,
                     modifier = Modifier.weight(1f),
-                    onClick = onQuickLog,
+                    onClick = { onQuickLog(QuickLogType.STEPS) },
                 )
                 MetricTile(
                     icon = Icons.Rounded.LocalFireDepartment,

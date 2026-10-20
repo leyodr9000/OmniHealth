@@ -92,7 +92,14 @@ enum class NavLayoutMode(
     ;
 
     companion object {
-        fun from(id: String?): NavLayoutMode = entries.firstOrNull { it.id == id } ?: A_FAB
+        /** 可在设置里选择的布局：C 的悬浮胶囊已下线，只保留两种常规底栏。 */
+        val selectable: List<NavLayoutMode> = listOf(A_FAB, B_FIVE)
+        /** 旧的 layout_c 数据会被当作 B，避免用户升级后落回一个不存在的形态。 */
+        fun from(id: String?): NavLayoutMode = when (id) {
+            A_FAB.id -> A_FAB
+            B_FIVE.id, C_BENTO.id -> B_FIVE
+            else -> B_FIVE
+        }
     }
 }
 
@@ -119,7 +126,7 @@ fun AdaptiveBottomBar(
         when (layout) {
             NavLayoutMode.A_FAB -> FabNavBar(items, currentRoute, hazeState, liquid, onSelect, onQuickLog, palette)
             NavLayoutMode.B_FIVE -> WideNavBar(items, currentRoute, hazeState, liquid, onSelect, palette)
-            NavLayoutMode.C_BENTO -> PillNavBar(items, currentRoute, hazeState, liquid, onSelect, palette)
+            NavLayoutMode.C_BENTO -> WideNavBar(items, currentRoute, hazeState, liquid, onSelect, palette)
         }
     }
 }

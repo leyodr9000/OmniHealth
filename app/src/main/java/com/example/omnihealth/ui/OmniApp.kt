@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -64,7 +65,7 @@ fun OmniApp(
     val palette = OmniTheme.palette
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = backStackEntry?.destination?.route
-    var quickLogOpen by remember { mutableStateOf(false) }
+    var quickLogType by remember { mutableStateOf<QuickLogType?>(null) }
     val hazeState = rememberHazeState()
     val liquid = framework == UiFramework.MIUIX
 
@@ -83,12 +84,13 @@ fun OmniApp(
                     hazeState = hazeState,
                     onSelect = { dest -> navController.navigateSingleTop(dest) },
                     liquid = liquid,
-                    onQuickLog = { quickLogOpen = true },
+                    onQuickLog = { quickLogType = QuickLogType.WATER },
                 )
             },
         ) { innerPadding ->
             // 底部安全区只由 Scaffold 计算一次：页面不再自行加底部补偿，
             // 避免出现「谁的 padding 生效」这类边界错位。
+            // 底部安全区只由 Scaffold 计算一次，页面不再自行补偿。
             NavHost(
                 navController = navController,
                 startDestination = OmniDest.Home.route,
@@ -147,20 +149,20 @@ fun OmniApp(
                         onOpenDiet = { navController.navigateSingleTop(OmniDest.Diet) },
                         onOpenStats = { navController.navigateSingleTop(OmniDest.Stats) },
                         onOpenAi = { navController.navigateSingleTop(OmniDest.Ai) },
-                        onQuickLog = { quickLogOpen = true },
+                        onQuickLog = { type -> quickLogType = type },
                     )
                 }
                 composable(OmniDest.Diet.route) {
                     DietSportScreen(
                         initialTab = 0,
-                        onQuickLog = { quickLogOpen = true },
+                        onQuickLog = { type -> quickLogType = type },
                         onOpenSport = { navController.navigateSingleTop(OmniDest.Sport) },
                     )
                 }
                 composable(OmniDest.Sport.route) {
                     DietSportScreen(
                         initialTab = 1,
-                        onQuickLog = { quickLogOpen = true },
+                        onQuickLog = { type -> quickLogType = type },
                         onOpenSport = {},
                     )
                 }
@@ -188,11 +190,12 @@ fun OmniApp(
     }
     }
 
-    if (quickLogOpen) {
+    quickLogType?.let { initialType ->
         val repository = LocalHealthRepository.current
         val scope = rememberCoroutineScope()
         QuickLogBottomSheet(
-            onDismiss = { quickLogOpen = false },
+            initialType = initialType,
+            onDismiss = { quickLogType = null },
             onSave = { type, value ->
                 scope.launch {
                     when (type) {
@@ -203,7 +206,7 @@ fun OmniApp(
                         QuickLogType.MOOD -> repository.logMood(value)
                     }
                 }
-                quickLogOpen = false
+                quickLogType = null
             },
         )
     }

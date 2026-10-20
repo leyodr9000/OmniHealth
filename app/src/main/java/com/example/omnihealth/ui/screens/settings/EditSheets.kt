@@ -481,7 +481,7 @@ fun RemindersSheet(
 
                 ReminderRow(
                     title = stringResource(R.string.reminder_water),
-                    desc = stringResource(R.string.reminder_water_desc),
+                    desc = stringResource(R.string.reminder_water_desc, intervalHours),
                     checked = water,
                     onCheckedChange = onWaterChange,
                 )

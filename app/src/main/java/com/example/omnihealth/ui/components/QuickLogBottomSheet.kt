@@ -76,7 +76,7 @@ fun QuickLogBottomSheet(
 ) {
     val palette = OmniTheme.palette
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    var type by remember { mutableStateOf(initialType) }
+    var type by remember(initialType) { mutableStateOf(initialType) }
     var value by remember(initialType) { mutableStateOf(initialType.defaultValue) }
 
     ModalBottomSheet(

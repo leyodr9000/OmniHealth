@@ -224,7 +224,7 @@
     <string name="settings_version">版本 1.0.0</string>
     <string name="settings_back">返回</string>
     <string name="settings_appearance_title">外观</string>
-    <string name="settings_appearance_sub">主题框架、配色与语言</string>
+    <string name="settings_appearance_sub">框架、配色、语言、动效</string>
     <string name="framework_miuix">MIUIX</string>
     <string name="framework_md3">Material 3</string>
     <string name="settings_section_framework">界面框架</string>
@@ -236,7 +236,7 @@
     <string name="reminders_title">提醒</string>
     <string name="reminders_sub">本地通知，不经过服务器</string>
     <string name="reminder_water">饮水提醒</string>
-    <string name="reminder_water_desc">每 2 小时一次</string>
+    <string name="reminder_water_desc">在你的时段内每 %1$d 小时提醒一次</string>
     <string name="reminder_sleep">睡前提醒</string>
     <string name="reminder_sleep_desc">每天 22:30</string>
     <string name="reminder_on">已开启</string>

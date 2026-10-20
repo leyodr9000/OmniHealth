@@ -67,6 +67,7 @@ import com.example.omnihealth.domain.util.TimeUtils
 import com.example.omnihealth.ui.components.AppearOnScreen
 import com.example.omnihealth.ui.components.animatedInt
 import com.example.omnihealth.ui.components.MetricTile
+import com.example.omnihealth.ui.components.QuickLogType
 import com.example.omnihealth.ui.components.ProgressRing
 import com.example.omnihealth.ui.components.SectionHeader
 import com.example.omnihealth.ui.di.LocalHealthRepository
@@ -82,7 +83,7 @@ import java.util.Locale
 @Composable
 fun DietSportScreen(
     initialTab: Int = 0,
-    onQuickLog: () -> Unit,
+    onQuickLog: (QuickLogType) -> Unit,
     onOpenSport: () -> Unit,
 ) {
     val repository = LocalHealthRepository.current

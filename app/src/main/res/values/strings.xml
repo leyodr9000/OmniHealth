@@ -224,7 +224,7 @@
     <string name="settings_version">Version 1.0.0</string>
     <string name="settings_back">Back</string>
     <string name="settings_appearance_title">Appearance</string>
-    <string name="settings_appearance_sub">Theme framework, palette and language</string>
+    <string name="settings_appearance_sub">Framework, palette, language, motion</string>
     <string name="framework_miuix">MIUIX</string>
     <string name="framework_md3">Material 3</string>
     <string name="settings_section_framework">UI framework</string>
@@ -236,7 +236,7 @@
     <string name="reminders_title">Reminders</string>
     <string name="reminders_sub">Local notifications, no server involved</string>
     <string name="reminder_water">Hydration</string>
-    <string name="reminder_water_desc">Every 2 hours</string>
+    <string name="reminder_water_desc">Every %1$d h inside your window</string>
     <string name="reminder_sleep">Bedtime</string>
     <string name="reminder_sleep_desc">Daily at 22:30</string>
     <string name="reminder_on">On</string>
