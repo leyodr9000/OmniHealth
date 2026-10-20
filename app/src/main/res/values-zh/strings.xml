@@ -331,4 +331,7 @@
     <string name="widget_logged">kcal 已记录</string>
     <string name="review_fiber">本周纤维达标 %1$d/7 天</string>
     <string name="review_share_image">存成图片</string>
+    <string name="theme_monet_label">莫奈</string>
+    <string name="theme_monet_tagline">跟随壁纸取色</string>
+    <string name="theme_monet_blurb">从系统壁纸提取主色与表面色（Android 12 及以上）；不支持时退化为低饱和青灰。</string>
 </resources>

@@ -7,8 +7,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Shapes
 import androidx.compose.material3.Typography
+import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.dynamicDarkColorScheme
+import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
+import android.os.Build
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Immutable
@@ -16,6 +20,7 @@ import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
@@ -53,6 +58,13 @@ enum class ThemeMode(
         emoji = "🎨",
         taglineRes = R.string.theme_morandi_tagline,
         blurbRes = R.string.theme_morandi_blurb,
+    ),
+    MONET(
+        id = "monet",
+        labelRes = R.string.theme_monet_label,
+        emoji = "",
+        taglineRes = R.string.theme_monet_tagline,
+        blurbRes = R.string.theme_monet_blurb,
     ),
     CYBER_DARK(
         id = "cyber_dark",
@@ -141,8 +153,8 @@ private val MiuiPalette = OmniPalette(
     blobA = Color(0x2E7FA8E8),
     blobB = Color(0x249BB8D9),
     blobC = Color(0x1FC9D6E8),
-    accent = Color(0xFF2B6CF6),
-    accentAlt = Color(0xFF5B6B82),
+    accent = Color(0xFF5E6B76),
+    accentAlt = Color(0xFF8A7F72),
     water = Color(0xFF4FB3FF),
     sleep = Color(0xFF8B7CFF),
     calorie = Color(0xFFFF8A5B),
@@ -236,9 +248,48 @@ private val CyberPalette = OmniPalette(
     glass = false,
 )
 
+/**
+ * 莫奈色：优先跟随系统壁纸取色（Android 12+），不支持时退化为低饱和青灰。
+ *
+ * 只取壁纸里的主色/次色与表面色，语义色（饮水/睡眠/热量/成功/警告）仍用固定值，
+ * 避免壁纸偏色把"饮水蓝"染成别的颜色，导致含义漂移。
+ */
+fun monetPalette(scheme: ColorScheme, fallback: OmniPalette): OmniPalette = fallback.copy(
+    mode = ThemeMode.MONET,
+    dark = fallback.dark,
+    bgTop = scheme.background,
+    bgMid = scheme.background,
+    bgBottom = scheme.surfaceContainerLowest,
+    blobA = scheme.primary.copy(alpha = 0.10f),
+    blobB = scheme.secondary.copy(alpha = 0.08f),
+    blobC = scheme.tertiary.copy(alpha = 0.06f),
+    accent = scheme.primary,
+    accentAlt = scheme.secondary,
+    textPrimary = scheme.onBackground,
+    textSecondary = scheme.onSurfaceVariant,
+    textTertiary = scheme.onSurfaceVariant.copy(alpha = 0.7f),
+    cardFill = scheme.surfaceContainer,
+    cardStroke = scheme.outlineVariant,
+    cardHighlight = scheme.surfaceContainerHigh,
+    barFill = scheme.surfaceContainerHigh,
+    barStroke = scheme.outlineVariant,
+    chartColors = listOf(scheme.primary, scheme.secondary, scheme.tertiary, fallback.water, fallback.calorie),
+)
+
+/** 不支持动态取色时的莫奈兜底：低饱和、偏暖，避开"AI 蓝"。 */
+private val MonetFallbackPalette = MiuiPalette.copy(
+    mode = ThemeMode.MONET,
+    accent = Color(0xFF6E7F72),
+    accentAlt = Color(0xFF9A8574),
+    bgTop = Color(0xFFF3F2EE),
+    bgMid = Color(0xFFEFEEE9),
+    bgBottom = Color(0xFFE9E7E0),
+)
+
 fun paletteFor(mode: ThemeMode): OmniPalette = when (mode) {
     ThemeMode.MIUIX_GLASS -> MiuiPalette
     ThemeMode.MD3_MORANDI -> MorandiPalette
+    ThemeMode.MONET -> MonetFallbackPalette
     ThemeMode.CYBER_DARK -> CyberPalette
 }
 
@@ -405,8 +456,21 @@ fun OmniHealthTheme(
     dark: Boolean = false,
     content: @Composable () -> Unit,
 ) {
-    val base = remember(mode) { paletteFor(mode) }
-    val palette = remember(mode, dark) { if (dark) base.toDark() else base }
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val palette = remember(mode, dark, context) {
+        val fallback = paletteFor(mode)
+        val themed = if (dark) fallback.toDark() else fallback
+        if (mode == ThemeMode.MONET && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+            val dynamic = if (dark) {
+                androidx.compose.material3.dynamicDarkColorScheme(context)
+            } else {
+                androidx.compose.material3.dynamicLightColorScheme(context)
+            }
+            monetPalette(dynamic, themed)
+        } else {
+            themed
+        }
+    }
     val scheme = remember(palette) { colorSchemeFor(palette) }
     val typography = remember { omniTypography() }
     val shapes = remember(mode) { omniShapes(palette.corner) }
